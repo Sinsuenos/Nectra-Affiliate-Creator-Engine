@@ -133,7 +133,7 @@ export default function CompliancePage() {
           </h2>
 
           <p className="text-base text-muted-foreground leading-relaxed">
-            Before any output is generated, the Necter Engine checks content
+            Before any output is generated, the Nectar Engine checks content
             against each platform&apos;s current advertising, affiliate, and
             community policies. This matrix summarizes the key risk vectors the
             engine evaluates for every supported destination.
@@ -225,7 +225,7 @@ export default function CompliancePage() {
           whileInView="visible"
           viewport={{ once: true, margin: "-40px" }}
         >
-          Data reflects policies as of 2025. Necter Engine re-scans rules on
+          Data reflects policies as of 2025. Nectar Engine re-scans rules on
           each run to stay current.
         </motion.p>
       </section>

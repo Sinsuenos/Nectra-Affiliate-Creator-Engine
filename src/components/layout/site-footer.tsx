@@ -8,7 +8,7 @@ export function SiteFooter() {
               className="inline-block h-4 w-4 rounded-sm bg-electric"
               aria-hidden="true"
             />
-            Necter Engine
+            Nectar Engine
           </span>
 
           <nav
@@ -43,7 +43,7 @@ export function SiteFooter() {
         </div>
 
         <p className="mt-6 text-center text-[11px] text-muted-foreground/40 font-mono">
-          &copy; {new Date().getFullYear()} Necter Engine. All rights reserved.
+          &copy; {new Date().getFullYear()} Nectar Engine. All rights reserved.
         </p>
       </div>
     </footer>

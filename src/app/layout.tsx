@@ -18,11 +18,11 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Necter Engine — Affiliate Content Architecture System",
+  title: "Nectar Engine — Affiliate Content Architecture System",
   description:
     "A 9-module engine that architects, generates, and packages compliant affiliate content systems. Built for operators who need infrastructure, not templates.",
   keywords: [
-    "Necter Engine",
+    "Nectar Engine",
     "affiliate marketing",
     "content generation",
     "compliance automation",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
   },
   openGraph: {
-    title: "Necter Engine",
+    title: "Nectar Engine",
     description:
       "A 9-module engine that architects, generates, and packages compliant affiliate content systems.",
     type: "website",

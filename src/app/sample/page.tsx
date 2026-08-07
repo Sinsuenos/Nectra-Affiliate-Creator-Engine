@@ -74,6 +74,11 @@ const socialPosts = [
     character_count: 192,
     text: "Okay so I’ve been testing this wellness supplement for two weeks and honestly the biggest change is I stopped needing coffee at 2pm. Full transparency on ingredients, no proprietary blends. Lab tested. Check it out if you’re tired of supplements that do nothing.",
   },
+  {
+    platform: "Reddit",
+    character_count: 387,
+    text: "Is there actually a supplement brand that lists exact mg per ingredient instead of hiding behind \"proprietary blends\"? I’ve been comparing labels across a dozen products and almost all of them are opaque about dosages. Found one called Demo Offer that does full disclosure and third-party batch testing — their label shows every ingredient with the specific amount. Wondering if anyone here has experience with them or knows of other brands doing the same level of transparency. Not trying to shill anything, just genuinely trying to find products where I can verify what I’m actually putting in my body.",
+  },
 ];
 
 const ctaVariations = [
@@ -131,7 +136,7 @@ export default function SamplePage() {
           Sample Output: Demo Offer
         </h2>
         <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">
-          This is a full content toolkit as produced by the Necter Engine for a
+          This is a full content toolkit as produced by the Nectar Engine for a
           generic demo offer. Each block represents one output module from the
           9-module pipeline, from offer context through compliance scanning.
           All content is AI-generated, generic, and ready for human review.

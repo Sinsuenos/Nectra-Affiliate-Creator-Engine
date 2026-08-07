@@ -82,7 +82,7 @@ export default function Home() {
               className="bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm cursor-pointer"
             >
               <a href="#">
-                Get Necter Engine
+                Get Nectar Engine
                 <ChevronRight className="ml-2 h-4 w-4" />
               </a>
             </Button>

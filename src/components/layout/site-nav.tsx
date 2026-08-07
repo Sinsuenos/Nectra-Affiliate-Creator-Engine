@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/modules", label: "Modules" },
   { href: "/sample", label: "Sample Output" },
   { href: "/compliance", label: "Compliance" },
+  { href: "/generator", label: "Generator" },
 ] as const;
 
 export function SiteNav() {
@@ -26,7 +27,7 @@ export function SiteNav() {
             className="inline-block h-5 w-5 rounded-sm bg-electric"
             aria-hidden="true"
           />
-          Necter
+          Nectar
         </Link>
 
         {/* Desktop links */}
