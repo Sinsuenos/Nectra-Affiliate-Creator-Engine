@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-border/60 bg-surface">
@@ -15,29 +17,29 @@ export function SiteFooter() {
             className="flex items-center gap-6 text-xs text-muted-foreground"
             aria-label="Footer navigation"
           >
-            <a
-              href="#"
+            <Link
+              href="/terms"
               className="hover:text-foreground transition-colors"
             >
               Terms of Service
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/privacy"
               className="hover:text-foreground transition-colors"
             >
               Privacy Policy
-            </a>
+            </Link>
+            <Link
+              href="/refund-policy"
+              className="hover:text-foreground transition-colors"
+            >
+              Refund Policy
+            </Link>
             <a
               href="#"
               className="hover:text-foreground transition-colors"
             >
               Contact
-            </a>
-            <a
-              href="#"
-              className="hover:text-foreground transition-colors"
-            >
-              Refund Policy
             </a>
           </nav>
         </div>

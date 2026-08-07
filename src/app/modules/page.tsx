@@ -48,7 +48,7 @@ const MODULES = [
     name: "Compliance Scanner",
     icon: ShieldCheck,
     summary:
-      "Runs every generated piece of content against a live ruleset of platform policies, FTC disclosure requirements, and network-specific restrictions.",
+      "Runs every generated piece of content against a reference ruleset of platform policies, FTC disclosure requirements, and network-specific restrictions.",
     inputs: ["Generated content", "Target platforms", "Offer category"],
     outputs: [
       "Pass/Warn/Fail per platform",
