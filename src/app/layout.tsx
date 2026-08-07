@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -55,6 +56,7 @@ export default function RootLayout({
           <SiteFooter />
         </div>
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );

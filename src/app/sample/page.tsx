@@ -27,9 +27,9 @@ const offerContext = {
 
 const headlines = [
   { variant: "A", text: "The Natural Supplement Backed by Over 1,200 Five-Star Reviews" },
-  { variant: "B", text: "Why Thousands Are Switching to This Daily Wellness Formula" },
+  { variant: "B", text: "Why This Supplement Prints Every Dosage on the Label" },
   { variant: "C", text: "Feel the Difference in 14 Days or Your Money Back" },
-  { variant: "D", text: "A Doctor-Formulated Approach to Everyday Vitality" },
+  { variant: "D", text: "Energy. Sleep. Clarity. One Formula, Three Results." },
 ];
 
 const bodyCopy =
@@ -66,8 +66,8 @@ const socialPosts = [
   },
   {
     platform: "Instagram",
-    character_count: 218,
-    text: "Finding a supplement with zero fillers and full dosage transparency felt impossible until I found Demo Offer. Every ingredient listed with exact mg counts. Third-party tested every batch. 14 days in, the difference in energy and sleep quality is noticeable. This is how wellness products should be made.",
+    character_count: 347,
+    text: "Most supplements are white-labeled from the same few contract factories, then rebranded with different labels and marketing stories. Demo Offer is made in a single FDA-registered facility that tests every production run across 47 quality markers — heavy metals, microbial contamination, labeled potency. Lab reports are available on request, not buried behind a support form. That level of manufacturing traceability is uncommon enough that it caught my attention.",
   },
   {
     platform: "TikTok",
@@ -83,8 +83,8 @@ const socialPosts = [
 
 const ctaVariations = [
   { id: "CTA-1", text: "See the Full Ingredient Breakdown" },
-  { id: "CTA-2", text: "Read Verified Customer Reviews" },
-  { id: "CTA-3", text: "Try Demo Offer Risk-Free" },
+  { id: "CTA-2", text: "Read What 1,200 Reviewers Reported After 14 Days" },
+  { id: "CTA-3", text: "Compare This Label Against the Competition" },
   { id: "CTA-4", text: "View Third-Party Lab Results" },
 ];
 
