@@ -35,6 +35,7 @@ export function SiteFooter() {
             >
               Refund Policy
             </Link>
+            {/* PLACEHOLDER — Christopher will provide real URL once listing is live */}
             <a
               href="#"
               className="hover:text-foreground transition-colors"

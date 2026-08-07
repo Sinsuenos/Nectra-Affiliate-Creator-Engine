@@ -65,9 +65,8 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            A 9-module engine that architects, generates, and packages
-            compliant affiliate content systems. Built for operators who
-            need infrastructure, not templates.
+            Built for affiliates working high-risk, tightly-restricted verticals
+            — where generic AI copy gets accounts banned.
           </motion.p>
 
           <motion.div
@@ -81,6 +80,7 @@ export default function Home() {
               size="lg"
               className="bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm cursor-pointer"
             >
+            {/* PLACEHOLDER CTA — Christopher will provide real Gumroad URL once listing is live */}
               <a href="#">
                 Get Nectar Engine
                 <ChevronRight className="ml-2 h-4 w-4" />

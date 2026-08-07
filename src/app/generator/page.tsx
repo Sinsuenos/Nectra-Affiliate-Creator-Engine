@@ -29,7 +29,7 @@ const fadeUp = {
 /*  DEMO PASTE TEXT                                                    */
 /* ------------------------------------------------------------------ */
 const DEMO_PASTE = "GreenHealth Pro \u2014 Natural Sleep & Recovery Supplement\n" +
-  "Network: MaxBounty | Offer ID: GH-4821\n" +
+  "Network: NetTrack | Offer ID: GH-4821\n" +
   "Vertical: Health & Wellness\n" +
   "Payout: $42 CPA (CC Submit)\n" +
   "Conversion Flow: Free Trial \u2192 CC Submit \u2192 Rebill $89/mo after 14 days\n" +
@@ -64,7 +64,7 @@ interface SubIDEntry {
 /* ------------------------------------------------------------------ */
 const DEMO_PARSED: ParsedField[] = [
   { key: "offer_name", label: "Offer Name", value: "GreenHealth Pro" },
-  { key: "network_id", label: "Network ID", value: "GH-4821 (MaxBounty)" },
+  { key: "network_id", label: "Network ID", value: "GH-4821 (NetTrack)" },
   { key: "vertical", label: "Vertical", value: "Health & Wellness" },
   {
     key: "payout_model",
