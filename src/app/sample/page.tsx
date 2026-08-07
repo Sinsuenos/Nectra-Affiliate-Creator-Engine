@@ -139,7 +139,7 @@ export default function SamplePage() {
           This is a full content toolkit as produced by the Nectar Engine for a
           generic demo offer. Each block represents one output module from the
           9-module pipeline, from offer context through compliance scanning.
-          All content is AI-generated, generic, and ready for human review.
+          All content is AI-generated and ready for human review.
         </p>
       </motion.header>
 
