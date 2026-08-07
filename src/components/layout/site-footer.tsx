@@ -1,0 +1,51 @@
+export function SiteFooter() {
+  return (
+    <footer className="mt-auto border-t border-border/60 bg-surface">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <span className="flex items-center gap-2 text-xs font-bold tracking-widest uppercase">
+            <span
+              className="inline-block h-4 w-4 rounded-sm bg-electric"
+              aria-hidden="true"
+            />
+            Necter Engine
+          </span>
+
+          <nav
+            className="flex items-center gap-6 text-xs text-muted-foreground"
+            aria-label="Footer navigation"
+          >
+            <a
+              href="#"
+              className="hover:text-foreground transition-colors"
+            >
+              Terms of Service
+            </a>
+            <a
+              href="#"
+              className="hover:text-foreground transition-colors"
+            >
+              Privacy Policy
+            </a>
+            <a
+              href="#"
+              className="hover:text-foreground transition-colors"
+            >
+              Contact
+            </a>
+            <a
+              href="#"
+              className="hover:text-foreground transition-colors"
+            >
+              Refund Policy
+            </a>
+          </nav>
+        </div>
+
+        <p className="mt-6 text-center text-[11px] text-muted-foreground/40 font-mono">
+          &copy; {new Date().getFullYear()} Necter Engine. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  );
+}

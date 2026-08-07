@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { SiteNav } from "@/components/layout/site-nav";
+import { SiteFooter } from "@/components/layout/site-footer";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -16,23 +18,23 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nectra Engine — Affiliate Content Architecture System",
+  title: "Necter Engine — Affiliate Content Architecture System",
   description:
-    "A 9-module engine that architects, generates, and deploys compliant affiliate content systems. Built for operators who need infrastructure, not templates.",
+    "A 9-module engine that architects, generates, and packages compliant affiliate content systems. Built for operators who need infrastructure, not templates.",
   keywords: [
-    "Nectra Engine",
+    "Necter Engine",
     "affiliate marketing",
     "content generation",
     "compliance automation",
-    "funnel builder",
+    "content architecture",
   ],
   icons: {
     icon: "/favicon.svg",
   },
   openGraph: {
-    title: "Nectra Engine",
+    title: "Necter Engine",
     description:
-      "A 9-module engine that architects, generates, and deploys compliant affiliate content systems.",
+      "A 9-module engine that architects, generates, and packages compliant affiliate content systems.",
     type: "website",
   },
 };
@@ -47,7 +49,11 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased font-sans`}
       >
-        {children}
+        <div className="min-h-screen flex flex-col bg-background text-foreground">
+          <SiteNav />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+        </div>
         <Toaster />
       </body>
     </html>
