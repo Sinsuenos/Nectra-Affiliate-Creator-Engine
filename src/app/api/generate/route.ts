@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const maxDuration = 60;
 import { GoogleGenAI } from "@google/genai";
 
 /* ------------------------------------------------------------------ */
@@ -197,8 +199,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: parsed });
   } catch (err: unknown) {
+    console.error("Gemini API Generation Error:", err);
+
     const message =
-      err instanceof Error ? err.message : "An unexpected error occurred.";
+      err instanceof Error ? err.message : "Unknown error";
 
     /* Surface rate-limit information if present */
     if (message.includes("429") || message.includes("RESOURCE_EXHAUSTED") || message.includes("quota")) {
@@ -209,7 +213,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: `Generation failed: ${message}` },
+      { error: err instanceof Error ? err.message : "Unknown error" },
       { status: 500 },
     );
   }
