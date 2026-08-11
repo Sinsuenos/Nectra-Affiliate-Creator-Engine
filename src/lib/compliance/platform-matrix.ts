@@ -81,10 +81,10 @@ export const PLATFORM_MATRIX: readonly PlatformCompliance[] = [
   {
     id: "telegram",
     name: "Telegram",
-    risk: "HIGH",
+    risk: "MEDIUM",
     bannedTriggers: ["Adult materials on the official Telegram Ads product", "Illegal pornographic content on publicly viewable channels", "Phishing or malware links", "Unsolicited DM blasts to non-opted-in users", "Crypto scam patterns", "Content that could trigger app-store policy crackdowns"],
-    safeApproach: "Do NOT use Telegram's paid Ads product for adult-adjacent dating content at all. Organic channel promotion carries real but inconsistent risk. Treat as HIGH, not a reliable channel to build a durable presence on. Prefer opted-in channels with clear disclosure.",
-    notes: "HIGH risk for the official ads product (adult content banned outright). MEDIUM-HIGH for organic channel/group promotion since enforcement is inconsistent but the platform is not a safe long-term bet due to periodic app-store crackdowns. Channels: 1 to 3 posts/day.",
+    safeApproach: "Do not use Telegram's paid Ads product for adult-adjacent dating content. For organic channels, use opted-in audiences, clear disclosure, and factual content. Treat organic promotion as MEDIUM-HIGH in practice, with the paid Ads product separately treated as HIGH-risk.",
+    notes: "Overall affiliate-content risk: MEDIUM for this matrix, but Telegram's official paid Ads product is HIGH-risk for adult content. Organic channel/group promotion sits between MEDIUM and HIGH because enforcement is inconsistent. Verify current Telegram rules before publishing.",
   },
 ] as const;
 
