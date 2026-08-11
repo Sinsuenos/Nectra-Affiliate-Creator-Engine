@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PLATFORM_MATRIX } from "@/lib/compliance/platform-matrix";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 interface ScanRequest {
   content: string;
