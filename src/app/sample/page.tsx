@@ -28,12 +28,15 @@ const platformExamples = [
 ];
 
 const scanExamples = [
+  { platform: "X", status: "PASS", detail: "Example: concise promotional copy with clear commercial disclosure and no unsupported claim." },
   { platform: "TikTok", status: "WARN", detail: "Example: a guarantee or unsupported outcome claim would be surfaced for review." },
+  { platform: "Instagram", status: "PASS", detail: "Example: disclosure-aware copy without invented results or before-and-after claims." },
+  { platform: "Facebook", status: "PASS", detail: "Example: clear offer language without fake urgency or misleading health claims." },
   { platform: "Reddit", status: "PASS", detail: "Example: discussion-first copy with transparent commercial context." },
-  { platform: "Instagram", status: "PASS", detail: "Example: disclosure-aware copy without invented results." },
-  { platform: "Snapchat", status: "WARN", detail: "Example: dating content emphasizing casual encounters flagged under Snap ad policy." },
-  { platform: "Telegram", status: "FAIL", detail: "Example: adult-adjacent content not permitted on Telegram's official ads product." },
-  { platform: "Discord", status: "PASS", detail: "Example: non-explicit relationship content in designated server channel." },
+  { platform: "Pinterest", status: "PASS", detail: "Example: discovery-oriented copy with disclosure and no deceptive product claim." },
+  { platform: "Snapchat", status: "WARN", detail: "Example: dating content emphasizing casual encounters would be surfaced for review." },
+  { platform: "Discord", status: "PASS", detail: "Example: non-explicit relationship content in a designated server channel." },
+  { platform: "Telegram", status: "FAIL", detail: "Example: adult-adjacent content would fail the official Telegram Ads policy context." },
 ];
 
 function Block({ label, children }: { label: string; children: React.ReactNode }) {
