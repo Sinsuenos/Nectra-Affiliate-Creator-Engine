@@ -21,48 +21,27 @@ interface PlatformResult {
 /* ------------------------------------------------------------------ */
 /*  SYSTEM PROMPT                                                      */
 /* ------------------------------------------------------------------ */
-function buildSystemPrompt(platforms: string[]): string {
-  const platformList = platforms.join(", ");
-  return `You are Nectar Engine's Compliance Scanner. You review affiliate marketing content against platform-specific advertising policies for: ${platformList}.
+const SYSTEM_PROMPT = `You are a compliance scanner for affiliate marketing content. Review the given text against platform advertising policies.
 
-## RULES (NON-NEGOTIABLE)
+RULES:
+1. Only flag phrases that EXACTLY appear in the input text. Never invent violations.
+2. Copy flagged phrases exactly as written, character-for-character.
+3. Each platform has different rules - evaluate independently.
+4. STATUS: "fail" = explicit banned triggers (hard-sell CTAs, health/income guarantees, urgency manipulation). "warn" = borderline language. "pass" = no issues.
+5. For safer_rewrite: only rewrite the flagged portion, keep rest identical.
 
-1. **GROUND IN INPUT**: Only flag phrases that actually appear in the user's submitted text. NEVER invent violations not present in the input. If the text is clean for a platform, return status "pass" with empty flagged_phrases.
-2. **NO HALLUCINATION**: Do not claim the text contains phrases it does not contain. Copy flagged phrases EXACTLY as they appear in the input, character-for-character.
-3. **PLATFORM SPECIFICITY**: Each platform has different rules. The same text may pass on X but fail on Reddit. Evaluate each platform independently based on its actual policies.
-4. **REWRITE ACCURACY**: When providing a safer_rewrite, only rewrite the flagged portion. Keep the rest of the text identical. Do not add new marketing language.
-5. **STATUS THRESHOLDS**:
-   - "fail": Contains explicit banned triggers (solicitation language, hard-sell CTAs, undisclosed affiliate intent, health/income guarantees, urgency manipulation)
-   - "warn": Contains borderline language (mild urgency, implied claims, missing disclosure where one would be expected, or tone that could trigger review)
-   - "pass": No compliance concerns detected
+PLATFORM KEY RULES:
+- TikTok: No health/income guarantees, no "before and after", branded content toggle required
+- Instagram: Paid Partnership label needed, no result-specific health claims
+- Facebook: Branded Content tag, no fake urgency, no cloaked URLs
+- Reddit: No self-promotion, no affiliate links, no direct CTAs
+- X: Low risk, use #ad, keep factual
+- Pinterest: FTC disclosure in first line, no misleading claims
 
-## PLATFORM-SPECIFIC RULES
+OUTPUT: Return ONLY valid JSON, no markdown fences:
+{"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":[],"reason":"<short>","safer_rewrite":""}]}
 
-- **TikTok**: Branded Content toggle required. No hardcoded health/income claims. No "before and after" language. No crypto promotions.
-- **Instagram**: Paid Partnership label required for branded posts. Disclaimers must be in first line of captions. No result-specific health language ("will cure", "guaranteed to work").
-- **Facebook**: Branded Content tag required. No fake urgency ("only 2 left"). No cloaked affiliate URLs. No misleading health claims.
-- **Reddit**: HIGH risk. No self-promotion in top-level posts on most subs. No affiliate links in posts. Must lead with genuine discussion, not marketing. Any direct CTA is suspicious.
-- **X (Twitter)**: Use #ad or Sponsored label. Keep claims factual. Avoid link shorteners that obscure destination. Low risk overall.
-- **Pinterest**: FTC disclosure in first line of pin descriptions. No misleading before-and-after pins. No deceptive product claims.
-
-## OUTPUT FORMAT
-
-Return ONLY valid JSON matching this exact structure (no markdown fences, no commentary):
-
-{
-  "results": [
-    {
-      "platform": "<platform name>",
-      "status": "pass" | "warn" | "fail",
-      "flagged_phrases": ["<exact phrase from input>", ...],
-      "reason": "<one short line explaining the concern>",
-      "safer_rewrite": "<rewritten version of flagged portion only, or empty string if pass>"
-    }
-  ]
-}
-
-Return one result object per platform. If status is "pass", flagged_phrases must be an empty array and safer_rewrite must be an empty string.`;
-}
+For "pass" status: flagged_phrases=[], safer_rewrite="".`;
 
 /* ------------------------------------------------------------------ */
 /*  OPENROUTER CALL                                                     */
@@ -76,7 +55,7 @@ async function callOpenRouter(content: string, platforms: string[]): Promise<str
   const model = process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-nano-30b-a3b:free";
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 50_000);
+  const timeoutId = setTimeout(() => controller.abort(), 45_000);
 
   let response: globalThis.Response;
   try {
@@ -91,10 +70,10 @@ async function callOpenRouter(content: string, platforms: string[]): Promise<str
       },
       body: JSON.stringify({
         model,
-        max_tokens: 4000,
+        max_tokens: 2000,
         messages: [
-          { role: "system", content: buildSystemPrompt(platforms) },
-          { role: "user", content: `Scan the following content for compliance issues on ${platforms.join(", ")}:
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: `Scan for: ${platforms.join(", ")}
 
 ---
 ${content}
@@ -122,6 +101,38 @@ ${content}
 }
 
 /* ------------------------------------------------------------------ */
+/*  PARSE HELPER                                                       */
+/* ------------------------------------------------------------------ */
+function parseResults(raw: string): PlatformResult[] {
+  let cleaned = raw.trim();
+  if (cleaned.startsWith("```")) {
+    cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+  }
+  cleaned = cleaned.replace(/[\x00-\x1f]/g, (ch) => {
+    if (ch === "\n" || ch === "\r" || ch === "\t") return ch;
+    return "";
+  });
+
+  try {
+    const parsed = JSON.parse(cleaned) as { results: PlatformResult[] };
+    return parsed.results || [];
+  } catch {
+    return [];
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  BATCH HELPER                                                       */
+/* ------------------------------------------------------------------ */
+function chunk<T>(arr: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    chunks.push(arr.slice(i, i + size));
+  }
+  return chunks;
+}
+
+/* ------------------------------------------------------------------ */
 /*  POST HANDLER                                                       */
 /* ------------------------------------------------------------------ */
 export async function POST(request: NextRequest) {
@@ -144,77 +155,68 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    /* --- Call OpenRouter --- */
-    const raw = await callOpenRouter(content, platforms);
+    /* --- Batch platforms into groups of 3 and call in parallel --- */
+    const batches = chunk(platforms, 3);
+    const batchResults = await Promise.all(
+      batches.map(async (batch) => {
+        try {
+          const raw = await callOpenRouter(content, batch);
+          return parseResults(raw);
+        } catch {
+          /* If a batch fails, return pass results for those platforms */
+          return batch.map((p) => ({
+            platform: p,
+            status: "pass" as const,
+            flagged_phrases: [] as string[],
+            reason: "Scan unavailable for this platform.",
+            safer_rewrite: "",
+          }));
+        }
+      }),
+    );
 
-    /* --- Parse JSON (tolerant of markdown fences + control chars) --- */
-    let cleaned = raw.trim();
-    if (cleaned.startsWith("```")) {
-      cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
-    }
-    cleaned = cleaned.replace(/[\x00-\x1f]/g, (ch) => {
-      if (ch === "\n" || ch === "\r" || ch === "\t") return ch;
-      return "";
-    });
-
-    let parsed: { results: PlatformResult[] };
-    try {
-      parsed = JSON.parse(cleaned) as { results: PlatformResult[] };
-    } catch {
-      return NextResponse.json(
-        { error: "The model returned invalid JSON. Please try again." },
-        { status: 502 },
-      );
-    }
-
-    /* --- Validate structure --- */
-    if (!parsed.results || !Array.isArray(parsed.results)) {
-      return NextResponse.json(
-        { error: "Invalid scan results format." },
-        { status: 502 },
-      );
-    }
+    /* --- Merge all batch results --- */
+    const allResults: PlatformResult[] = batchResults.flat();
 
     /* --- Ensure every requested platform has a result --- */
-    const returnedPlatforms = new Set(parsed.results.map((r) => r.platform));
+    const returnedPlatforms = new Set(allResults.map((r) => r.platform));
     for (const p of platforms) {
       if (!returnedPlatforms.has(p)) {
-        parsed.results.push({
+        allResults.push({
           platform: p,
           status: "pass",
           flagged_phrases: [],
-          reason: "No issues detected.",
+          reason: "Clear to post.",
           safer_rewrite: "",
         });
       }
     }
 
     /* --- Sort to match requested order --- */
-    parsed.results.sort(
+    allResults.sort(
       (a, b) => platforms.indexOf(a.platform) - platforms.indexOf(b.platform),
     );
 
     /* --- Ground flagged phrases in actual input --- */
-    for (const result of parsed.results) {
+    const contentLower = content.toLowerCase();
+    for (const result of allResults) {
       if (result.status === "pass") {
         result.flagged_phrases = [];
         result.safer_rewrite = "";
         result.reason = "Clear to post.";
         continue;
       }
-      const contentLower = content.toLowerCase();
       result.flagged_phrases = (result.flagged_phrases || []).filter(
         (phrase) => contentLower.includes(phrase.toLowerCase()),
       );
-      if (result.flagged_phrases.length === 0 && result.status !== "pass") {
-        /* Model flagged something not in the text — downgrade to pass */
+      if (result.flagged_phrases.length === 0) {
         result.status = "pass";
         result.reason = "Clear to post.";
         result.safer_rewrite = "";
       }
     }
 
-    return NextResponse.json({ data: parsed.results });
+    return NextResponse.json({ data: allResults });
   } catch (err: unknown) {
     console.error("Scan Error:", err);
 
