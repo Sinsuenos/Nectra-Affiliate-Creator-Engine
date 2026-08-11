@@ -154,27 +154,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    /* --- Batch platforms into groups of 2 and call in parallel --- */
+    /* --- Batch platforms into groups of 2 and call sequentially --- */
     const batches = chunk(platforms, 2);
-    const batchResults = await Promise.all(
-      batches.map(async (batch) => {
-        try {
-          const raw = await callOpenRouter(content, batch);
-          return parseResults(raw);
-        } catch {
-          return batch.map((p) => ({
+    const allResults: PlatformResult[] = [];
+
+    for (const batch of batches) {
+      try {
+        const raw = await callOpenRouter(content, batch);
+        allResults.push(...parseResults(raw));
+      } catch {
+        allResults.push(
+          ...batch.map((p) => ({
             platform: p,
             status: "pass" as const,
             flagged_phrases: [] as string[],
             reason: "Scan unavailable for this platform.",
             safer_rewrite: "",
-          }));
-        }
-      }),
-    );
-
-    /* --- Merge all batch results --- */
-    const allResults: PlatformResult[] = batchResults.flat();
+          })),
+        );
+      }
+    }
 
     /* --- Ensure every requested platform has a result --- */
     const returnedPlatforms = new Set(allResults.map((r) => r.platform));
