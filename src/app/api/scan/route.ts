@@ -54,7 +54,7 @@ async function callOpenRouter(content: string, platforms: string[]): Promise<str
 
   const model = process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-nano-30b-a3b:free";
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 45_000);
+  const timeoutId = setTimeout(() => controller.abort(), 75_000);
 
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -68,7 +68,7 @@ async function callOpenRouter(content: string, platforms: string[]): Promise<str
       },
       body: JSON.stringify({
         model,
-        max_tokens: 2600,
+        max_tokens: 3500,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           {
@@ -110,16 +110,6 @@ function parseResults(raw: string): PlatformResult[] {
   }
 }
 
-function unavailable(platform: string): PlatformResult {
-  return {
-    platform,
-    status: "warn",
-    flagged_phrases: [],
-    reason: "Scanner could not complete this platform check. No compliance clearance was issued.",
-    safer_rewrite: "",
-  };
-}
-
 export async function POST(request: NextRequest) {
   try {
     const body: ScanRequest = await request.json();
@@ -141,16 +131,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let modelResults: PlatformResult[] = [];
+    let raw: string;
     try {
-      /* One request reviews all selected platforms. The previous 2-platform
-         sequential design could take ~126s for nine platforms and exceed the
-         serverless execution window. One grounded call is both faster and
-         friendlier to free-tier rate limits. */
-      modelResults = parseResults(await callOpenRouter(content, platforms));
+      raw = await callOpenRouter(content, platforms);
     } catch (err) {
       console.error("Scanner model call failed:", err);
-      modelResults = platforms.map(unavailable);
+      const message = err instanceof Error ? err.message : "Scanner model call failed.";
+      if (message.includes("429") || message.toLowerCase().includes("rate") || message.toLowerCase().includes("quota")) {
+        return NextResponse.json(
+          { error: "The scanner model is rate-limited. Please wait a moment and try again." },
+          { status: 429 },
+        );
+      }
+      return NextResponse.json(
+        { error: "The scanner could not complete the AI check. No compliance clearance was issued. Please try again." },
+        { status: 503 },
+      );
+    }
+
+    const modelResults = parseResults(raw);
+    if (modelResults.length === 0) {
+      return NextResponse.json(
+        { error: "The scanner returned an unreadable result. No compliance clearance was issued. Please try again." },
+        { status: 503 },
+      );
     }
 
     const byPlatform = new Map<string, PlatformResult>();
@@ -159,8 +163,16 @@ export async function POST(request: NextRequest) {
     }
 
     const contentLower = content.toLowerCase();
+    const missing = platforms.filter((platform) => !byPlatform.has(platform.toLowerCase()));
+    if (missing.length > 0) {
+      return NextResponse.json(
+        { error: `The scanner did not return a complete check for: ${missing.join(", ")}. No compliance clearance was issued. Please try again.` },
+        { status: 503 },
+      );
+    }
+
     const results = platforms.map((platform) => {
-      const result = byPlatform.get(platform.toLowerCase()) ?? unavailable(platform);
+      const result = byPlatform.get(platform.toLowerCase())!;
       const grounded = (result.flagged_phrases || []).filter(
         (phrase) => typeof phrase === "string" && contentLower.includes(phrase.toLowerCase()),
       );
@@ -176,7 +188,14 @@ export async function POST(request: NextRequest) {
       }
 
       if (grounded.length === 0) {
-        return unavailable(platform);
+        return {
+          ...result,
+          platform,
+          status: "warn" as const,
+          flagged_phrases: [],
+          safer_rewrite: "",
+          reason: "The model identified a risk, but it did not cite an exact phrase from the supplied content. No compliance clearance was issued for this platform.",
+        };
       }
 
       return {
@@ -191,18 +210,7 @@ export async function POST(request: NextRequest) {
     console.error("Scan Error:", err);
     const message = err instanceof Error ? err.message : "Unknown error";
 
-    if (message.includes("429") || message.includes("rate") || message.includes("quota")) {
-      return NextResponse.json(
-        { error: "The scanner model is rate-limited. Please wait a moment and try again." },
-        { status: 429 },
-      );
-    }
-
-    if (message.includes("not configured") || message.includes("not set")) {
-      return NextResponse.json({ error: message }, { status: 503 });
-    }
-
-    if (message.includes("401") || message.includes("403") || message.includes("invalid")) {
+    if (message.includes("401") || message.includes("403") || message.toLowerCase().includes("invalid")) {
       return NextResponse.json(
         { error: "Scanner API access is invalid or unauthorized." },
         { status: 503 },
