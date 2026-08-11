@@ -21,35 +21,26 @@ interface PlatformResult {
 /* ------------------------------------------------------------------ */
 /*  SYSTEM PROMPT                                                      */
 /* ------------------------------------------------------------------ */
-const SYSTEM_PROMPT = `You are Nectar Engine's Compliance Scanner. Review affiliate marketing content against platform advertising policies.
+const SYSTEM_PROMPT = `You are a compliance scanner for affiliate content. Flag explicit banned triggers like: health/income guarantees, hard-sell CTAs, urgency, "click here", "sign up", "act now", "free trial", "no risk", "guaranteed".
 
-## STRICT RULES
+STATUS THRESHOLDS:
+- "fail" = explicit banned triggers (solicitation, hard-sell, guarantees, urgency manipulation)
+- "warn" = borderline language (mild urgency, implied claims)
+- "pass" = clean
 
-1. GROUND IN INPUT: Only flag phrases that EXACTLY appear in the user text. NEVER invent violations. Copy flagged phrases character-for-character from the input.
-2. PLATFORM SPECIFICITY: Same text may pass on X but fail on Reddit. Evaluate each platform independently.
-3. REWRITE ACCURACY: Only rewrite the flagged portion in safer_rewrite. Keep rest identical.
+PLATFORM CONTEXT:
+- TikTok/Instagram: Branded content disclosure required. No health/income guarantees.
+- Facebook: No fake urgency. No cloaked URLs.
+- Reddit: HIGH risk. No self-promotion, no affiliate links, no CTAs.
+- X: Low risk. Use #ad. Keep factual.
+- Pinterest: FTC disclosure required. No misleading claims.
 
-## STATUS THRESHOLDS
+RULES:
+1. Only flag phrases that EXACTLY appear in the input. Copy them character-for-character.
+2. For safer_rewrite: only rewrite the flagged portion, keep rest identical. Empty string if pass.
 
-- "fail": Explicit banned triggers (solicitation language, hard-sell CTAs, undisclosed affiliate intent, health/income guarantees, urgency manipulation, "click here", "sign up now", "act now", "free trial", "no risk", "guaranteed")
-- "warn": Borderline language (mild urgency, implied claims, missing disclosure)
-- "pass": No compliance concerns
-
-## PLATFORM KEY RULES
-
-- TikTok: No health/income guarantees, no "before and after", branded content toggle required
-- Instagram: Paid Partnership label needed, no result-specific health claims
-- Facebook: Branded Content tag, no fake urgency ("only 2 left"), no cloaked URLs
-- Reddit: HIGH risk. No self-promotion, no affiliate links in posts, no direct CTAs
-- X (Twitter): Low risk. Use #ad. Keep claims factual.
-- Pinterest: FTC disclosure in first line, no misleading before-and-after pins
-
-## OUTPUT FORMAT
-
-Return ONLY valid JSON (no markdown fences, no commentary):
-{"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":["<exact phrase>"],"reason":"<short>","safer_rewrite":"<or empty>"}]}
-
-For pass: flagged_phrases=[], safer_rewrite="".`;
+Return ONLY valid JSON, no markdown fences:
+{"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":["<exact phrase from input>"],"reason":"<short>","safer_rewrite":"<or empty>"}]}`;
 
 /* ------------------------------------------------------------------ */
 /*  OPENROUTER CALL                                                     */
@@ -81,7 +72,7 @@ async function callOpenRouter(content: string, platforms: string[]): Promise<str
         max_tokens: 2000,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: `Scan for: ${platforms.join(", ")}
+          { role: "user", content: `Review for: ${platforms.join(", ")}
 
 ---
 ${content}
