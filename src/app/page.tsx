@@ -52,7 +52,7 @@ export default function Home() {
           >
             One Offer.
             <br />
-            <span className="text-electric">Many Angles. One Campaign.</span>
+            <span className="text-electric">Many Angles. Nine Platforms.</span>
           </motion.h1>
 
           <motion.p
@@ -63,7 +63,7 @@ export default function Home() {
           >
             Paste an offer once. Nectar turns the same source into platform-ready
             angles and social content, then lets you check the copy before you post it.
-            Campaign orchestration and contextual intelligence are the next layer.
+            Geo, seasonal context, and campaign orchestration are the next layer.
           </motion.p>
 
           <motion.div
@@ -129,7 +129,7 @@ export default function Home() {
               tag: "PROTECT THE COPY",
               title: "Compliance Scanner",
               desc: "Check generated content for platform-specific risk signals and get a safer rewrite when needed.",
-              href: "/compliance",
+              href: "/scanner",
             },
           ].map((card, i) => (
             <motion.div
