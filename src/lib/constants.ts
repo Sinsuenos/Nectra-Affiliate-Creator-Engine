@@ -2,6 +2,6 @@
 /*  EXTERNAL LINKS                                                     */
 /* ------------------------------------------------------------------ */
 
-/** Gumroad listing — update once the product page is live. */
+/** Official Nectar Engine Gumroad listing. */
 export const GUMROAD_URL =
-  "https://nectarengine.gumroad.com/l/nectar-engine";
+  "https://sinaloainspired.gumroad.com/l/nectar-engine";
