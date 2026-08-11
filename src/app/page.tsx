@@ -18,7 +18,7 @@ const fadeUp = {
 
 const previewStages = [
   { label: "OFFER", value: "OhChat · PPS", tone: "text-electric border-electric/40 bg-electric/[0.12] shadow-[0_0_24px_rgba(34,184,255,0.08)]" },
-  { label: "ANGLES", value: "3 strategic directions", tone: "text-fuchsia-200 border-fuchsia-400/30 bg-fuchsia-400/[0.09] shadow-[0_0_24px_rgba(217,70,239,0.07)]" },
+  { label: "DIRECTIONS", value: "3 campaign directions", tone: "text-fuchsia-200 border-fuchsia-400/30 bg-fuchsia-400/[0.09] shadow-[0_0_24px_rgba(217,70,239,0.07)]" },
   { label: "OUTPUT", value: "9 platform-ready posts", tone: "text-lime-200 border-lime-400/30 bg-lime-400/[0.08] shadow-[0_0_24px_rgba(163,230,53,0.06)]" },
   { label: "PROTECT", value: "Pass · Warn · Fail", tone: "text-amber-200 border-amber-400/30 bg-amber-400/[0.09] shadow-[0_0_24px_rgba(251,191,36,0.06)]" },
 ];
@@ -59,7 +59,7 @@ export default function Home() {
             One Offer.
             <br />
             <span className="bg-gradient-to-r from-electric via-fuchsia-300 to-lime-200 bg-clip-text text-transparent">
-              Many Angles. Nine Platforms.
+              Multiple Campaign Directions. Nine Platforms.
             </span>
           </motion.h1>
 
@@ -69,7 +69,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            Paste an affiliate offer once. Nectar extracts what matters, turns the source into distinct angles and platform-ready content, then checks the copy before you publish it.
+            Paste an affiliate offer once. Nectar extracts what matters, turns the source into distinct campaign directions and platform-ready content, then checks the copy before you publish it.
           </motion.p>
 
           <motion.div
