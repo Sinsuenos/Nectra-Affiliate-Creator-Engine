@@ -20,8 +20,6 @@ import {
   Send,
   ExternalLink,
   BookOpen,
-  Sparkles,
-  LayoutList,
   ArrowRight,
 } from "lucide-react";
 import {
@@ -172,6 +170,21 @@ const DEMO_TOOLKIT: GeneratedToolkit = {
       character_count: 391,
       text: "If you're single and over 45, you already know most dating apps feel like they're not made for you. Cozy 50+ was built specifically for this age group — real profiles, real people looking for actual connection. They have a 7-day trial for $1 so you can browse without committing. The compatibility matching is surprisingly good.",
     },
+    {
+      platform: "Snapchat",
+      character_count: 312,
+      text: "Story time: my aunt tried every dating app and said they were all the same — 80% guys, nobody real. Then she found Cozy 50+. It's built for people over 45 who want actual connection. 3.2 women for every man. She's been on 3 real coffee dates in a month. $1 to try it for a week.",
+    },
+    {
+      platform: "Discord",
+      character_count: 298,
+      text: "For anyone in the 45+ dating communities here — has anyone tried Cozy 50+? It claims a 3.2:1 female-to-male ratio and AI compatibility matching. I've seen it mentioned in a few other servers. Curious about real experiences before I sign up for the $1 trial.",
+    },
+    {
+      platform: "Telegram",
+      character_count: 315,
+      text: "Cozy 50+ is a dating platform built specifically for adults 45+. Unlike most apps that skew 80% male, it has a 3.2:1 female-to-male ratio with verified profiles and AI compatibility matching. $1 for a 7-day trial with full access to browse and message real members.",
+    },
   ],
   headlines: [
     { variant: "A", text: "The Dating Platform Where Women Outnumber Men 3 to 1" },
@@ -209,6 +222,18 @@ const DEMO_TOOLKIT: GeneratedToolkit = {
     {
       platform: "X",
       note: "Character limit forces concise messaging. Avoid claims about member counts or ratios that can't be verified. The 3.2:1 ratio claim should be attributed to the platform's reported data.",
+    },
+    {
+      platform: "Snapchat",
+      note: "Dating ads are permitted if non-explicit and age-gated 18+. Keep the companionship angle, never 'casual encounters.' Use the Sponsored label on all branded Stories.",
+    },
+    {
+      platform: "Discord",
+      note: "MEDIUM risk - enforcement is server-level, not algorithmic. Post only in designated promo channels. Get admin approval. The question format works well here.",
+    },
+    {
+      platform: "Telegram",
+      note: "HIGH risk - do NOT use Telegram's paid ads for dating content. Organic channel posts carry inconsistent risk. Keep content factual and disclosure-clear.",
     },
   ],
 };
@@ -428,48 +453,6 @@ function ComplianceSection({ notes }: { notes: ComplianceNote[] }) {
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  WORKFLOW STEPS                                                     */
-/* ------------------------------------------------------------------ */
-const STEPS = [
-  { label: "Paste Offer", icon: ClipboardPaste },
-  { label: "Generate", icon: Sparkles },
-  { label: "Review Toolkit", icon: LayoutList },
-];
-
-function WorkflowSteps({ current }: { current: number }) {
-  return (
-    <div className="flex items-center gap-2 mt-6 mb-2">
-      {STEPS.map((step, i) => {
-        const active = i + 1 === current;
-        const done = i + 1 < current;
-        const Icon = step.icon;
-        return (
-          <div key={step.label} className="flex items-center gap-2">
-            {i > 0 && (
-              <span
-                className={`h-px w-6 sm:w-8 ${done ? "bg-electric/60" : "bg-border/40"}`}
-              />
-            )}
-            <div
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono transition-colors ${
-                active
-                  ? "bg-electric/10 text-electric border border-electric/20"
-                  : done
-                    ? "text-electric/60"
-                    : "text-muted-foreground/50"
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              {step.label}
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 }

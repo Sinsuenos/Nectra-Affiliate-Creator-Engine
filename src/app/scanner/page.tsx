@@ -106,10 +106,10 @@ function ResultCard({
       animate="visible"
       className={
         isPass
-          ? "rounded-xl border border-border/40 bg-surface p-5 sm:p-6"
+          ? "rounded-xl border border-border/40 border-l-2 border-l-emerald-500/30 bg-surface p-5 sm:p-6"
           : result.status === "fail"
-            ? "rounded-xl border border-red-500/20 bg-red-500/[0.03] p-5 sm:p-6"
-            : "rounded-xl border border-amber-500/20 bg-amber-500/[0.03] p-5 sm:p-6"
+            ? "rounded-xl border border-red-500/20 border-l-2 border-l-red-500/50 bg-red-500/[0.03] p-5 sm:p-6"
+            : "rounded-xl border border-amber-500/20 border-l-2 border-l-amber-500/40 bg-amber-500/[0.03] p-5 sm:p-6"
       }
     >
       {/* Status pill */}
@@ -408,9 +408,25 @@ function ScannerInner() {
 
           {/* Platform chips */}
           <motion.div variants={fadeUp} custom={1}>
-            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-3">
-              Select Platforms
-            </p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                Select Platforms
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (selectedPlatforms.size === ALL_PLATFORMS.length) {
+                    setSelectedPlatforms(new Set());
+                  } else {
+                    setSelectedPlatforms(new Set(ALL_PLATFORMS));
+                  }
+                  setResults(null);
+                }}
+                className="text-[11px] font-mono text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                {selectedPlatforms.size === ALL_PLATFORMS.length ? "Deselect all" : "Select all"}
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {ALL_PLATFORMS.map((p) => (
                 <PlatformChip

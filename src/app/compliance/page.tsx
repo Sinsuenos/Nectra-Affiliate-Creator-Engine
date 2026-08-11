@@ -10,11 +10,13 @@ const fadeUp = {
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5, ease: "easeOut" as const } }),
 };
 
-const riskColors: Record<string, { dot: string; text: string }> = {
-  LOW: { dot: "bg-emerald-400", text: "text-emerald-400" },
-  MEDIUM: { dot: "bg-amber-400", text: "text-amber-400" },
-  HIGH: { dot: "bg-red-400", text: "text-red-400" },
+const riskColors: Record<string, { dot: string; text: string; rowBorder: string }> = {
+  LOW: { dot: "bg-emerald-400", text: "text-emerald-400", rowBorder: "border-l-emerald-400/40" },
+  MEDIUM: { dot: "bg-amber-400", text: "text-amber-400", rowBorder: "border-l-amber-400/40" },
+  HIGH: { dot: "bg-red-400", text: "text-red-400", rowBorder: "border-l-red-400/40" },
 };
+
+const RESEARCH_VERIFIED_IDS = new Set(["snapchat", "discord", "telegram"]);
 
 export default function CompliancePage() {
   return (
@@ -39,9 +41,19 @@ export default function CompliancePage() {
             <thead className="border-b border-border/60 bg-surface-raised"><tr>
               {['Platform','Risk Level','Risk Signals','Safer Approach','Posting Guidance'].map((heading) => <th key={heading} className="text-left px-5 py-3 text-xs uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">{heading}</th>)}
             </tr></thead>
-            <tbody>{PLATFORM_MATRIX.map((row, i) => { const colors = riskColors[row.risk]; return (
-              <tr key={row.id} className="border-b border-border/30 last:border-0 hover:bg-surface-raised/50 transition-colors">
-                <td className="px-5 py-4 text-foreground font-medium whitespace-nowrap">{row.name}</td>
+            <tbody>{PLATFORM_MATRIX.map((row, i) => {
+              const colors = riskColors[row.risk];
+              const isVerified = RESEARCH_VERIFIED_IDS.has(row.id);
+              return (
+              <tr key={row.id} className={`border-b border-border/30 last:border-0 border-l-2 ${colors.rowBorder} hover:bg-surface-raised/50 transition-colors`}>
+                <td className="px-5 py-4 text-foreground font-medium whitespace-nowrap">
+                  <span className="flex items-center gap-2">
+                    {row.name}
+                    {isVerified && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold tracking-wider bg-electric/10 text-electric border border-electric/20">SOURCED</span>
+                    )}
+                  </span>
+                </td>
                 <td className="px-5 py-4 whitespace-nowrap"><span className="inline-flex items-center gap-2"><span className={`inline-block h-2 w-2 rounded-full ${colors.dot}`} /><span className={`${colors.text} font-medium`}>{row.risk}</span></span></td>
                 <td className="px-5 py-4 text-foreground/70 text-xs leading-relaxed max-w-xs">{row.bannedTriggers.join(", ")}</td>
                 <td className="px-5 py-4 text-foreground/70 text-xs leading-relaxed max-w-xs">{row.safeApproach}</td>
@@ -51,7 +63,12 @@ export default function CompliancePage() {
           </table>
         </motion.div>
 
-        <motion.p className="mt-6 font-mono text-xs text-muted-foreground/60" variants={fadeUp} custom={2} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}>
+        <motion.div className="mt-6 flex items-center gap-3" variants={fadeUp} custom={2} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}>
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold tracking-wider bg-electric/10 text-electric border border-electric/20">SOURCED</span>
+          <p className="font-mono text-xs text-muted-foreground/60">Indicates policy data individually researched and cited in source code.</p>
+        </motion.div>
+
+        <motion.p className="mt-3 font-mono text-xs text-muted-foreground/60" variants={fadeUp} custom={3} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}>
           Reference data is maintained as strategic guidance. Verify current platform policies directly before publishing.
         </motion.p>
       </section>
