@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Tooltip,
@@ -13,7 +14,6 @@ import {
   CalendarDays,
   ShieldCheck,
   LayoutList,
-  Lock,
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
@@ -26,6 +26,7 @@ export interface RailStage {
   id: string;
   label: string;
   sublabel: string;
+  tooltipLine: string;
   icon: React.ElementType;
   live: boolean;
   href?: string;
@@ -36,6 +37,7 @@ export const RAIL_STAGES: RailStage[] = [
     id: "offer",
     label: "OFFER",
     sublabel: "Paste raw offer details",
+    tooltipLine: "",
     icon: ClipboardPaste,
     live: true,
     href: "/generator",
@@ -44,6 +46,7 @@ export const RAIL_STAGES: RailStage[] = [
     id: "angles",
     label: "ANGLES",
     sublabel: "AI extracts promo angles",
+    tooltipLine: "",
     icon: Sparkles,
     live: true,
   },
@@ -51,6 +54,7 @@ export const RAIL_STAGES: RailStage[] = [
     id: "context",
     label: "CONTEXT",
     sublabel: "Geo + seasonal intelligence",
+    tooltipLine: "Geo & seasonal context - next",
     icon: Globe,
     live: false,
   },
@@ -58,6 +62,7 @@ export const RAIL_STAGES: RailStage[] = [
     id: "campaign",
     label: "CAMPAIGN",
     sublabel: "Schedule + sequence builder",
+    tooltipLine: "Campaign building - next",
     icon: CalendarDays,
     live: false,
   },
@@ -65,6 +70,7 @@ export const RAIL_STAGES: RailStage[] = [
     id: "compliance",
     label: "COMPLIANCE",
     sublabel: "Platform risk scanner",
+    tooltipLine: "",
     icon: ShieldCheck,
     live: true,
     href: "/scanner",
@@ -73,6 +79,7 @@ export const RAIL_STAGES: RailStage[] = [
     id: "output",
     label: "OUTPUT",
     sublabel: "6-platform toolkit",
+    tooltipLine: "",
     icon: LayoutList,
     live: true,
   },
@@ -114,6 +121,7 @@ function Connector({ index }: { index: number }) {
   const stage = RAIL_STAGES[index];
   const nextStage = RAIL_STAGES[index + 1];
   const bothLive = stage.live && nextStage?.live;
+  const eitherLive = stage.live || nextStage?.live;
 
   return (
     <motion.div
@@ -135,56 +143,79 @@ function Connector({ index }: { index: number }) {
             }}
           />
         </div>
+      ) : eitherLive ? (
+        /* Adjacent to at least one live stage - keep the spine visible */
+        <div className="relative w-full h-px">
+          <div className="absolute inset-0 bg-electric/15" />\n          <motion.div
+            className="absolute inset-y-0 left-0 w-1/3 bg-electric/50"
+            animate={{ x: ["0%", "200%", "0%"] }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: index * 0.5,
+            }}
+          />
+        </div>
       ) : (
-        <ChevronRight className="h-4 w-4 text-muted-foreground/30" />
+        <div className="w-full h-px bg-border/30" />
       )}
     </motion.div>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  STAGE NODE                                                          */
+/*  NEXT STAGE NODE (roadmap stage - confident, intentional)             */
 /* ------------------------------------------------------------------ */
 
-function StageNode({ stage }: { stage: RailStage }) {
+function NextStageNode({ stage }: { stage: RailStage }) {
+  const [open, setOpen] = useState(false);
   const Icon = stage.icon;
 
-  /* --- NEXT stage --- */
-  if (!stage.live) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <motion.div
-            className="relative flex flex-col items-center gap-2 cursor-default select-none px-2 sm:px-0"
-            variants={nodeVariants}
-          >
-            <div className="relative">
-              <div className="flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-xl border border-border/20 bg-surface/40">
-                <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground/30" />
-              </div>
-              <div className="absolute -top-1.5 -right-1.5 flex items-center justify-center h-4 w-4 rounded-full bg-surface border border-border/30">
-                <Lock className="h-2.5 w-2.5 text-muted-foreground/40" />
-              </div>
-            </div>
-            <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-muted-foreground/40">
-              {stage.label}
-            </span>
-            <span className="hidden sm:block text-[10px] text-muted-foreground/25 text-center leading-tight max-w-[100px]">
-              {stage.sublabel}
-            </span>
-          </motion.div>
-        </TooltipTrigger>
-        <TooltipContent
-          side="bottom"
-          className="bg-surface border-border/60 text-muted-foreground text-xs font-mono"
+  return (
+    <Tooltip open={open} onOpenChange={setOpen}>
+      <TooltipTrigger asChild>
+        <motion.div
+          className="relative flex flex-col items-center gap-2 cursor-default select-none px-2 sm:px-0"
+          variants={nodeVariants}
+          onClick={() => setOpen(true)}
         >
-          Coming soon
-        </TooltipContent>
-      </Tooltip>
-    );
-  }
+          <div className="relative">
+            {/* Subtle electric glow behind the node */}
+            <div className="absolute -inset-2 rounded-2xl bg-electric/[0.03] pointer-events-none" />
+            <div className="relative flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-xl border border-electric/15 bg-surface">
+              <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-electric/40" />
+            </div>
+          </div>
+          <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-foreground/50">
+            {stage.label}
+          </span>
+          {/* Always-visible NEXT badge */}
+          <span className="font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-electric/20 text-electric/50 bg-electric/[0.06]">
+            Next
+          </span>
+          <span className="hidden sm:block text-[10px] text-muted-foreground/40 text-center leading-tight max-w-[100px]">
+            {stage.sublabel}
+          </span>
+        </motion.div>
+      </TooltipTrigger>
+      <TooltipContent
+        side="bottom"
+        className="bg-surface border-border/60 text-muted-foreground text-xs font-mono"
+      >
+        {stage.tooltipLine}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
 
-  /* --- LIVE stage --- */
+/* ------------------------------------------------------------------ */
+/*  LIVE STAGE NODE                                                     */
+/* ------------------------------------------------------------------ */
+
+function LiveStageNode({ stage }: { stage: RailStage }) {
+  const Icon = stage.icon;
+
   const content = (
     <motion.div
       className="relative flex flex-col items-center gap-2 group px-2 sm:px-0"
@@ -213,6 +244,15 @@ function StageNode({ stage }: { stage: RailStage }) {
   }
 
   return content;
+}
+
+/* ------------------------------------------------------------------ */
+/*  STAGE NODE (router)                                                 */
+/* ------------------------------------------------------------------ */
+
+function StageNode({ stage }: { stage: RailStage }) {
+  if (!stage.live) return <NextStageNode stage={stage} />;
+  return <LiveStageNode stage={stage} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -288,12 +328,6 @@ export interface CompactRailProps {
   currentStep: number;
 }
 
-/**
- * Maps the generator's simple 1-2-3 step to rail stage activation.
- * Step 1 (paste)   -> OFFER active
- * Step 2 (loading)  -> OFFER done, ANGLES pulsing
- * Step 3 (review)   -> OFFER done, ANGLES done, OUTPUT active
- */
 function getStageState(
   stageId: string,
   currentStep: number
@@ -308,10 +342,16 @@ function getStageState(
     return currentStep >= 3 ? "active" : "next";
   }
   if (stageId === "compliance") {
-    return currentStep >= 3 ? "next" : "next";
+    return "next";
   }
-  /* CONTEXT and CAMPAIGN are always locked */
   return "locked";
+}
+
+function getProgressLabel(currentStep: number): string {
+  if (currentStep >= 3) return "Output";
+  if (currentStep === 2) return "Generating...";
+  if (currentStep === 1) return "Offer";
+  return "";
 }
 
 function CompactNode({
@@ -325,12 +365,14 @@ function CompactNode({
 
   if (state === "locked") {
     return (
-      <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-muted-foreground/25 select-none">
+      <div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-electric/10 text-electric/35 select-none">
         <Icon className="h-3 w-3" />
         <span className="font-mono text-[10px] uppercase tracking-wider hidden md:inline">
           {stage.label}
         </span>
-        <Lock className="h-2.5 w-2.5 md:ml-0.5" />
+        <span className="font-mono text-[8px] uppercase tracking-widest px-1.5 py-px rounded-full border border-electric/15 text-electric/40 bg-electric/[0.05]">
+          Next
+        </span>
       </div>
     );
   }
@@ -355,27 +397,36 @@ function CompactNode({
 }
 
 export function CompactTransformationRail({ currentStep }: CompactRailProps) {
+  const progressLabel = getProgressLabel(currentStep);
+
   return (
-    <div className="flex items-center gap-1 sm:gap-2 mt-6 mb-2 flex-wrap">
-      {RAIL_STAGES.map((stage, i) => {
-        const stageState = getStageState(stage.id, currentStep);
-        return (
-          <div key={stage.id} className="flex items-center">
-            {i > 0 && (
-              <span
-                className={`h-px w-3 sm:w-4 mr-1 sm:mr-1 ${
-                  stageState === "locked"
-                    ? "bg-border/20"
-                    : stageState === "done" || stageState === "active"
-                      ? "bg-electric/40"
-                      : "bg-border/30"
-                }`}
-              />
-            )}
-            <CompactNode stage={stage} state={stageState} />
-          </div>
-        );
-      })}
+    <div>
+      <div className="flex items-center gap-1 sm:gap-2 mt-6 mb-1 flex-wrap">
+        {RAIL_STAGES.map((stage, i) => {
+          const stageState = getStageState(stage.id, currentStep);
+          return (
+            <div key={stage.id} className="flex items-center">
+              {i > 0 && (
+                <span
+                  className={`h-px w-3 sm:w-4 mr-1 sm:mr-1 ${
+                    stageState === "locked"
+                      ? "bg-electric/10"
+                      : stageState === "done" || stageState === "active"
+                        ? "bg-electric/40"
+                        : "bg-border/30"
+                  }`}
+                />
+              )}
+              <CompactNode stage={stage} state={stageState} />
+            </div>
+          );
+        })}
+      </div>
+      {progressLabel && (
+        <p className="font-mono text-[10px] text-muted-foreground/50 mb-2">
+          Current stage: {progressLabel}
+        </p>
+      )}
     </div>
   );
 }
