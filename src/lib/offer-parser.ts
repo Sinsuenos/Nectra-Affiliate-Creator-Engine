@@ -15,10 +15,6 @@ interface FieldDef {
   patterns: RegExp[];
 }
 
-/* Affiliate exports are heterogeneous by design. Networks use different
-   labels, separators, table layouts, ordering, and sometimes put a value
-   on the line immediately after its label. This parser deliberately uses
-   several deterministic passes and never invents a value. */
 const LABEL_PREFIX = String.raw`(?:[-*•]\s*)?`;
 
 const FIELD_DEFS: FieldDef[] = [
@@ -81,6 +77,18 @@ const FIELD_DEFS: FieldDef[] = [
   },
 ];
 
+const COMMON_VERTICALS: Array<[string, string[]]> = [
+  ["Dating", ["dating", "singles", "matchmaking", "dating platform", "dating site", "dating app"]],
+  ["Adult", ["adult", "cams", "webcam", "porn", "explicit"]],
+  ["Gaming", ["gaming", "games", "gamer", "geek culture"]],
+  ["Finance", ["finance", "financial", "loan", "credit", "forex", "trading", "banking"]],
+  ["Crypto", ["crypto", "cryptocurrency", "bitcoin", "ethereum"]],
+  ["Health", ["health", "wellness", "supplement", "telehealth"]],
+  ["E-commerce", ["ecommerce", "e-commerce", "online store", "shopping"]],
+  ["Software", ["software", "saas", "app", "platform"]],
+  ["Travel", ["travel", "hotel", "flight", "vacation"]],
+];
+
 function cleanCapturedValue(value: string): string {
   return value.trim().replace(/^[|\s]+|[|\s]+$/g, "").replace(/^[`\"']|[`\"']$/g, "").replace(/\s+\|\s*$/, "").trim();
 }
@@ -127,10 +135,6 @@ function extractInlineKeyValue(lines: string[], aliases: string[]): string | nul
   return null;
 }
 
-/* Handles exports such as:
-   Accepted countries:
-   Australia, Austria, Belgium...
-   and markdown/table variants where the label occupies its own row. */
 function extractFollowingLineValue(lines: string[], aliases: string[]): string | null {
   const aliasSet = new Set(aliases.map(normalizeLabel));
   for (let i = 0; i < lines.length; i += 1) {
@@ -145,19 +149,36 @@ function extractFollowingLineValue(lines: string[], aliases: string[]): string |
   return null;
 }
 
+function extractStandaloneUrl(lines: string[]): string | null {
+  for (const line of lines) {
+    const match = line.match(/^(?:\[[^\]]*\]\()?\s*(https?:\/\/\S+?)(?:\)\s*)?$/i);
+    if (match?.[1]) return match[1].replace(/[),.;]+$/, "");
+  }
+  return null;
+}
+
+function extractOfferNameFromProse(lines: string[]): string | null {
+  for (const rawLine of lines.slice(0, 6)) {
+    const line = rawLine.replace(/^\[[^\]]*\]\s*/, "").trim();
+    const match = line.match(/^(.+?)\s+is\s+(?:a|an|the)\s+/i);
+    if (match?.[1]) {
+      const candidate = cleanCapturedValue(match[1]);
+      if (candidate.length >= 2 && candidate.length <= 80) return candidate;
+    }
+  }
+  return null;
+}
+
 function extractOfferNameFromFirstMeaningfulLine(lines: string[]): string | null {
   for (const rawLine of lines.slice(0, 8)) {
     const line = rawLine.replace(/^[|\s]+|[|\s]+$/g, "");
     if (!line || /^[-|:]+$/.test(line)) continue;
-
     const shorthand = line.match(/^(?:\|\s*)?(.+?)\s*(?:-|\|)\s*(?:PPS|CPA|CPL|CPI|CPS|CPM|RevShare|REVSHARE)\s*$/i);
     if (shorthand?.[1]) return cleanCapturedValue(shorthand[1]);
-
     if (/^https?:\/\//i.test(line)) continue;
     if (/^(?:network|network id|offer id|vertical|category|payout|default payout|commission|rate|conversion|conversion flow|flow|funnel|top geo|geo|countries|accepted countries|landing|default landing page|banned|prohibited|restricted|traffic|sub[- ]?id|parsed fields)\b/i.test(line)) continue;
     if (/^(?:key offer details|offer details|details|description)\s*[:#-]?$/i.test(line)) continue;
     if (/^\|?\s*(field|value|label|name)\s*\|/i.test(line)) continue;
-
     return cleanCapturedValue(line);
   }
   return null;
@@ -171,6 +192,28 @@ function extractOfferNameFromAnyLine(lines: string[]): string | null {
   return null;
 }
 
+function extractProseVertical(source: string): string | null {
+  const lower = source.toLowerCase();
+  for (const [vertical, terms] of COMMON_VERTICALS) {
+    if (terms.some((term) => lower.includes(term))) return vertical;
+  }
+  return null;
+}
+
+function extractProsePayout(source: string): string | null {
+  const patterns = [
+    /earns?\s+(\d+(?:\.\d+)?%)\s+of\s+all\s+user\s+spending/i,
+    /(\d+(?:\.\d+)?%)\s+(?:of\s+)?(?:all\s+)?user\s+spending/i,
+    /(?:commission|rev(?:enue)?\s*share|revenue share)\s+(?:of\s+)?(\d+(?:\.\d+)?%)/i,
+    /(\$\s?\d+(?:\.\d+)?\s*(?:CPA|CPL|CPS|CPM|per\s+lead|per\s+sale))/i,
+  ];
+  for (const pattern of patterns) {
+    const match = source.match(pattern);
+    if (match?.[1]) return cleanCapturedValue(match[0]);
+  }
+  return null;
+}
+
 function extractField(def: FieldDef, source: string, lines: string[]): string | null {
   for (const pattern of def.patterns) {
     const match = source.match(pattern);
@@ -179,16 +222,12 @@ function extractField(def: FieldDef, source: string, lines: string[]): string | 
       if (value) return value;
     }
   }
-
   const tableValue = extractTableValue(lines, def.aliases);
   if (tableValue) return tableValue;
-
   const inlineValue = extractInlineKeyValue(lines, def.aliases);
   if (inlineValue) return inlineValue;
-
   const followingLineValue = extractFollowingLineValue(lines, def.aliases);
   if (followingLineValue) return followingLineValue;
-
   return null;
 }
 
@@ -198,7 +237,10 @@ export function extractFields(text: string): ParsedField[] {
 
   return FIELD_DEFS.map((def) => {
     let value = extractField(def, source, lines);
-    if (def.key === "offer_name" && !value) value = extractOfferNameFromAnyLine(lines) ?? extractOfferNameFromFirstMeaningfulLine(lines);
+    if (def.key === "offer_name" && !value) value = extractOfferNameFromProse(lines) ?? extractOfferNameFromAnyLine(lines) ?? extractOfferNameFromFirstMeaningfulLine(lines);
+    if (def.key === "vertical" && !value) value = extractProseVertical(source);
+    if (def.key === "payout_model" && !value) value = extractProsePayout(source);
+    if (def.key === "landing_page" && !value) value = extractStandaloneUrl(lines);
     return { key: def.key, label: def.label, value: value || "Not detected" };
   });
 }
