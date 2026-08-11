@@ -44,7 +44,7 @@ function Connector({ index }: { index: number }) {
   const eitherLive = stage.live || nextStage?.live;
 
   return (
-    <motion.div className="hidden sm:flex items-center justify-center shrink-0 w-8 lg:w-12" variants={connectorVariants} style={{ originX: 0 }}>
+    <motion.div className="hidden sm:flex items-center justify-center shrink-0 w-10 lg:w-14" variants={connectorVariants} style={{ originX: 0 }}>
       {bothLive ? (
         <div className="relative w-full h-px overflow-hidden rounded-full">
           <div className="absolute inset-0 bg-gradient-to-r from-electric/45 via-fuchsia-400/55 to-lime-300/45" />
@@ -66,16 +66,16 @@ function NextStageNode({ stage }: { stage: RailStage }) {
   return (
     <Tooltip open={open} onOpenChange={setOpen}>
       <TooltipTrigger asChild>
-        <motion.div className="relative flex flex-col items-center gap-2 cursor-default select-none px-2 sm:px-0" variants={nodeVariants} onClick={() => setOpen(true)}>
+        <motion.div className="relative flex flex-col items-center gap-2.5 cursor-default select-none px-2 sm:px-0" variants={nodeVariants} onClick={() => setOpen(true)}>
           <div className="relative">
             <div className="absolute -inset-3 rounded-2xl bg-fuchsia-400/[0.06] blur-md pointer-events-none" />
-            <div className="relative flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-xl border border-electric/25 bg-surface">
-              <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-electric/65" />
+            <div className="relative flex items-center justify-center h-14 w-14 sm:h-16 sm:w-16 rounded-xl border border-electric/25 bg-surface">
+              <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-electric/65" />
             </div>
           </div>
-          <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-foreground/75">{stage.label}</span>
-          <span className="font-mono text-[7px] sm:text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-fuchsia-400/35 text-fuchsia-200 bg-fuchsia-400/[0.09]">NEXT</span>
-          <span className="hidden sm:block text-[10px] text-muted-foreground/75 text-center leading-tight max-w-[100px]">{stage.sublabel}</span>
+          <span className="font-mono text-[11px] sm:text-[12px] uppercase tracking-widest text-foreground/80">{stage.label}</span>
+          <span className="font-mono text-[8px] sm:text-[9px] uppercase tracking-widest px-2.5 py-0.5 rounded-full border border-fuchsia-400/35 text-fuchsia-200 bg-fuchsia-400/[0.09]">NEXT</span>
+          <span className="hidden sm:block text-[11px] text-muted-foreground/80 text-center leading-tight max-w-[118px]">{stage.sublabel}</span>
         </motion.div>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="bg-surface border-border/60 text-foreground text-xs font-mono">{stage.tooltipLine}</TooltipContent>
@@ -86,13 +86,13 @@ function NextStageNode({ stage }: { stage: RailStage }) {
 function LiveStageNode({ stage }: { stage: RailStage }) {
   const Icon = stage.icon;
   const content = (
-    <motion.div className="relative flex flex-col items-center gap-2 group px-1 sm:px-0" variants={nodeVariants}>
+    <motion.div className="relative flex flex-col items-center gap-2.5 group px-1 sm:px-0" variants={nodeVariants}>
       <div className="hidden sm:block absolute -inset-3 rounded-2xl bg-electric/[0.07] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-      <div className="relative flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-xl border border-electric/35 bg-surface shadow-lg shadow-electric/10">
-        <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-electric" />
+      <div className="relative flex items-center justify-center h-14 w-14 sm:h-16 sm:w-16 rounded-xl border border-electric/35 bg-surface shadow-lg shadow-electric/10">
+        <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-electric" />
       </div>
-      <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-electric">{stage.label}</span>
-      <span className="hidden sm:block text-[10px] text-muted-foreground/80 text-center leading-tight max-w-[100px]">{stage.sublabel}</span>
+      <span className="font-mono text-[11px] sm:text-[12px] uppercase tracking-widest text-electric">{stage.label}</span>
+      <span className="hidden sm:block text-[11px] text-muted-foreground/85 text-center leading-tight max-w-[118px]">{stage.sublabel}</span>
     </motion.div>
   );
   return stage.href ? <Link href={stage.href} className="hover:no-underline">{content}</Link> : content;
@@ -105,16 +105,16 @@ function StageNode({ stage }: { stage: RailStage }) {
 export function TransformationRail() {
   return (
     <motion.div className="mx-auto max-w-6xl px-4 sm:px-6 pb-20 sm:pb-28" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
-      <motion.div className="font-mono text-xs tracking-widest uppercase text-electric mb-2 text-center" variants={nodeVariants}>The Pipeline</motion.div>
-      <motion.div className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 sm:mb-16" variants={nodeVariants}>One Offer.<span className="bg-gradient-to-r from-electric via-fuchsia-400 to-lime-300 bg-clip-text text-transparent"> Multiple Campaign Directions.</span> One Campaign.</motion.div>
+      <motion.div className="font-mono text-sm tracking-widest uppercase text-electric mb-3 text-center" variants={nodeVariants}>The Pipeline</motion.div>
+      <motion.div className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center mb-12 sm:mb-16" variants={nodeVariants}>One Offer.<span className="bg-gradient-to-r from-electric via-fuchsia-400 to-lime-300 bg-clip-text text-transparent"> Multiple Campaign Directions.</span> One Campaign.</motion.div>
       <div className="hidden sm:flex items-center justify-center">
         {RAIL_STAGES.map((stage, i) => <div key={stage.id} className="flex items-center"><StageNode stage={stage} />{i < RAIL_STAGES.length - 1 && <Connector index={i} />}</div>)}
       </div>
       <div className="sm:hidden grid grid-cols-2 gap-x-3 gap-y-8 justify-items-center">
         {RAIL_STAGES.map((stage) => <div key={stage.id} className="w-full flex justify-center"><StageNode stage={stage} /></div>)}
       </div>
-      <div className="mt-8 flex items-center justify-center gap-2 text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground/75">
-        <ArrowRight className="h-3 w-3 text-electric/70" /> Live now: Offer · Directions · Compliance · Output
+      <div className="mt-10 flex items-center justify-center gap-2 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground/80">
+        <ArrowRight className="h-3.5 w-3.5 text-electric/75" /> Live now: Offer · Directions · Compliance · Output
       </div>
     </motion.div>
   );
