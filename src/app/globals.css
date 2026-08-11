@@ -49,79 +49,79 @@
 
 :root {
   --radius: 0.625rem;
-  --background: #0c0c12;
-  --foreground: #e4e4e7;
-  --card: #14141e;
-  --card-foreground: #e4e4e7;
-  --popover: #14141e;
-  --popover-foreground: #e4e4e7;
-  --primary: #0ea5e9;
-  --primary-foreground: #0c0c12;
-  --secondary: #1e1e2c;
-  --secondary-foreground: #e4e4e7;
-  --muted: #1a1a26;
-  --muted-foreground: #71717a;
-  --accent: #1e1e2c;
-  --accent-foreground: #e4e4e7;
+  --background: #10131b;
+  --foreground: #f4f4f5;
+  --card: #181b25;
+  --card-foreground: #f4f4f5;
+  --popover: #181b25;
+  --popover-foreground: #f4f4f5;
+  --primary: #22b8ff;
+  --primary-foreground: #081018;
+  --secondary: #242938;
+  --secondary-foreground: #f4f4f5;
+  --muted: #202432;
+  --muted-foreground: #a1a1aa;
+  --accent: #242938;
+  --accent-foreground: #f4f4f5;
   --destructive: #ef4444;
-  --border: #2a2a3a;
-  --input: #2a2a3a;
-  --ring: #0ea5e9;
-  --electric: #0ea5e9;
-  --electric-dim: #0ea5e933;
-  --surface: #111119;
-  --surface-raised: #1a1a26;
-  --chart-1: #0ea5e9;
-  --chart-2: #22d3ee;
-  --chart-3: #06b6d4;
-  --chart-4: #38bdf8;
-  --chart-5: #0891b2;
-  --sidebar: #111119;
-  --sidebar-foreground: #e4e4e7;
-  --sidebar-primary: #0ea5e9;
-  --sidebar-primary-foreground: #0c0c12;
-  --sidebar-accent: #1e1e2c;
-  --sidebar-accent-foreground: #e4e4e7;
-  --sidebar-border: #2a2a3a;
-  --sidebar-ring: #0ea5e9;
+  --border: #3a4052;
+  --input: #3a4052;
+  --ring: #22b8ff;
+  --electric: #22b8ff;
+  --electric-dim: #22b8ff3d;
+  --surface: #151923;
+  --surface-raised: #202533;
+  --chart-1: #22b8ff;
+  --chart-2: #2dd4ff;
+  --chart-3: #a78bfa;
+  --chart-4: #d946ef;
+  --chart-5: #a3e635;
+  --sidebar: #151923;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: #22b8ff;
+  --sidebar-primary-foreground: #081018;
+  --sidebar-accent: #242938;
+  --sidebar-accent-foreground: #f4f4f5;
+  --sidebar-border: #3a4052;
+  --sidebar-ring: #22b8ff;
 }
 
 .dark {
-  --background: #0c0c12;
-  --foreground: #e4e4e7;
-  --card: #14141e;
-  --card-foreground: #e4e4e7;
-  --popover: #14141e;
-  --popover-foreground: #e4e4e7;
-  --primary: #0ea5e9;
-  --primary-foreground: #0c0c12;
-  --secondary: #1e1e2c;
-  --secondary-foreground: #e4e4e7;
-  --muted: #1a1a26;
-  --muted-foreground: #71717a;
-  --accent: #1e1e2c;
-  --accent-foreground: #e4e4e7;
+  --background: #10131b;
+  --foreground: #f4f4f5;
+  --card: #181b25;
+  --card-foreground: #f4f4f5;
+  --popover: #181b25;
+  --popover-foreground: #f4f4f5;
+  --primary: #22b8ff;
+  --primary-foreground: #081018;
+  --secondary: #242938;
+  --secondary-foreground: #f4f4f5;
+  --muted: #202432;
+  --muted-foreground: #a1a1aa;
+  --accent: #242938;
+  --accent-foreground: #f4f4f5;
   --destructive: #ef4444;
-  --border: #2a2a3a;
-  --input: #2a2a3a;
-  --ring: #0ea5e9;
-  --electric: #0ea5e9;
-  --electric-dim: #0ea5e933;
-  --surface: #111119;
-  --surface-raised: #1a1a26;
-  --chart-1: #0ea5e9;
-  --chart-2: #22d3ee;
-  --chart-3: #06b6d4;
-  --chart-4: #38bdf8;
-  --chart-5: #0891b2;
-  --sidebar: #111119;
-  --sidebar-foreground: #e4e4e7;
-  --sidebar-primary: #0ea5e9;
-  --sidebar-primary-foreground: #0c0c12;
-  --sidebar-accent: #1e1e2c;
-  --sidebar-accent-foreground: #e4e4e7;
-  --sidebar-border: #2a2a3a;
-  --sidebar-ring: #0ea5e9;
+  --border: #3a4052;
+  --input: #3a4052;
+  --ring: #22b8ff;
+  --electric: #22b8ff;
+  --electric-dim: #22b8ff3d;
+  --surface: #151923;
+  --surface-raised: #202533;
+  --chart-1: #22b8ff;
+  --chart-2: #2dd4ff;
+  --chart-3: #a78bfa;
+  --chart-4: #d946ef;
+  --chart-5: #a3e635;
+  --sidebar: #151923;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: #22b8ff;
+  --sidebar-primary-foreground: #081018;
+  --sidebar-accent: #242938;
+  --sidebar-accent-foreground: #f4f4f5;
+  --sidebar-border: #3a4052;
+  --sidebar-ring: #22b8ff;
 }
 
 @layer base {
@@ -133,23 +133,21 @@
   }
 }
 
-/* Custom scrollbar for dark theme */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #111119;
+  background: #151923;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2a3a;
+  background: #3a4052;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a4a;
+  background: #525a70;
 }
 
-/* Selection color */
 ::selection {
-  background: #0ea5e933;
-  color: #e4e4e7;
+  background: #22b8ff4d;
+  color: #ffffff;
 }
