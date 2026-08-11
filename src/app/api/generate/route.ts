@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
-import { GoogleGenAI } from "@google/genai";
 
 /* ------------------------------------------------------------------ */
 /*  TYPES                                                              */
@@ -62,7 +61,7 @@ const SYSTEM_PROMPT = `You are Nectar Engine — a specialized affiliate content
 
 4. **REDDIT RULE**: The Reddit post must be ONE honest question/discussion post written as if from a real person genuinely asking for input. No disguised promotions. No fake personal stories. No astroturfing.
 
-5. **PLATFORM DIFFERENTIATION**: Each platform's post must genuinely differ in tone, structure, and approach — not just length. X is concise and direct. TikTok is casual and POV-driven. Pinterest is informational and saveable. Reddit is a genuine community question.
+5. **PLATFORM DIFFERENTIATION**: Each platform's post must genuinely differ in tone, structure, and approach — not just length. X is concise and direct. TikTok is casual and POV-driven. Pinterest is informational and saveable. Reddit is a genuine community question. Instagram uses visual-caption style with solicitation-safe language (existence-friendly, not hard-sell). Facebook uses solicitation-safe framing similar to Instagram but group-spam-aware.
 
 6. **COMPLIANCE AWARENESS**: Compliance notes must reference the specific risk factors present in the offer data (e.g., health claims, income claims, rebill structure, banned traffic types) and the platform-specific restrictions that apply.
 
@@ -78,7 +77,9 @@ Return ONLY valid JSON matching this exact structure (no markdown fences, no com
     { "platform": "X", "character_count": <number>, "text": "<post text>" },
     { "platform": "TikTok", "character_count": <number>, "text": "<post text>" },
     { "platform": "Pinterest", "character_count": <number>, "text": "<post text>" },
-    { "platform": "Reddit", "character_count": <number>, "text": "<post text>" }
+    { "platform": "Reddit", "character_count": <number>, "text": "<post text>" },
+    { "platform": "Instagram", "character_count": <number>, "text": "<post text>" },
+    { "platform": "Facebook", "character_count": <number>, "text": "<post text>" }
   ],
   "headlines": [
     { "variant": "A", "text": "<headline>" },
@@ -98,7 +99,7 @@ Return ONLY valid JSON matching this exact structure (no markdown fences, no com
   ]
 }
 
-Generate exactly 3 promo angles, 4 social posts (one per platform), 4 headlines, 4 CTA variations, and 3-5 compliance notes.
+Generate exactly 3 promo angles, 6 social posts (one per platform), 4 headlines, 4 CTA variations, and 3-5 compliance notes.
 
 ## CHARACTER COUNTS
 
@@ -106,6 +107,8 @@ Generate exactly 3 promo angles, 4 social posts (one per platform), 4 headlines,
 - TikTok: stay under 300 characters.
 - Pinterest: stay under 500 characters.
 - Reddit: 300-500 characters.
+- Instagram: stay under 400 characters.
+- Facebook: stay under 400 characters.
 
 ## IMPORTANT
 
@@ -113,6 +116,59 @@ Generate exactly 3 promo angles, 4 social posts (one per platform), 4 headlines,
 - Do NOT wrap the JSON in markdown code fences.
 - Return raw JSON only.
 - Count characters accurately for each social post.`;
+
+/* ------------------------------------------------------------------ */
+/*  OPENROUTER CALL                                                     */
+/* ------------------------------------------------------------------ */
+async function callOpenRouter(offerText: string): Promise<string> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    throw new Error("Generator is not configured. OPENROUTER_API_KEY is not set.");
+  }
+
+  const model = process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-nano-30b-a3b:free";
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 50_000);
+
+  let response: globalThis.Response;
+  try {
+    response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://nectar-engine.vercel.app",
+        "X-Title": "Nectar Engine",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 8000,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: offerText },
+        ],
+      }),
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!response.ok) {
+    const errBody = await response.text();
+    throw new Error(`OpenRouter ${response.status}: ${errBody}`);
+  }
+
+  const data = await response.json();
+  const content = data?.choices?.[0]?.message?.content;
+
+  if (!content) {
+    throw new Error("The model returned an empty response.");
+  }
+
+  return content;
+}
 
 /* ------------------------------------------------------------------ */
 /*  POST HANDLER                                                       */
@@ -130,44 +186,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    /* --- Check API key --- */
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "Generator is not configured. GEMINI_API_KEY is not set." },
-        { status: 503 },
-      );
-    }
+    /* --- Call OpenRouter --- */
+    const raw = await callOpenRouter(offerText);
 
-    /* --- Resolve model --- */
-    const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-
-    /* --- Call Gemini --- */
-    const ai = new GoogleGenAI({ apiKey });
-
-    const response = await ai.models.generateContent({
-      model,
-      contents: [{ role: "user", parts: [{ text: offerText }] }],
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        temperature: 0.7,
-        maxOutputTokens: 4096,
-      },
-    });
-
-    const raw = response.text;
-    if (!raw) {
-      return NextResponse.json(
-        { error: "The model returned an empty response." },
-        { status: 502 },
-      );
-    }
-
-    /* --- Parse JSON (tolerant of markdown fences) --- */
+    /* --- Parse JSON (tolerant of markdown fences + control chars) --- */
     let cleaned = raw.trim();
     if (cleaned.startsWith("```")) {
       cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
     }
+    /* Strip control characters that break JSON.parse */
+    cleaned = cleaned.replace(/[\x00-\x1f]/g, (ch) => {
+      if (ch === "\n" || ch === "\r" || ch === "\t") return ch;
+      return "";
+    });
 
     let parsed: GeneratedToolkit;
     try {
@@ -197,18 +228,46 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    /* --- Enforce accurate character counts --- */
+    if (Array.isArray(parsed.social_posts)) {
+      for (const post of parsed.social_posts) {
+        if (typeof post.text === "string") {
+          post.character_count = post.text.length;
+        }
+      }
+    }
+
     return NextResponse.json({ data: parsed });
   } catch (err: unknown) {
-    console.error("Gemini API Generation Error:", err);
+    console.error("Generation Error:", err);
 
     const message =
       err instanceof Error ? err.message : "Unknown error";
 
-    /* Surface rate-limit information if present */
-    if (message.includes("429") || message.includes("RESOURCE_EXHAUSTED") || message.includes("quota")) {
+    /* Surface rate-limit / auth / billing information */
+    if (
+      message.includes("429") ||
+      message.includes("rate") ||
+      message.includes("quota") ||
+      message.includes("insufficient")
+    ) {
       return NextResponse.json(
-        { error: "Rate limit reached. Please wait a moment and try again." },
+        { error: "Rate limit or billing issue. Please wait a moment and try again." },
         { status: 429 },
+      );
+    }
+
+    if (message.includes("not configured") || message.includes("not set")) {
+      return NextResponse.json(
+        { error: message },
+        { status: 503 },
+      );
+    }
+
+    if (message.includes("401") || message.includes("403") || message.includes("invalid")) {
+      return NextResponse.json(
+        { error: "API key is invalid or unauthorized." },
+        { status: 503 },
       );
     }
 

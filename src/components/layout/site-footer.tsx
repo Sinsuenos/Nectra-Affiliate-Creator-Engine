@@ -35,9 +35,8 @@ export function SiteFooter() {
             >
               Refund Policy
             </Link>
-            {/* PLACEHOLDER — Christopher will provide real URL once listing is live */}
             <a
-              href="#"
+              href="mailto:support@nectar-engine.example"
               className="hover:text-foreground transition-colors"
             >
               Contact
