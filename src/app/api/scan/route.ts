@@ -21,27 +21,35 @@ interface PlatformResult {
 /* ------------------------------------------------------------------ */
 /*  SYSTEM PROMPT                                                      */
 /* ------------------------------------------------------------------ */
-const SYSTEM_PROMPT = `You are a compliance scanner for affiliate marketing content. Review the given text against platform advertising policies.
+const SYSTEM_PROMPT = `You are Nectar Engine's Compliance Scanner. Review affiliate marketing content against platform advertising policies.
 
-RULES:
-1. Only flag phrases that EXACTLY appear in the input text. Never invent violations.
-2. Copy flagged phrases exactly as written, character-for-character.
-3. Each platform has different rules - evaluate independently.
-4. STATUS: "fail" = explicit banned triggers (hard-sell CTAs, health/income guarantees, urgency manipulation). "warn" = borderline language. "pass" = no issues.
-5. For safer_rewrite: only rewrite the flagged portion, keep rest identical.
+## STRICT RULES
 
-PLATFORM KEY RULES:
+1. GROUND IN INPUT: Only flag phrases that EXACTLY appear in the user text. NEVER invent violations. Copy flagged phrases character-for-character from the input.
+2. PLATFORM SPECIFICITY: Same text may pass on X but fail on Reddit. Evaluate each platform independently.
+3. REWRITE ACCURACY: Only rewrite the flagged portion in safer_rewrite. Keep rest identical.
+
+## STATUS THRESHOLDS
+
+- "fail": Explicit banned triggers (solicitation language, hard-sell CTAs, undisclosed affiliate intent, health/income guarantees, urgency manipulation, "click here", "sign up now", "act now", "free trial", "no risk", "guaranteed")
+- "warn": Borderline language (mild urgency, implied claims, missing disclosure)
+- "pass": No compliance concerns
+
+## PLATFORM KEY RULES
+
 - TikTok: No health/income guarantees, no "before and after", branded content toggle required
 - Instagram: Paid Partnership label needed, no result-specific health claims
-- Facebook: Branded Content tag, no fake urgency, no cloaked URLs
-- Reddit: No self-promotion, no affiliate links, no direct CTAs
-- X: Low risk, use #ad, keep factual
-- Pinterest: FTC disclosure in first line, no misleading claims
+- Facebook: Branded Content tag, no fake urgency ("only 2 left"), no cloaked URLs
+- Reddit: HIGH risk. No self-promotion, no affiliate links in posts, no direct CTAs
+- X (Twitter): Low risk. Use #ad. Keep claims factual.
+- Pinterest: FTC disclosure in first line, no misleading before-and-after pins
 
-OUTPUT: Return ONLY valid JSON, no markdown fences:
-{"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":[],"reason":"<short>","safer_rewrite":""}]}
+## OUTPUT FORMAT
 
-For "pass" status: flagged_phrases=[], safer_rewrite="".`;
+Return ONLY valid JSON (no markdown fences, no commentary):
+{"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":["<exact phrase>"],"reason":"<short>","safer_rewrite":"<or empty>"}]}
+
+For pass: flagged_phrases=[], safer_rewrite="".`;
 
 /* ------------------------------------------------------------------ */
 /*  OPENROUTER CALL                                                     */
@@ -155,15 +163,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    /* --- Batch platforms into groups of 3 and call in parallel --- */
-    const batches = chunk(platforms, 3);
+    /* --- Batch platforms into groups of 2 and call in parallel --- */
+    const batches = chunk(platforms, 2);
     const batchResults = await Promise.all(
       batches.map(async (batch) => {
         try {
           const raw = await callOpenRouter(content, batch);
           return parseResults(raw);
         } catch {
-          /* If a batch fails, return pass results for those platforms */
           return batch.map((p) => ({
             platform: p,
             status: "pass" as const,
