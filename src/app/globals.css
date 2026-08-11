@@ -25,18 +25,20 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
   --color-electric: var(--electric);
   --color-electric-dim: var(--electric-dim);
   --color-surface: var(--surface);
@@ -60,12 +62,12 @@
   --secondary: #293247;
   --secondary-foreground: #f8fafc;
   --muted: #252d40;
-  --muted-foreground: #b5bccb;
+  --muted-foreground: #d0d6e2;
   --accent: #293247;
   --accent-foreground: #f8fafc;
   --destructive: #ef4444;
-  --border: #46516a;
-  --input: #46516a;
+  --border: #56627a;
+  --input: #56627a;
   --ring: #25bfff;
   --electric: #25bfff;
   --electric-dim: #25bfff4d;
@@ -82,7 +84,7 @@
   --sidebar-primary-foreground: #061018;
   --sidebar-accent: #293247;
   --sidebar-accent-foreground: #f8fafc;
-  --sidebar-border: #46516a;
+  --sidebar-border: #56627a;
   --sidebar-ring: #25bfff;
 }
 
@@ -98,12 +100,12 @@
   --secondary: #293247;
   --secondary-foreground: #f8fafc;
   --muted: #252d40;
-  --muted-foreground: #b5bccb;
+  --muted-foreground: #d0d6e2;
   --accent: #293247;
   --accent-foreground: #f8fafc;
   --destructive: #ef4444;
-  --border: #46516a;
-  --input: #46516a;
+  --border: #56627a;
+  --input: #56627a;
   --ring: #25bfff;
   --electric: #25bfff;
   --electric-dim: #25bfff4d;
@@ -120,7 +122,7 @@
   --sidebar-primary-foreground: #061018;
   --sidebar-accent: #293247;
   --sidebar-accent-foreground: #f8fafc;
-  --sidebar-border: #46516a;
+  --sidebar-border: #56627a;
   --sidebar-ring: #25bfff;
 }
 
@@ -140,11 +142,11 @@
   background: #182031;
 }
 ::-webkit-scrollbar-thumb {
-  background: #46516a;
+  background: #56627a;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #65718b;
+  background: #7b879f;
 }
 
 ::selection {
