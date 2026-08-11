@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 interface GenerateRequest {
   offerText: string;
+  offerUrl?: string;
 }
 
 interface PromoAngle { angle: string; hook: string; body: string; }
@@ -20,89 +21,103 @@ interface GeneratedToolkit {
   compliance_notes: ComplianceNote[];
 }
 
-const SYSTEM_PROMPT = `You are Nectar Engine — a specialized affiliate content generation system built for high-risk, tightly-restricted verticals.
+const SYSTEM_PROMPT = `You are Nectar Engine, a creative affiliate content transformation system.
 
-## CONTENT STANDARDS (NON-NEGOTIABLE)
+## CORE RULE: CREATIVE, BUT NEVER FABRICATE
+The supplied offer data and optional verified offer-page context are the factual source of truth.
+You SHOULD be creative: invent hooks, campaign framing, positioning, phrasing, emotional framing, and fresh ways to present verified benefits.
+You MUST NOT invent factual product claims, features, prices, payouts, guarantees, statistics, user counts, testimonials, availability, locations, or capabilities.
+A creative idea is allowed to be original wording. A factual assertion must be supported by the source material.
+If a useful fact is missing, work creatively around what is known instead of filling the gap with an invented fact.
+If the supplied sources conflict, do not silently choose. Avoid repeating the conflicting fact and flag the conflict in a compliance note when relevant.
 
-1. FACT GROUNDING: Use ONLY facts present in the supplied offer data. NEVER invent features, prices, payouts, guarantees, statistics, user counts, testimonials, or claims. Never turn assumptions into facts. If information is missing, identify it as missing rather than filling gaps.
+## SOURCE PRIORITY
+1. Verified offer-page context, when supplied.
+2. Human-supplied offer data.
+3. Creative interpretation based on those facts.
+Never treat creative interpretation as a source fact.
 
-2. NO GENERIC FILLER: Every promotional angle must be traceable to a specific supplied offer fact. No "game-changer," "revolutionary," "cutting-edge," "world-class," or similar hollow modifiers unless the offer text itself uses them.
+## PLATFORM RULES
+Reddit must be an honest discussion/question format, not fake personal experience or disguised astroturfing.
+Each platform must genuinely differ in tone and structure.
+Follow the supplied platform compliance guidance. Do not invent platform restrictions.
 
-3. NO REPEATED ANGLES: Each output section must use a materially different angle. Do not repeat the same hook, benefit, or framing across sections.
-
-4. REDDIT RULE: The Reddit post must be ONE honest question/discussion post written as if from a real person genuinely asking for input. No disguised promotions. No fake personal stories. No astroturfing.
-
-5. PLATFORM DIFFERENTIATION: Each platform's post must genuinely differ in tone, structure, and approach — not just length. X is concise and direct. TikTok is casual and POV-driven. Pinterest is informational and saveable. Reddit is a genuine community question. Instagram uses visual-caption style with solicitation-safe language. Facebook uses solicitation-safe framing and avoids group-spam behavior. Snapchat is short, story-native, and non-explicit. Discord is community-first and suitable for an approved promo channel, never unsolicited mass promotion. Telegram is concise and disclosure-clear, with no implication that paid Telegram ads permit restricted content.
-
-6. COMPLIANCE AWARENESS: Compliance notes must reference specific risk factors present in the offer data and platform-specific restrictions. Do not invent a restriction that is not supported by the supplied offer or the platform matrix.
-
-## OUTPUT FORMAT
-
-Return ONLY valid JSON matching this exact structure:
-
+## OUTPUT
+Return ONLY valid JSON matching the exact structure below.
 {
-  "promo_angles": [
-    { "angle": "<angle name>", "hook": "<compelling opening line>", "body": "<supporting paragraph tying to specific offer facts>" }
-  ],
+  "promo_angles": [{ "angle": "<creative angle name>", "hook": "<hook>", "body": "<supporting copy grounded in source facts>" }],
   "social_posts": [
-    { "platform": "X", "character_count": <number>, "text": "<post text>" },
-    { "platform": "TikTok", "character_count": <number>, "text": "<post text>" },
-    { "platform": "Pinterest", "character_count": <number>, "text": "<post text>" },
-    { "platform": "Reddit", "character_count": <number>, "text": "<post text>" },
-    { "platform": "Instagram", "character_count": <number>, "text": "<post text>" },
-    { "platform": "Facebook", "character_count": <number>, "text": "<post text>" },
-    { "platform": "Snapchat", "character_count": <number>, "text": "<post text>" },
-    { "platform": "Discord", "character_count": <number>, "text": "<post text>" },
-    { "platform": "Telegram", "character_count": <number>, "text": "<post text>" }
+    { "platform": "X", "character_count": <number>, "text": "<post>" },
+    { "platform": "TikTok", "character_count": <number>, "text": "<post>" },
+    { "platform": "Pinterest", "character_count": <number>, "text": "<post>" },
+    { "platform": "Reddit", "character_count": <number>, "text": "<post>" },
+    { "platform": "Instagram", "character_count": <number>, "text": "<post>" },
+    { "platform": "Facebook", "character_count": <number>, "text": "<post>" },
+    { "platform": "Snapchat", "character_count": <number>, "text": "<post>" },
+    { "platform": "Discord", "character_count": <number>, "text": "<post>" },
+    { "platform": "Telegram", "character_count": <number>, "text": "<post>" }
   ],
   "headlines": [
-    { "variant": "A", "text": "<headline>" },
-    { "variant": "B", "text": "<headline>" },
-    { "variant": "C", "text": "<headline>" },
-    { "variant": "D", "text": "<headline>" }
+    { "variant": "A", "text": "<headline>" }, { "variant": "B", "text": "<headline>" },
+    { "variant": "C", "text": "<headline>" }, { "variant": "D", "text": "<headline>" }
   ],
-  "body_copy": "<2-3 paragraph long-form sales copy grounded in offer facts>",
+  "body_copy": "<2-3 paragraph copy grounded in source facts>",
   "cta_variations": [
-    { "id": "CTA-1", "text": "<call to action text>", "tone": "<tone description>" },
-    { "id": "CTA-2", "text": "<call to action text>", "tone": "<tone description>" },
-    { "id": "CTA-3", "text": "<call to action text>", "tone": "<tone description>" },
-    { "id": "CTA-4", "text": "<call to action text>", "tone": "<tone description>" }
+    { "id": "CTA-1", "text": "<cta>", "tone": "<tone>" }, { "id": "CTA-2", "text": "<cta>", "tone": "<tone>" },
+    { "id": "CTA-3", "text": "<cta>", "tone": "<tone>" }, { "id": "CTA-4", "text": "<cta>", "tone": "<tone>" }
   ],
-  "compliance_notes": [
-    { "platform": "<platform name>", "note": "<specific risk note based on offer data>" }
-  ]
+  "compliance_notes": [{ "platform": "<platform>", "note": "<specific note>" }]
+}
+Generate exactly 3 promo angles, 9 social posts, 4 headlines, 4 CTAs, and 3-5 compliance notes.
+Character limits: X <280, TikTok <300, Pinterest <500, Reddit 300-500, Instagram <400, Facebook <400, Snapchat <300, Discord <400, Telegram <400.
+Count social characters accurately.`;
+
+async function fetchOfferContext(url: string): Promise<string> {
+  try {
+    const parsed = new URL(url);
+    if (!["http:", "https:"].includes(parsed.protocol)) return "";
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    let response: Response;
+    try {
+      response = await fetch(parsed.toString(), {
+        signal: controller.signal,
+        headers: { "User-Agent": "Mozilla/5.0 NectarEngine/1.0" },
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+    if (!response.ok) return "";
+    const html = await response.text();
+    const text = html
+      .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/\s+/g, " ")
+      .trim();
+    return text.slice(0, 12000);
+  } catch {
+    return "";
+  }
 }
 
-Generate exactly 3 promo angles, 9 social posts (one per platform), 4 headlines, 4 CTA variations, and 3-5 compliance notes.
-
-## CHARACTER COUNTS
-
-- X: under 280 characters.
-- TikTok: under 300 characters.
-- Pinterest: under 500 characters.
-- Reddit: 300-500 characters.
-- Instagram: under 400 characters.
-- Facebook: under 400 characters.
-- Snapchat: under 300 characters.
-- Discord: under 400 characters.
-- Telegram: under 400 characters.
-
-## IMPORTANT
-
-- Do NOT include disclaimer text, intro, or outro outside the JSON.
-- Do NOT wrap the JSON in markdown code fences.
-- Return raw JSON only.
-- Count characters accurately for each social post.`;
-
-async function callOpenRouter(offerText: string): Promise<string> {
+async function callOpenRouter(offerText: string, offerUrl?: string): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("Generator is not configured. OPENROUTER_API_KEY is not set.");
 
   const model = process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-nano-30b-a3b:free";
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 50_000);
+  const pageContext = offerUrl ? await fetchOfferContext(offerUrl) : "";
+  const userContent = [
+    "HUMAN-SUPPLIED OFFER DATA:\n" + offerText,
+    offerUrl ? `\nOFFER URL SUPPLIED BY HUMAN:\n${offerUrl}` : "",
+    pageContext ? `\nVERIFIED OFFER-PAGE CONTEXT (use as source material, not as a reason to invent claims):\n${pageContext}` : "",
+  ].join("\n");
 
-  let response: globalThis.Response;
+  let response: Response;
   try {
     response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -118,7 +133,7 @@ async function callOpenRouter(offerText: string): Promise<string> {
         max_tokens: 8000,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: offerText },
+          { role: "user", content: userContent },
         ],
       }),
     });
@@ -126,11 +141,7 @@ async function callOpenRouter(offerText: string): Promise<string> {
     clearTimeout(timeoutId);
   }
 
-  if (!response.ok) {
-    const errBody = await response.text();
-    throw new Error(`OpenRouter ${response.status}: ${errBody}`);
-  }
-
+  if (!response.ok) throw new Error(`OpenRouter ${response.status}: ${await response.text()}`);
   const data = await response.json();
   const content = data?.choices?.[0]?.message?.content;
   if (!content) throw new Error("The model returned an empty response.");
@@ -140,53 +151,40 @@ async function callOpenRouter(offerText: string): Promise<string> {
 export async function POST(request: NextRequest) {
   try {
     const body: GenerateRequest = await request.json();
-    const { offerText } = body;
-
+    const { offerText, offerUrl } = body;
     if (!offerText || typeof offerText !== "string" || offerText.trim().length < 20) {
       return NextResponse.json({ error: "Offer text is required and must be at least 20 characters." }, { status: 400 });
     }
+    if (offerUrl && typeof offerUrl !== "string") {
+      return NextResponse.json({ error: "Offer URL must be a valid URL string." }, { status: 400 });
+    }
 
-    const raw = await callOpenRouter(offerText);
+    const raw = await callOpenRouter(offerText, offerUrl);
     let cleaned = raw.trim();
     if (cleaned.startsWith("```")) cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
     cleaned = cleaned.replace(/[\x00-\x1f]/g, (ch) => (ch === "\n" || ch === "\r" || ch === "\t" ? ch : ""));
 
     let parsed: GeneratedToolkit;
-    try {
-      parsed = JSON.parse(cleaned) as GeneratedToolkit;
-    } catch {
-      return NextResponse.json({ error: "The model returned invalid JSON. Please try again." }, { status: 502 });
-    }
+    try { parsed = JSON.parse(cleaned) as GeneratedToolkit; }
+    catch { return NextResponse.json({ error: "The model returned invalid JSON. Please try again." }, { status: 502 }); }
 
     const requiredKeys: (keyof GeneratedToolkit)[] = ["promo_angles", "social_posts", "headlines", "body_copy", "cta_variations", "compliance_notes"];
-    for (const key of requiredKeys) {
-      if (!parsed[key]) return NextResponse.json({ error: `Generated output is missing required field: ${key}` }, { status: 502 });
-    }
-
-    if (!Array.isArray(parsed.social_posts)) {
-      return NextResponse.json({ error: "Generated output contains an invalid social_posts list." }, { status: 502 });
-    }
+    for (const key of requiredKeys) if (!parsed[key]) return NextResponse.json({ error: `Generated output is missing required field: ${key}` }, { status: 502 });
+    if (!Array.isArray(parsed.social_posts)) return NextResponse.json({ error: "Generated output contains an invalid social_posts list." }, { status: 502 });
 
     const requiredPlatforms = ["X", "TikTok", "Pinterest", "Reddit", "Instagram", "Facebook", "Snapchat", "Discord", "Telegram"];
     const postsByPlatform = new Map(parsed.social_posts.map((post) => [post.platform, post]));
     const missingPlatforms = requiredPlatforms.filter((platform) => !postsByPlatform.has(platform));
-    if (missingPlatforms.length) {
-      return NextResponse.json({ error: `Generated output is missing platforms: ${missingPlatforms.join(", ")}` }, { status: 502 });
-    }
-
+    if (missingPlatforms.length) return NextResponse.json({ error: `Generated output is missing platforms: ${missingPlatforms.join(", ")}` }, { status: 502 });
     parsed.social_posts = requiredPlatforms.map((platform) => {
       const post = postsByPlatform.get(platform)!;
       return { ...post, character_count: typeof post.text === "string" ? post.text.length : 0 };
     });
-
     return NextResponse.json({ data: parsed });
   } catch (err: unknown) {
     console.error("Generation Error:", err);
     const message = err instanceof Error ? err.message : "Unknown error";
-
-    if (message.includes("429") || message.includes("rate") || message.includes("quota") || message.includes("insufficient")) {
-      return NextResponse.json({ error: "Rate limit or billing issue. Please wait a moment and try again." }, { status: 429 });
-    }
+    if (message.includes("429") || message.includes("rate") || message.includes("quota") || message.includes("insufficient")) return NextResponse.json({ error: "Rate limit or billing issue. Please wait a moment and try again." }, { status: 429 });
     if (message.includes("not configured") || message.includes("not set")) return NextResponse.json({ error: message }, { status: 503 });
     if (message.includes("401") || message.includes("403") || message.includes("invalid")) return NextResponse.json({ error: "API key is invalid or unauthorized." }, { status: 503 });
     return NextResponse.json({ error: message }, { status: 500 });
