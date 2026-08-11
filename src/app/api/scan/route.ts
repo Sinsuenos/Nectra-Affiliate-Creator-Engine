@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PLATFORM_MATRIX, PLATFORM_MATRIX_BY_ID } from "@/lib/compliance/platform-matrix";
+import { PLATFORM_MATRIX } from "@/lib/compliance/platform-matrix";
 
-export const maxDuration = 120;
+export const maxDuration = 60;
 
-/* ------------------------------------------------------------------ */
-/*  TYPES                                                              */
-/* ------------------------------------------------------------------ */
 interface ScanRequest {
   content: string;
   platforms: string[];
@@ -19,51 +16,48 @@ interface PlatformResult {
   safer_rewrite: string;
 }
 
-/* ------------------------------------------------------------------ */
-/*  BUILD PLATFORM CONTEXT FROM MATRIX                                 */
-/* ------------------------------------------------------------------ */
 const PLATFORM_CONTEXT_STRING = PLATFORM_MATRIX.map((p) => {
-  const triggers = p.bannedTriggers.join("; ");
-  return `  - ${p.name} [${p.risk} risk]: ${p.safeApproach} Banned: ${triggers}`;
+  return [
+    `- ${p.name} [${p.risk} risk]`,
+    `Risk signals: ${p.bannedTriggers.join("; ")}`,
+    `Safer approach: ${p.safeApproach}`,
+  ].join("\n  ");
 }).join("\n");
 
-/* ------------------------------------------------------------------ */
-/*  SYSTEM PROMPT                                                      */
-/* ------------------------------------------------------------------ */
-const SYSTEM_PROMPT = `You are a compliance scanner for affiliate content. Flag explicit banned triggers like: health/income guarantees, hard-sell CTAs, urgency, "click here", "sign up", "act now", "free trial", "no risk", "guaranteed".
+const SYSTEM_PROMPT = `You are Nectar Engine's platform compliance scanner.
 
-STATUS THRESHOLDS:
-- "fail" = explicit banned triggers (solicitation, hard-sell, guarantees, urgency manipulation)
-- "warn" = borderline language (mild urgency, implied claims)
-- "pass" = clean
+Your job is to review ONE piece of affiliate content against the selected publishing platforms.
+Do not invent policy violations. Use the platform context below as guidance, not as a claim that every signal is universally banned in every format.
 
-PLATFORM CONTEXT (from Nectar Engine compliance matrix):
+PLATFORM CONTEXT:
 ${PLATFORM_CONTEXT_STRING}
 
-RULES:
+STATUS:
+- fail = the input contains an explicit high-risk/banned trigger for that platform
+- warn = the input contains a meaningful borderline risk that deserves review
+- pass = no meaningful platform-specific risk signal was found
+
+GROUNDING RULES:
 1. Only flag phrases that EXACTLY appear in the input. Copy them character-for-character.
-2. For safer_rewrite: only rewrite the flagged portion, keep rest identical. Empty string if pass.
+2. Do not flag a phrase merely because it appears in another platform's rules.
+3. Do not invent facts, policy claims, or prohibited categories beyond the supplied platform context.
+4. If no exact phrase from the input supports a warning/failure, return pass.
+5. For safer_rewrite, preserve the rest of the input and only replace the risky phrase(s). Empty string for pass.
+6. Return exactly one result for every requested platform, using the platform name supplied by the user.
 
-Return ONLY valid JSON, no markdown fences:
-{"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":["<exact phrase from input>"],"reason":"<short>","safer_rewrite":"<or empty>"}]}`;
+Return ONLY valid JSON:
+{"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":["<exact phrase from input>"],"reason":"<short grounded reason>","safer_rewrite":"<full rewritten content or empty>"}]}`;
 
-/* ------------------------------------------------------------------ */
-/*  OPENROUTER CALL                                                     */
-/* ------------------------------------------------------------------ */
 async function callOpenRouter(content: string, platforms: string[]): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    throw new Error("Scanner is not configured. OPENROUTER_API_KEY is not set.");
-  }
+  if (!apiKey) throw new Error("Scanner is not configured. OPENROUTER_API_KEY is not set.");
 
   const model = process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-nano-30b-a3b:free";
-
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 45_000);
 
-  let response: globalThis.Response;
   try {
-    response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       signal: controller.signal,
       headers: {
@@ -74,164 +68,132 @@ async function callOpenRouter(content: string, platforms: string[]): Promise<str
       },
       body: JSON.stringify({
         model,
-        max_tokens: 2000,
+        max_tokens: 2600,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: `Review for: ${platforms.join(", ")}
-
----
-${content}
----` },
+          {
+            role: "user",
+            content: `Selected platforms: ${platforms.join(", ")}\n\n--- CONTENT ---\n${content}\n--- END CONTENT ---`,
+          },
         ],
       }),
     });
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      throw new Error(`OpenRouter ${response.status}: ${errBody}`);
+    }
+
+    const data = await response.json();
+    const raw = data?.choices?.[0]?.message?.content;
+    if (!raw) throw new Error("The model returned an empty response.");
+    return raw;
   } finally {
     clearTimeout(timeoutId);
   }
-
-  if (!response.ok) {
-    const errBody = await response.text();
-    throw new Error(`OpenRouter ${response.status}: ${errBody}`);
-  }
-
-  const data = await response.json();
-  const raw = data?.choices?.[0]?.message?.content;
-
-  if (!raw) {
-    throw new Error("The model returned an empty response.");
-  }
-
-  return raw;
 }
 
-/* ------------------------------------------------------------------ */
-/*  PARSE HELPER                                                       */
-/* ------------------------------------------------------------------ */
 function parseResults(raw: string): PlatformResult[] {
   let cleaned = raw.trim();
   if (cleaned.startsWith("```")) {
     cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
   }
-  cleaned = cleaned.replace(/[\x00-\x1f]/g, (ch) => {
-    if (ch === "\n" || ch === "\r" || ch === "\t") return ch;
-    return "";
-  });
+  cleaned = cleaned.replace(/[\x00-\x1f]/g, (ch) =>
+    ch === "\n" || ch === "\r" || ch === "\t" ? ch : "",
+  );
 
   try {
-    const parsed = JSON.parse(cleaned) as { results: PlatformResult[] };
-    return parsed.results || [];
+    const parsed = JSON.parse(cleaned) as { results?: PlatformResult[] };
+    return Array.isArray(parsed.results) ? parsed.results : [];
   } catch {
     return [];
   }
 }
 
-/* ------------------------------------------------------------------ */
-/*  BATCH HELPER                                                       */
-/* ------------------------------------------------------------------ */
-function chunk<T>(arr: T[], size: number): T[][] {
-  const chunks: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) {
-    chunks.push(arr.slice(i, i + size));
-  }
-  return chunks;
+function unavailable(platform: string): PlatformResult {
+  return {
+    platform,
+    status: "warn",
+    flagged_phrases: [],
+    reason: "Scanner could not complete this platform check. No compliance clearance was issued.",
+    safer_rewrite: "",
+  };
 }
 
-/* ------------------------------------------------------------------ */
-/*  POST HANDLER                                                       */
-/* ------------------------------------------------------------------ */
 export async function POST(request: NextRequest) {
   try {
-    /* --- Validate request body --- */
     const body: ScanRequest = await request.json();
-    const { content, platforms } = body;
+    const content = typeof body.content === "string" ? body.content.trim() : "";
+    const platforms = Array.isArray(body.platforms)
+      ? body.platforms.filter((p): p is string => typeof p === "string" && p.length > 0)
+      : [];
 
-    if (!content || typeof content !== "string" || content.trim().length < 10) {
+    if (content.length < 10) {
       return NextResponse.json(
         { error: "Content is required and must be at least 10 characters." },
         { status: 400 },
       );
     }
-
-    if (!Array.isArray(platforms) || platforms.length === 0) {
+    if (platforms.length === 0) {
       return NextResponse.json(
         { error: "At least one platform must be selected." },
         { status: 400 },
       );
     }
 
-    /* --- Batch platforms into groups of 2 and call sequentially --- */
-    const batches = chunk(platforms, 2);
-    const allResults: PlatformResult[] = [];
-
-    for (const batch of batches) {
-      try {
-        const raw = await callOpenRouter(content, batch);
-        allResults.push(...parseResults(raw));
-      } catch {
-        allResults.push(
-          ...batch.map((p) => ({
-            platform: p,
-            status: "pass" as const,
-            flagged_phrases: [] as string[],
-            reason: "Scan unavailable for this platform.",
-            safer_rewrite: "",
-          })),
-        );
-      }
+    let modelResults: PlatformResult[] = [];
+    try {
+      /* One request reviews all selected platforms. The previous 2-platform
+         sequential design could take ~126s for nine platforms and exceed the
+         serverless execution window. One grounded call is both faster and
+         friendlier to free-tier rate limits. */
+      modelResults = parseResults(await callOpenRouter(content, platforms));
+    } catch (err) {
+      console.error("Scanner model call failed:", err);
+      modelResults = platforms.map(unavailable);
     }
 
-    /* --- Ensure every requested platform has a result --- */
-    const returnedPlatforms = new Set(allResults.map((r) => r.platform));
-    for (const p of platforms) {
-      if (!returnedPlatforms.has(p)) {
-        allResults.push({
-          platform: p,
-          status: "pass",
-          flagged_phrases: [],
-          reason: "Clear to post.",
-          safer_rewrite: "",
-        });
-      }
+    const byPlatform = new Map<string, PlatformResult>();
+    for (const result of modelResults) {
+      if (result?.platform) byPlatform.set(result.platform.toLowerCase(), result);
     }
 
-    /* --- Sort to match requested order --- */
-    allResults.sort(
-      (a, b) => platforms.indexOf(a.platform) - platforms.indexOf(b.platform),
-    );
-
-    /* --- Ground flagged phrases in actual input --- */
     const contentLower = content.toLowerCase();
-    for (const result of allResults) {
-      if (result.status === "pass") {
-        result.flagged_phrases = [];
-        result.safer_rewrite = "";
-        result.reason = "Clear to post.";
-        continue;
-      }
-      result.flagged_phrases = (result.flagged_phrases || []).filter(
-        (phrase) => contentLower.includes(phrase.toLowerCase()),
+    const results = platforms.map((platform) => {
+      const result = byPlatform.get(platform.toLowerCase()) ?? unavailable(platform);
+      const grounded = (result.flagged_phrases || []).filter(
+        (phrase) => typeof phrase === "string" && contentLower.includes(phrase.toLowerCase()),
       );
-      if (result.flagged_phrases.length === 0) {
-        result.status = "pass";
-        result.reason = "Clear to post.";
-        result.safer_rewrite = "";
-      }
-    }
 
-    return NextResponse.json({ data: allResults });
+      if (result.status === "pass") {
+        return {
+          ...result,
+          platform,
+          flagged_phrases: [],
+          safer_rewrite: "",
+          reason: "No meaningful platform-specific risk signal found.",
+        };
+      }
+
+      if (grounded.length === 0) {
+        return unavailable(platform);
+      }
+
+      return {
+        ...result,
+        platform,
+        flagged_phrases: grounded,
+      };
+    });
+
+    return NextResponse.json({ data: results });
   } catch (err: unknown) {
     console.error("Scan Error:", err);
-
     const message = err instanceof Error ? err.message : "Unknown error";
 
-    if (
-      message.includes("429") ||
-      message.includes("rate") ||
-      message.includes("quota") ||
-      message.includes("insufficient")
-    ) {
+    if (message.includes("429") || message.includes("rate") || message.includes("quota")) {
       return NextResponse.json(
-        { error: "Rate limit or billing issue. Please wait a moment and try again." },
+        { error: "The scanner model is rate-limited. Please wait a moment and try again." },
         { status: 429 },
       );
     }
@@ -242,14 +204,11 @@ export async function POST(request: NextRequest) {
 
     if (message.includes("401") || message.includes("403") || message.includes("invalid")) {
       return NextResponse.json(
-        { error: "API key is invalid or unauthorized." },
+        { error: "Scanner API access is invalid or unauthorized." },
         { status: 503 },
       );
     }
 
-    return NextResponse.json(
-      { error: message },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
