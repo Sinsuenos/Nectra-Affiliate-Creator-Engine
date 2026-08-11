@@ -247,6 +247,18 @@ function ScannerInner() {
 
   return (
     <>
+      {/* Atmospheric background - original Nectar imagery */}
+      <div
+        className="fixed inset-0 -z-10 pointer-events-none"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/nectar-atmo-scanner.png)' }}
+        />
+        <div className="absolute inset-0 bg-[#121827]/[0.78]" />
+      </div>
+
       <NectarOrbs />
 
       <section className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-8">
