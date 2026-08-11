@@ -34,7 +34,7 @@ export const RAIL_STAGES: RailStage[] = [
   { id: "context", label: "CONTEXT", sublabel: "Geo + seasonal intelligence", tooltipLine: "Geo & seasonal context - next", icon: Globe, live: false },
   { id: "campaign", label: "CAMPAIGN", sublabel: "Schedule + sequence builder", tooltipLine: "Campaign building - next", icon: CalendarDays, live: false },
   { id: "compliance", label: "COMPLIANCE", sublabel: "Platform risk scanner", tooltipLine: "", icon: ShieldCheck, live: true, href: "/scanner" },
-  { id: "output", label: "OUTPUT", sublabel: "6-platform toolkit", tooltipLine: "", icon: LayoutList, live: true },
+  { id: "output", label: "OUTPUT", sublabel: "9-platform toolkit", tooltipLine: "", icon: LayoutList, live: true },
 ];
 
 const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } } };

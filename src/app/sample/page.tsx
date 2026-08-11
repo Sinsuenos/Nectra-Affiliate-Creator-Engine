@@ -22,12 +22,18 @@ const platformExamples = [
   { platform: "Reddit", text: "A discussion-first version that avoids pretending an affiliate recommendation is independent advice." },
   { platform: "Facebook", text: "A readable post variation that keeps the offer clear without manufactured urgency." },
   { platform: "Pinterest", text: "A compact discovery-oriented version suited to a pin title and description." },
+  { platform: "Snapchat", text: "An emotional, companionship-led Story format with proper 18+ age-gating and Sponsored label." },
+  { platform: "Discord", text: "A value-first community post for designated promo channels, with clear affiliate disclosure." },
+  { platform: "Telegram", text: "A concise channel post with transparent disclosure for opted-in audiences only." },
 ];
 
 const scanExamples = [
   { platform: "TikTok", status: "WARN", detail: "Example: a guarantee or unsupported outcome claim would be surfaced for review." },
   { platform: "Reddit", status: "PASS", detail: "Example: discussion-first copy with transparent commercial context." },
   { platform: "Instagram", status: "PASS", detail: "Example: disclosure-aware copy without invented results." },
+  { platform: "Snapchat", status: "WARN", detail: "Example: dating content emphasizing casual encounters flagged under Snap ad policy." },
+  { platform: "Telegram", status: "FAIL", detail: "Example: adult-adjacent content not permitted on Telegram's official ads product." },
+  { platform: "Discord", status: "PASS", detail: "Example: non-explicit relationship content in designated server channel." },
 ];
 
 function Block({ label, children }: { label: string; children: React.ReactNode }) {
@@ -73,8 +79,8 @@ export default function SamplePage() {
         </motion.div>
 
         <motion.div variants={fadeUp} custom={3}>
-          <Block label="03 · Platform Output">
-            <div className="grid sm:grid-cols-2 gap-3">
+          <Block label="03 · Platform Output (9 platforms)">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {platformExamples.map((item) => (
                 <div key={item.platform} className="rounded-lg border border-border/40 bg-surface p-4">
                   <div className="flex items-center justify-between mb-2"><span className="font-mono text-sm text-electric">{item.platform}</span><ArrowRight className="h-3.5 w-3.5 text-muted-foreground" /></div>
@@ -86,11 +92,11 @@ export default function SamplePage() {
         </motion.div>
 
         <motion.div variants={fadeUp} custom={4}>
-          <Block label="04 · Protect Before You Post">
-            <div className="grid md:grid-cols-3 gap-3">
+          <Block label="04 · Protect Before You Post (scanner checks all 9)">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
               {scanExamples.map((item) => (
                 <div key={item.platform} className="rounded-lg border border-border/40 bg-surface p-4">
-                  <div className="flex items-center gap-2 mb-2"><ShieldCheck className="h-4 w-4 text-electric" /><span className="font-mono text-sm">{item.platform}</span><span className={`ml-auto text-[10px] font-mono font-semibold ${item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`}>{item.status}</span></div>
+                  <div className="flex items-center gap-2 mb-2"><ShieldCheck className="h-4 w-4 text-electric" /><span className="font-mono text-sm">{item.platform}</span><span className={`ml-auto text-[10px] font-mono font-semibold ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`}>{item.status}</span></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.detail}</p>
                 </div>
               ))}

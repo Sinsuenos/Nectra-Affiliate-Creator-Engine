@@ -102,7 +102,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.55 }}
           >
             <span className="inline-flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5 text-electric" /> Offer-aware generation</span>
-            <span className="inline-flex items-center gap-1.5"><WandSparkles className="h-3.5 w-3.5 text-electric" /> 6-platform output</span>
+            <span className="inline-flex items-center gap-1.5"><WandSparkles className="h-3.5 w-3.5 text-electric" /> 9-platform output</span>
             <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-electric" /> Compliance checking</span>
           </motion.div>
         </div>

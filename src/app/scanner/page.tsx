@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
@@ -233,8 +233,10 @@ function ScannerInner() {
     new Set(ALL_PLATFORMS),
   );
   const [isScanning, setIsScanning] = useState(false);
+  const [scanBatch, setScanBatch] = useState(0);
   const [results, setResults] = useState<PlatformResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /* --- Pre-fill from generator via URL params --- */
   useEffect(() => {
@@ -294,6 +296,17 @@ function ScannerInner() {
     setError(null);
     setResults(null);
 
+    const totalBatches = Math.ceil(selectedPlatforms.size / 2);
+    let currentBatch = 0;
+    setScanBatch(1);
+
+    scanIntervalRef.current = setInterval(() => {
+      currentBatch += 1;
+      if (currentBatch <= totalBatches) {
+        setScanBatch(currentBatch);
+      }
+    }, 14000);
+
     try {
       const res = await fetch("/api/scan", {
         method: "POST",
@@ -319,6 +332,11 @@ function ScannerInner() {
       const msg = err instanceof Error ? err.message : "Scan failed.";
       setError(msg);
     } finally {
+      if (scanIntervalRef.current) {
+        clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+      setScanBatch(0);
       setIsScanning(false);
     }
   }
@@ -405,25 +423,53 @@ function ScannerInner() {
             </div>
           </motion.div>
 
-          {/* Scan button */}
-          <motion.div variants={fadeUp} custom={2}>
-            <button
-              onClick={handleScan}
-              disabled={isScanning}
-              className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
-            >
-              {isScanning ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Scanning...
-                </>
-              ) : (
-                <>
-                  <ShieldCheck className="h-4 w-4" />
-                  Scan Content
-                </>
+          {/* Scan button with progress */}
+          <motion.div variants={fadeUp} custom={2} className="space-y-3">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleScan}
+                disabled={isScanning}
+                className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              >
+                {isScanning ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {scanBatch > 0
+                      ? `Checking batch ${scanBatch} of ${Math.ceil(selectedPlatforms.size / 2)}...`
+                      : "Scanning..."}
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="h-4 w-4" />
+                    Scan {selectedPlatforms.size} Platform{selectedPlatforms.size !== 1 ? "s" : ""}
+                  </>
+                )}
+              </button>
+              {!isScanning && selectedPlatforms.size > 0 && (
+                <span className="text-xs text-muted-foreground/60 font-mono hidden sm:inline">
+                  ~{Math.ceil(selectedPlatforms.size / 2) * 14}s estimated
+                </span>
               )}
-            </button>
+            </div>
+
+            {/* Progress bar during scan */}
+            {isScanning && (
+              <div className="space-y-2">
+                <div className="h-1.5 w-full rounded-full bg-surface overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-electric"
+                    initial={{ width: "0%" }}
+                    animate={{
+                      width: `${Math.min((scanBatch / Math.ceil(selectedPlatforms.size / 2)) * 100, 95)}%`,
+                    }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                  />
+                </div>
+                <p className="text-[11px] text-muted-foreground/60 font-mono">
+                  Each batch checks 2 platforms against AI compliance rules
+                </p>
+              </div>
+            )}
           </motion.div>
 
           {/* Error display */}
