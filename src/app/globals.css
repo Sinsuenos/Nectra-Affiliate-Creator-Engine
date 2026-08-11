@@ -37,8 +37,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
   --color-electric: var(--electric);
   --color-electric-dim: var(--electric-dim);
   --color-surface: var(--surface);
