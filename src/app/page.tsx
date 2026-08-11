@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { TransformationRail } from "@/components/transformation-rail";
 
 /* ------------------------------------------------------------------ */
 /*  ANIMATION HELPERS                                                  */
@@ -66,7 +67,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             Built for affiliates working high-risk, tightly-restricted verticals
-            — where generic AI copy gets accounts banned.
+            - where generic AI copy gets accounts banned.
           </motion.p>
 
           <motion.div
@@ -80,7 +81,7 @@ export default function Home() {
               size="lg"
               className="bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm cursor-pointer"
             >
-            {/* PLACEHOLDER CTA — Christopher will provide real Gumroad URL once listing is live */}
+            {/* PLACEHOLDER CTA - Christopher will provide real Gumroad URL once listing is live */}
               <a href="#">
                 Get Nectar Engine
                 <ChevronRight className="ml-2 h-4 w-4" />
@@ -89,6 +90,11 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* ============================================================ */
+      /*  TRANSFORMATION RAIL                                           */
+      /* ============================================================ */}
+      <TransformationRail />
 
       {/* ============================================================ */
       /*  SECTION TEASERS                                              */
@@ -105,7 +111,7 @@ export default function Home() {
             {
               tag: "Output",
               title: "Sample Output",
-              desc: "See a full toolkit generated for a generic demo offer — headlines, copy, sequences, and more.",
+              desc: "See a full toolkit generated for a generic demo offer - headlines, copy, sequences, and more.",
               href: "/sample",
             },
             {

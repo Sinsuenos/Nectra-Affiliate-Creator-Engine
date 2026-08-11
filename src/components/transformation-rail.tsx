@@ -1,0 +1,381 @@
+"use client";
+
+import { motion } from "framer-motion";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  ClipboardPaste,
+  Sparkles,
+  Globe,
+  CalendarDays,
+  ShieldCheck,
+  LayoutList,
+  Lock,
+  ChevronRight,
+} from "lucide-react";
+import Link from "next/link";
+
+/* ------------------------------------------------------------------ */
+/*  STAGE DEFINITIONS                                                   */
+/* ------------------------------------------------------------------ */
+
+export interface RailStage {
+  id: string;
+  label: string;
+  sublabel: string;
+  icon: React.ElementType;
+  live: boolean;
+  href?: string;
+}
+
+export const RAIL_STAGES: RailStage[] = [
+  {
+    id: "offer",
+    label: "OFFER",
+    sublabel: "Paste raw offer details",
+    icon: ClipboardPaste,
+    live: true,
+    href: "/generator",
+  },
+  {
+    id: "angles",
+    label: "ANGLES",
+    sublabel: "AI extracts promo angles",
+    icon: Sparkles,
+    live: true,
+  },
+  {
+    id: "context",
+    label: "CONTEXT",
+    sublabel: "Geo + seasonal intelligence",
+    icon: Globe,
+    live: false,
+  },
+  {
+    id: "campaign",
+    label: "CAMPAIGN",
+    sublabel: "Schedule + sequence builder",
+    icon: CalendarDays,
+    live: false,
+  },
+  {
+    id: "compliance",
+    label: "COMPLIANCE",
+    sublabel: "Platform risk scanner",
+    icon: ShieldCheck,
+    live: true,
+    href: "/scanner",
+  },
+  {
+    id: "output",
+    label: "OUTPUT",
+    sublabel: "6-platform toolkit",
+    icon: LayoutList,
+    live: true,
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/*  ANIMATION                                                           */
+/* ------------------------------------------------------------------ */
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
+  },
+};
+
+const nodeVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+};
+
+const connectorVariants = {
+  hidden: { scaleX: 0 },
+  visible: {
+    scaleX: 1,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/*  CONNECTOR                                                           */
+/* ------------------------------------------------------------------ */
+
+function Connector({ index }: { index: number }) {
+  const stage = RAIL_STAGES[index];
+  const nextStage = RAIL_STAGES[index + 1];
+  const bothLive = stage.live && nextStage?.live;
+
+  return (
+    <motion.div
+      className="hidden sm:flex items-center justify-center shrink-0 w-8 lg:w-12"
+      variants={connectorVariants}
+      style={{ originX: 0 }}
+    >
+      {bothLive ? (
+        <div className="relative w-full h-px">
+          <div className="absolute inset-0 bg-electric/30" />
+          <motion.div
+            className="absolute inset-y-0 left-0 w-1/2 bg-electric"
+            animate={{ x: ["0%", "100%", "0%"] }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: index * 0.4,
+            }}
+          />
+        </div>
+      ) : (
+        <ChevronRight className="h-4 w-4 text-muted-foreground/30" />
+      )}
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  STAGE NODE                                                          */
+/* ------------------------------------------------------------------ */
+
+function StageNode({ stage }: { stage: RailStage }) {
+  const Icon = stage.icon;
+
+  /* --- NEXT stage --- */
+  if (!stage.live) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <motion.div
+            className="relative flex flex-col items-center gap-2 cursor-default select-none px-2 sm:px-0"
+            variants={nodeVariants}
+          >
+            <div className="relative">
+              <div className="flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-xl border border-border/20 bg-surface/40">
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground/30" />
+              </div>
+              <div className="absolute -top-1.5 -right-1.5 flex items-center justify-center h-4 w-4 rounded-full bg-surface border border-border/30">
+                <Lock className="h-2.5 w-2.5 text-muted-foreground/40" />
+              </div>
+            </div>
+            <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-muted-foreground/40">
+              {stage.label}
+            </span>
+            <span className="hidden sm:block text-[10px] text-muted-foreground/25 text-center leading-tight max-w-[100px]">
+              {stage.sublabel}
+            </span>
+          </motion.div>
+        </TooltipTrigger>
+        <TooltipContent
+          side="bottom"
+          className="bg-surface border-border/60 text-muted-foreground text-xs font-mono"
+        >
+          Coming soon
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  /* --- LIVE stage --- */
+  const content = (
+    <motion.div
+      className="relative flex flex-col items-center gap-2 group px-2 sm:px-0"
+      variants={nodeVariants}
+    >
+      {/* Glow behind icon on desktop */}
+      <div className="hidden sm:block absolute -inset-3 rounded-2xl bg-electric/[0.04] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <div className="relative flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-xl border border-electric/20 bg-surface">
+        <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-electric" />
+      </div>
+      <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-electric">
+        {stage.label}
+      </span>
+      <span className="hidden sm:block text-[10px] text-muted-foreground/60 text-center leading-tight max-w-[100px]">
+        {stage.sublabel}
+      </span>
+    </motion.div>
+  );
+
+  if (stage.href) {
+    return (
+      <Link href={stage.href} className="hover:no-underline">
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
+}
+
+/* ------------------------------------------------------------------ */
+/*  MOBILE CONNECTOR (vertical chevron for small screens)               */
+/* ------------------------------------------------------------------ */
+
+function MobileConnector() {
+  return (
+    <div className="flex sm:hidden items-center justify-center py-1">
+      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/20 rotate-90" />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  FULL RAIL (homepage)                                                */
+/* ------------------------------------------------------------------ */
+
+export function TransformationRail() {
+  return (
+    <motion.div
+      className="mx-auto max-w-5xl px-4 sm:px-6 pb-20 sm:pb-28"
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
+    >
+      {/* Section label */}
+      <motion.div
+        className="font-mono text-xs tracking-widest uppercase text-electric/70 mb-2 text-center"
+        variants={nodeVariants}
+      >
+        The Pipeline
+      </motion.div>
+
+      <motion.div
+        className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 sm:mb-16"
+        variants={nodeVariants}
+      >
+        One Offer.
+        <span className="text-electric"> Many Angles.</span> One Campaign.
+      </motion.div>
+
+      {/* Rail row - desktop */}
+      <div className="hidden sm:flex items-center justify-center">
+        {RAIL_STAGES.map((stage, i) => (
+          <div key={stage.id} className="flex items-center">
+            <StageNode stage={stage} />
+            {i < RAIL_STAGES.length - 1 && <Connector index={i} />}
+          </div>
+        ))}
+      </div>
+
+      {/* Rail grid - mobile (2 columns wrapping) */}
+      <div className="sm:hidden grid grid-cols-2 gap-x-4 gap-y-2 justify-items-center">
+        {RAIL_STAGES.map((stage, i) => (
+          <div key={stage.id}>
+            <StageNode stage={stage} />
+            {i < RAIL_STAGES.length - 1 && i % 2 === 1 && <MobileConnector />}
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  COMPACT RAIL (generator progress indicator)                         */
+/* ------------------------------------------------------------------ */
+
+export interface CompactRailProps {
+  /** 1=paste, 2=generating, 3=review/output */
+  currentStep: number;
+}
+
+/**
+ * Maps the generator's simple 1-2-3 step to rail stage activation.
+ * Step 1 (paste)   -> OFFER active
+ * Step 2 (loading)  -> OFFER done, ANGLES pulsing
+ * Step 3 (review)   -> OFFER done, ANGLES done, OUTPUT active
+ */
+function getStageState(
+  stageId: string,
+  currentStep: number
+): "done" | "active" | "next" | "locked" {
+  if (stageId === "offer") {
+    return currentStep >= 1 ? (currentStep > 1 ? "done" : "active") : "next";
+  }
+  if (stageId === "angles") {
+    return currentStep >= 3 ? "done" : currentStep === 2 ? "active" : "next";
+  }
+  if (stageId === "output") {
+    return currentStep >= 3 ? "active" : "next";
+  }
+  if (stageId === "compliance") {
+    return currentStep >= 3 ? "next" : "next";
+  }
+  /* CONTEXT and CAMPAIGN are always locked */
+  return "locked";
+}
+
+function CompactNode({
+  stage,
+  state,
+}: {
+  stage: RailStage;
+  state: "done" | "active" | "next" | "locked";
+}) {
+  const Icon = stage.icon;
+
+  if (state === "locked") {
+    return (
+      <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-muted-foreground/25 select-none">
+        <Icon className="h-3 w-3" />
+        <span className="font-mono text-[10px] uppercase tracking-wider hidden md:inline">
+          {stage.label}
+        </span>
+        <Lock className="h-2.5 w-2.5 md:ml-0.5" />
+      </div>
+    );
+  }
+
+  const styles =
+    state === "active"
+      ? "bg-electric/10 text-electric border border-electric/20"
+      : state === "done"
+        ? "text-electric/60"
+        : "text-muted-foreground/40";
+
+  return (
+    <div
+      className={`flex items-center gap-1.5 px-2 py-1 rounded-full transition-colors ${styles}`}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      <span className="font-mono text-[10px] uppercase tracking-wider hidden md:inline">
+        {stage.label}
+      </span>
+    </div>
+  );
+}
+
+export function CompactTransformationRail({ currentStep }: CompactRailProps) {
+  return (
+    <div className="flex items-center gap-1 sm:gap-2 mt-6 mb-2 flex-wrap">
+      {RAIL_STAGES.map((stage, i) => {
+        const stageState = getStageState(stage.id, currentStep);
+        return (
+          <div key={stage.id} className="flex items-center">
+            {i > 0 && (
+              <span
+                className={`h-px w-3 sm:w-4 mr-1 sm:mr-1 ${
+                  stageState === "locked"
+                    ? "bg-border/20"
+                    : stageState === "done" || stageState === "active"
+                      ? "bg-electric/40"
+                      : "bg-border/30"
+                }`}
+              />
+            )}
+            <CompactNode stage={stage} state={stageState} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}

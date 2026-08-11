@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
+import { CompactTransformationRail } from "@/components/transformation-rail";
 import { GUMROAD_URL } from "@/lib/constants";
 import {
   ClipboardPaste,
@@ -611,8 +612,8 @@ export default function GeneratorPage() {
           copy, offer sheets — and the engine will parse the fields.
         </motion.p>
 
-        {/* Workflow step indicator */}
-        <WorkflowSteps current={currentStep} />
+        {/* Transformation Rail - compact progress indicator */}
+        <CompactTransformationRail currentStep={currentStep} />
       </section>
 
       {/* Info box: what to include */}
