@@ -4,12 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { GUMROAD_URL } from "@/lib/constants";
 
 const LINKS = [
   { href: "/modules", label: "Modules" },
   { href: "/sample", label: "Sample Output" },
   { href: "/compliance", label: "Compliance" },
   { href: "/generator", label: "Generator" },
+  { href: "/scanner", label: "Scanner" },
 ] as const;
 
 export function SiteNav() {
@@ -48,6 +50,14 @@ export function SiteNav() {
               </Link>
             );
           })}
+          <a
+            href={GUMROAD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-2 px-3 py-1.5 rounded-md text-xs font-semibold tracking-wide bg-electric hover:bg-electric/90 text-background transition-colors"
+          >
+            Get Nectar Engine
+          </a>
         </div>
 
         {/* Mobile menu toggle */}
@@ -81,6 +91,15 @@ export function SiteNav() {
                 </Link>
               );
             })}
+            <a
+              href={GUMROAD_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="mt-1 px-3 py-2 rounded-md text-sm font-semibold bg-electric hover:bg-electric/90 text-background transition-colors text-center"
+            >
+              Get Nectar Engine
+            </a>
           </div>
         </div>
       )}

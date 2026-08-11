@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 
@@ -146,13 +147,17 @@ export default function CompliancePage() {
             Platform Compliance Matrix
           </h2>
 
-          <p className="text-base text-muted-foreground leading-relaxed mb-4">
+          <p className="text-base text-muted-foreground leading-relaxed mb-2">
             This matrix is a static reference summarizing the key risk vectors
             the Nectar Engine evaluates for every supported destination, based on
             platform advertising, affiliate, and community policies as of 2025.
           </p>
 
-          <p className="text-sm text-muted-foreground/70 leading-relaxed rounded-lg border border-amber-400/20 bg-amber-400/5 px-4 py-3">
+          <p className="text-sm text-electric hover:text-electric/80 transition-colors">
+            Have content ready? <Link href="/scanner">Open the Scanner</Link>
+          </p>
+
+          <p className="text-sm text-muted-foreground/70 leading-relaxed mt-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-4 py-3">
             This matrix is educational and strategic guidance only, not a
             guarantee of compliance. Platform terms of service change without
             notice, and enforcement varies by region, account history, and

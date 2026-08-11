@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
@@ -20,6 +21,7 @@ import {
   BookOpen,
   Sparkles,
   LayoutList,
+  ArrowRight,
 } from "lucide-react";
 import {
   extractFields,
@@ -478,6 +480,7 @@ const FREE_GENERATION_LIMIT = 3;
 const STORAGE_KEY = "nectar_generation_count";
 
 export default function GeneratorPage() {
+  const router = useRouter();
   const [showSubIDs, setShowSubIDs] = useState(false);
   const [pasteText, setPasteText] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -841,6 +844,39 @@ export default function GeneratorPage() {
                 <BodyCopySection text={displayToolkit.body_copy} />
                 <CTASection ctas={displayToolkit.cta_variations} />
                 <ComplianceSection notes={displayToolkit.compliance_notes} />
+
+                {/* Check This Toolkit → scanner button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.3 }}
+                >
+                  <button
+                    onClick={() => {
+                      try {
+                        const posts = displayToolkit.social_posts;
+                        const contentText = posts
+                          .map((p) => `[${p.platform}] ${p.text}`)
+                          .join("\n\n");
+                        const platforms = JSON.stringify(
+                          posts.map((p) => p.platform),
+                        );
+                        const params = new URLSearchParams({
+                          content: contentText,
+                          platforms,
+                        });
+                        router.push(`/scanner?${params.toString()}`);
+                      } catch {
+                        router.push("/scanner");
+                      }
+                    }}
+                    className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center gap-2"
+                  >
+                    <ShieldCheck className="h-4 w-4" />
+                    Check This Toolkit
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </motion.div>
               </div>
             </motion.div>
           </section>
