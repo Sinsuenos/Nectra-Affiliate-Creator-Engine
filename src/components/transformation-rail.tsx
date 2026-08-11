@@ -1,13 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   ClipboardPaste,
   Sparkles,
-  Globe,
-  CalendarDays,
   ShieldCheck,
   LayoutList,
   ArrowRight,
@@ -27,8 +24,6 @@ export interface RailStage {
 export const RAIL_STAGES: RailStage[] = [
   { id: "offer", label: "OFFER", sublabel: "Paste raw offer details", tooltipLine: "", icon: ClipboardPaste, live: true, href: "/generator" },
   { id: "angles", label: "ANGLES", sublabel: "Campaign directions", tooltipLine: "", icon: Sparkles, live: true },
-  { id: "context", label: "CONTEXT", sublabel: "Geo + seasonal intelligence", tooltipLine: "Geo & seasonal context - next", icon: Globe, live: false },
-  { id: "campaign", label: "CAMPAIGN", sublabel: "Schedule + sequence builder", tooltipLine: "Campaign building - next", icon: CalendarDays, live: false },
   { id: "compliance", label: "COMPLIANCE", sublabel: "Platform risk scanner", tooltipLine: "", icon: ShieldCheck, live: true, href: "/scanner" },
   { id: "output", label: "OUTPUT", sublabel: "9-platform toolkit", tooltipLine: "", icon: LayoutList, live: true },
 ];
@@ -41,7 +36,6 @@ function Connector({ index }: { index: number }) {
   const stage = RAIL_STAGES[index];
   const nextStage = RAIL_STAGES[index + 1];
   const bothLive = stage.live && nextStage?.live;
-  const eitherLive = stage.live || nextStage?.live;
 
   return (
     <motion.div className="hidden sm:flex items-center justify-center shrink-0 w-10 lg:w-14" variants={connectorVariants} style={{ originX: 0 }}>
@@ -50,36 +44,8 @@ function Connector({ index }: { index: number }) {
           <div className="absolute inset-0 bg-gradient-to-r from-electric/45 via-fuchsia-400/55 to-lime-300/45" />
           <motion.div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-electric via-fuchsia-400 to-lime-300" animate={{ x: ["-100%", "220%"] }} transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", delay: index * 0.4 }} />
         </div>
-      ) : eitherLive ? (
-        <div className="relative w-full h-px overflow-hidden rounded-full">
-          <div className="absolute inset-0 bg-electric/25" />
-          <motion.div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-electric/80 to-fuchsia-400/55" animate={{ x: ["-100%", "320%"] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: index * 0.5 }} />
-        </div>
       ) : <div className="w-full h-px bg-border/60" />}
     </motion.div>
-  );
-}
-
-function NextStageNode({ stage }: { stage: RailStage }) {
-  const [open, setOpen] = useState(false);
-  const Icon = stage.icon;
-  return (
-    <Tooltip open={open} onOpenChange={setOpen}>
-      <TooltipTrigger asChild>
-        <motion.div className="relative flex flex-col items-center gap-2.5 cursor-default select-none px-2 sm:px-0" variants={nodeVariants} onClick={() => setOpen(true)}>
-          <div className="relative">
-            <div className="absolute -inset-3 rounded-2xl bg-fuchsia-400/[0.06] blur-md pointer-events-none" />
-            <div className="relative flex items-center justify-center h-14 w-14 sm:h-16 sm:w-16 rounded-xl border border-electric/25 bg-surface">
-              <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-electric/65" />
-            </div>
-          </div>
-          <span className="font-mono text-[11px] sm:text-[12px] uppercase tracking-widest text-foreground/80">{stage.label}</span>
-          <span className="font-mono text-[8px] sm:text-[9px] uppercase tracking-widest px-2.5 py-0.5 rounded-full border border-fuchsia-400/35 text-fuchsia-200 bg-fuchsia-400/[0.09]">NEXT</span>
-          <span className="hidden sm:block text-[11px] text-muted-foreground/80 text-center leading-tight max-w-[118px]">{stage.sublabel}</span>
-        </motion.div>
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="bg-surface border-border/60 text-foreground text-xs font-mono">{stage.tooltipLine}</TooltipContent>
-    </Tooltip>
   );
 }
 
@@ -99,7 +65,7 @@ function LiveStageNode({ stage }: { stage: RailStage }) {
 }
 
 function StageNode({ stage }: { stage: RailStage }) {
-  return stage.live ? <LiveStageNode stage={stage} /> : <NextStageNode stage={stage} />;
+  return <LiveStageNode stage={stage} />;
 }
 
 export function TransformationRail() {
