@@ -75,7 +75,7 @@ export default function SamplePage() {
           <Block label="02 · Angle Prism">
             <div className="grid md:grid-cols-3 gap-4">
               {angleExamples.map((angle) => (
-                <div key={angle.label} className="rounded-xl border border-electric/20 bg-electric/[0.03] p-5">
+                <div key={angle.label} className="rounded-xl border border-electric/20 bg-electric/[0.03] p-5 hover:border-electric/35 hover:bg-electric/[0.06] transition-all duration-200">
                   <p className="font-mono text-[10px] tracking-widest text-electric mb-2">{angle.label}</p>
                   <h2 className="font-bold mb-2">{angle.title}</h2>
                   <p className="text-sm text-muted-foreground leading-relaxed">{angle.hook}</p>
@@ -89,7 +89,7 @@ export default function SamplePage() {
           <Block label="03 · Platform Output (9 platforms)">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {platformExamples.map((item) => (
-                <div key={item.platform} className="rounded-lg border border-border/40 bg-surface p-4">
+                <div key={item.platform} className="rounded-lg border border-border/40 bg-surface p-4 hover:border-border/60 transition-colors duration-200">
                   <div className="flex items-center justify-between mb-2"><span className="font-mono text-sm text-electric">{item.platform}</span><ArrowRight className="h-3.5 w-3.5 text-muted-foreground" /></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
                 </div>
@@ -102,7 +102,7 @@ export default function SamplePage() {
           <Block label="04 · Protect Before You Post (scanner checks all 9)">
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
               {scanExamples.map((item) => { const borderColor = item.status === "FAIL" ? "border-l-red-500/50 bg-red-500/[0.03]" : item.status === "WARN" ? "border-l-amber-400/40 bg-amber-500/[0.03]" : "border-l-emerald-500/30"; return (
-                <div key={item.platform} className={`rounded-lg border border-border/40 border-l-2 ${borderColor} bg-surface p-4`}>
+                <div key={item.platform} className={`rounded-lg border border-border/40 border-l-2 ${borderColor} bg-surface p-4 hover:border-border/60 transition-colors duration-200`}>
                   <div className="flex items-center gap-2 mb-2"><ShieldCheck className={`h-4 w-4 ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`} /><span className="font-mono text-sm">{item.platform}</span><span className={`ml-auto text-[10px] font-mono font-semibold ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`}>{item.status}</span></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.detail}</p>
                 </div>

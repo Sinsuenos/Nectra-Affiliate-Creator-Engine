@@ -110,7 +110,16 @@ function ResultCard({
       </div>
 
       {isPass ? (
-        <p className="text-sm text-muted-foreground">Clear to post.</p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">Clear to post.</p>
+          <button
+            onClick={() => handleCopy(result.reason || 'Clear to post.')}
+            className="shrink-0 ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-mono text-muted-foreground/60 hover:text-electric hover:bg-electric/[0.06] border border-transparent hover:border-electric/20 transition-all cursor-pointer"
+            aria-label="Copy"
+          >
+            {copied ? <><Check className="h-3 w-3 text-emerald-400" />Copied</> : <><Copy className="h-3 w-3" />Copy</>}
+          </button>
+        </div>
       ) : (
         <div className="space-y-3">
           {result.flagged_phrases.length > 0 && (
@@ -258,7 +267,7 @@ function ScannerInner() {
       const line = `[${icon}] ${r.platform}`;
       if (r.status === "pass") return `${line}: Clear to post.`;
       let detail = `${line}: ${r.reason}`;
-      if (r.flagged_phrases.length > 0) detail += `\n  Flagged: ${r.flagged_phrases.map((p) => \`"${p}"\`).join(", ")}`;
+      if (r.flagged_phrases.length > 0) detail += '\n  Flagged: ' + r.flagged_phrases.map((p) => '“' + p + '”').join(', ');
       if (r.safer_rewrite && r.safer_rewrite.trim()) detail += `\n  Safer: ${r.safer_rewrite}`;
       return detail;
     });

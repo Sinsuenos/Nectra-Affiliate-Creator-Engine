@@ -21,6 +21,7 @@ import {
   ExternalLink,
   BookOpen,
   ArrowRight,
+  Copy,
 } from "lucide-react";
 import {
   extractFields,
@@ -312,16 +313,17 @@ function PromoAnglesSection({ angles }: { angles: PromoAngle[] }) {
         {angles.map((angle, i) => (
           <div
             key={angle.angle}
-            className="rounded-lg bg-surface border border-border/40 p-5"
+            className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="font-mono text-[11px] uppercase text-electric">
                 Angle {i + 1}
               </span>
-              <span className="h-px flex-1 bg-border/40" />
+              <span className="h-px flex-1 bg-border/30" />
               <span className="font-mono text-xs text-foreground font-medium">
                 {angle.angle}
               </span>
+              <CopyButton text={`${angle.hook}\n\n${angle.body}`} />
             </div>
             <p className="text-sm text-foreground font-medium mb-2">
               {angle.hook}
@@ -336,6 +338,54 @@ function PromoAnglesSection({ angles }: { angles: PromoAngle[] }) {
   );
 }
 
+/* Platform character limits for badge color coding */
+const PLATFORM_CHAR_LIMITS: Record<string, number> = {
+  "X": 280,
+  "TikTok": 2200,
+  "Instagram": 2200,
+  "Facebook": 63206,
+  "Reddit": 40000,
+  "Pinterest": 500,
+  "Snapchat": 250,
+  "Discord": 2000,
+  "Telegram": 4096,
+};
+
+function CharBadge({ count, platform }: { count: number; platform: string }) {
+  const limit = PLATFORM_CHAR_LIMITS[platform];
+  if (!limit) return <span className="font-mono text-[11px] text-muted-foreground/70">{count} chars</span>;
+  const ratio = count / limit;
+  const pct = Math.min(Math.round(ratio * 100), 100);
+  const over = count > limit;
+  const color = over ? "text-red-400 bg-red-500/10 border-red-500/20" : ratio > 0.85 ? "text-amber-400 bg-amber-500/10 border-amber-500/20" : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border font-mono text-[10px] font-semibold tracking-wide ${color}`}>
+      {over && <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />}
+      {count}<span className="text-muted-foreground/50">/{limit}</span>
+      <span className="hidden sm:inline opacity-70">({pct}%)</span>
+    </span>
+  );
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  function handleCopy() {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }
+  return (
+    <button
+      onClick={handleCopy}
+      className="shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-mono text-muted-foreground/60 hover:text-electric hover:bg-electric/[0.06] border border-transparent hover:border-electric/20 transition-all cursor-pointer"
+      aria-label="Copy"
+    >
+      {copied ? <><Check className="h-3 w-3 text-emerald-400" />Copied</> : <><Copy className="h-3 w-3" />Copy</>}
+    </button>
+  );
+}
+
 function SocialPostsSection({ posts }: { posts: SocialPost[] }) {
   return (
     <div id="gen-posts">
@@ -343,18 +393,18 @@ function SocialPostsSection({ posts }: { posts: SocialPost[] }) {
         Social Posts
       </p>
       <div className="space-y-4">
-        {posts.map((post) => (
+        {posts.map((post, i) => (
           <div
             key={post.platform}
-            className="rounded-lg bg-surface border border-border/40 p-5"
+            className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors"
           >
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-3">
               <span className="font-mono text-xs text-electric font-semibold">
                 {post.platform}
               </span>
-              <span className="font-mono text-[11px] text-muted-foreground">
-                {post.character_count} chars
-              </span>
+              <span className="h-px flex-1 bg-border/30" />
+              <CharBadge count={post.character_count} platform={post.platform} />
+              <CopyButton text={post.text} />
             </div>
             <p className="text-sm text-foreground/90 leading-relaxed">
               {post.text}
@@ -376,13 +426,14 @@ function HeadlinesSection({ headlines }: { headlines: Headline[] }) {
         {headlines.map((h) => (
           <div
             key={h.variant}
-            className="rounded-lg bg-surface border border-border/40 p-5"
+            className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="font-mono text-[11px] uppercase text-electric">
                 Variant {h.variant}
               </span>
-              <span className="h-px flex-1 bg-border/40" />
+              <span className="h-px flex-1 bg-border/30" />
+              <CopyButton text={h.text} />
             </div>
             <p className="text-sm text-foreground font-medium">{h.text}</p>
           </div>
@@ -395,10 +446,13 @@ function HeadlinesSection({ headlines }: { headlines: Headline[] }) {
 function BodyCopySection({ text }: { text: string }) {
   return (
     <div id="gen-body">
-      <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
-        Body Copy
-      </p>
-      <div className="rounded-lg bg-surface border border-border/40 p-5">
+      <div className="flex items-center justify-between mb-4">
+        <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+          Body Copy
+        </p>
+        <CopyButton text={text} />
+      </div>
+      <div className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors">
         <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
           {text}
         </p>
@@ -417,16 +471,17 @@ function CTASection({ ctas }: { ctas: CTA[] }) {
         {ctas.map((cta) => (
           <div
             key={cta.id}
-            className="rounded-lg bg-surface border border-border/40 p-5"
+            className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="font-mono text-[11px] uppercase text-electric">
                 {cta.id}
               </span>
-              <span className="h-px flex-1 bg-border/40" />
-              <span className="font-mono text-[11px] text-muted-foreground">
+              <span className="h-px flex-1 bg-border/30" />
+              <span className="font-mono text-[10px] text-muted-foreground/70 bg-surface-raised px-2 py-0.5 rounded border border-border/30">
                 {cta.tone}
               </span>
+              <CopyButton text={cta.text} />
             </div>
             <p className="text-sm text-foreground font-medium">{cta.text}</p>
           </div>
@@ -435,6 +490,38 @@ function CTASection({ ctas }: { ctas: CTA[] }) {
     </div>
   );
 }
+
+/* Map platform names to risk for compliance note border colors */
+const COMPLIANCE_RISK_MAP: Record<string, "LOW" | "MEDIUM" | "HIGH"> = {
+  "X": "LOW",
+  "TikTok": "MEDIUM",
+  "Instagram": "MEDIUM",
+  "Facebook": "MEDIUM",
+  "Reddit": "HIGH",
+  "Pinterest": "LOW",
+  "Snapchat": "MEDIUM",
+  "Discord": "MEDIUM",
+  "Telegram": "MEDIUM",
+  "Google Ads": "MEDIUM",
+};
+
+const RISK_BORDER: Record<string, string> = {
+  LOW: "border-l-emerald-400/30",
+  MEDIUM: "border-l-amber-400/30",
+  HIGH: "border-l-red-400/40",
+};
+
+const RISK_DOT: Record<string, string> = {
+  LOW: "bg-emerald-400",
+  MEDIUM: "bg-amber-400",
+  HIGH: "bg-red-400",
+};
+
+const RISK_TEXT: Record<string, string> = {
+  LOW: "text-emerald-400",
+  MEDIUM: "text-amber-400",
+  HIGH: "text-red-400",
+};
 
 function ComplianceSection({ notes }: { notes: ComplianceNote[] }) {
   return (
@@ -446,21 +533,29 @@ function ComplianceSection({ notes }: { notes: ComplianceNote[] }) {
         </p>
       </div>
       <div className="space-y-4">
-        {notes.map((note) => (
-          <div
-            key={note.platform}
-            className="rounded-lg bg-surface border border-border/40 p-5"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <span className="font-mono text-xs text-foreground font-medium">
-                {note.platform}
-              </span>
+        {notes.map((note) => {
+          const platformKey = Object.keys(COMPLIANCE_RISK_MAP).find((k) =>
+            note.platform.toLowerCase().includes(k.toLowerCase()),
+          );
+          const risk = platformKey ? COMPLIANCE_RISK_MAP[platformKey] : "MEDIUM";
+          return (
+            <div
+              key={note.platform}
+              className={`rounded-lg bg-surface border border-border/40 border-l-2 ${RISK_BORDER[risk]} p-5 hover:border-border/60 transition-colors`}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <span className={`inline-block h-2 w-2 rounded-full ${RISK_DOT[risk]}`} />
+                <span className="font-mono text-xs text-foreground font-medium">
+                  {note.platform}
+                </span>
+                <span className={`ml-auto font-mono text-[10px] font-semibold tracking-wider ${RISK_TEXT[risk]}`}>{risk}</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {note.note}
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {note.note}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -857,7 +952,7 @@ export default function GeneratorPage() {
               </div>
 
               {/* Output sections */}
-              <div className="space-y-8 scroll-mt-28">
+              <div className="space-y-10 scroll-mt-28">
                 <PromoAnglesSection angles={displayToolkit.promo_angles} />
                 <SocialPostsSection posts={displayToolkit.social_posts} />
                 <HeadlinesSection headlines={displayToolkit.headlines} />

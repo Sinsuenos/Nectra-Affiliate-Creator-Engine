@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
+import Link from "next/link";
 import {
   Terminal,
   ShieldCheck,
@@ -14,6 +15,7 @@ import {
   BarChart3,
   Package,
   LockKeyhole,
+  ArrowRight,
 } from "lucide-react";
 
 const fadeUp = {
@@ -33,7 +35,7 @@ const MODULES = [
     outputs: ["Niche signals", "Audience context", "Research inputs"],
   },
   {
-    id: "M02", name: "Compliance Scanner", icon: ShieldCheck, state: "LIVE",
+    id: "M02", name: "Compliance Scanner", icon: ShieldCheck, state: "LIVE", link: "/scanner",
     summary: "Checks generated copy for platform-specific risk signals and can return flagged phrases, a reason, and a safer rewrite.",
     inputs: ["Generated content", "Target platforms", "Offer context"],
     outputs: ["Pass / Warn / Fail", "Flagged phrases", "Safer rewrite"],
@@ -45,7 +47,7 @@ const MODULES = [
     outputs: ["Content structure", "Channel plan", "Topic directions"],
   },
   {
-    id: "M04", name: "Copy Generator", icon: Zap, state: "LIVE",
+    id: "M04", name: "Copy Generator", icon: Zap, state: "LIVE", link: "/generator",
     summary: "The current engine turns an offer into platform-aware social content with editable offer fields and character counts.",
     inputs: ["Offer details", "Audience", "Platform targets"],
     outputs: ["Angles", "Platform posts", "Character counts"],
@@ -104,11 +106,21 @@ function ModuleCard({ mod, index }: { mod: (typeof MODULES)[number]; index: numb
             <h3 className="text-base font-bold tracking-tight truncate">{mod.name}</h3>
           </div>
         </div>
-        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider ${live ? "border-electric/30 bg-electric/10 text-electric" : partial ? "border-lime-400/30 bg-lime-400/[0.08] text-lime-300" : "border-border/50 bg-background text-muted-foreground"}`}>
-          {!live && !partial && <LockKeyhole className="h-3 w-3" />}
-          {partial && <Zap className="h-3 w-3" />}
-          {mod.state}
-        </span>
+        {live && mod.link ? (
+          <Link
+            href={mod.link}
+            className="inline-flex items-center gap-1.5 rounded-full border border-electric/30 bg-electric/10 px-3 py-1 font-mono text-[10px] font-semibold tracking-wider text-electric hover:bg-electric/20 transition-colors"
+          >
+            {mod.state}
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        ) : (
+          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider ${live ? "border-electric/30 bg-electric/10 text-electric" : partial ? "border-lime-400/30 bg-lime-400/[0.08] text-lime-300" : "border-border/50 bg-background text-muted-foreground"}`}>
+            {!live && !partial && <LockKeyhole className="h-3 w-3" />}
+            {partial && <Zap className="h-3 w-3" />}
+            {mod.state}
+          </span>
+        )}
       </div>
 
       <div className="px-5 py-5 space-y-5">
