@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
+import { NectarOrbs } from "@/components/nectar-orbs";
 import { PLATFORM_MATRIX } from "@/lib/compliance/platform-matrix";
 
 const fadeUp = {
@@ -21,6 +22,7 @@ const RESEARCH_VERIFIED_IDS = new Set(["snapchat", "discord", "telegram"]);
 export default function CompliancePage() {
   return (
     <>
+      <NectarOrbs />
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24">
         <motion.header className="max-w-3xl" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <p className="font-mono text-xs tracking-widest uppercase text-electric mb-4">Protect Before You Post</p>

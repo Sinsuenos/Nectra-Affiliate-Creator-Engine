@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
+import { NectarOrbs } from "@/components/nectar-orbs";
+import Link from "next/link";
 import { ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
 
 const fadeUp = {
@@ -45,6 +47,8 @@ function Block({ label, children }: { label: string; children: React.ReactNode }
 
 export default function SamplePage() {
   return (
+    <>
+      <NectarOrbs />
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-24">
       <motion.header initial="hidden" animate="visible" variants={fadeUp} custom={0}>
         <p className="font-mono text-xs tracking-widest uppercase text-electric mb-3">Transformation Preview</p>
@@ -97,22 +101,36 @@ export default function SamplePage() {
         <motion.div variants={fadeUp} custom={4}>
           <Block label="04 · Protect Before You Post (scanner checks all 9)">
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {scanExamples.map((item) => (
-                <div key={item.platform} className="rounded-lg border border-border/40 bg-surface p-4">
-                  <div className="flex items-center gap-2 mb-2"><ShieldCheck className="h-4 w-4 text-electric" /><span className="font-mono text-sm">{item.platform}</span><span className={`ml-auto text-[10px] font-mono font-semibold ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`}>{item.status}</span></div>
+              {scanExamples.map((item) => { const borderColor = item.status === "FAIL" ? "border-l-red-500/50 bg-red-500/[0.03]" : item.status === "WARN" ? "border-l-amber-400/40 bg-amber-500/[0.03]" : "border-l-emerald-500/30"; return (
+                <div key={item.platform} className={`rounded-lg border border-border/40 border-l-2 ${borderColor} bg-surface p-4`}>
+                  <div className="flex items-center gap-2 mb-2"><ShieldCheck className={`h-4 w-4 ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`} /><span className="font-mono text-sm">{item.platform}</span><span className={`ml-auto text-[10px] font-mono font-semibold ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`}>{item.status}</span></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.detail}</p>
                 </div>
-              ))}
+              ); })}
             </div>
           </Block>
         </motion.div>
 
         <motion.div variants={fadeUp} custom={5}>
+          <Link href="/scanner" className="group flex items-center justify-between rounded-xl border border-electric/25 bg-electric/[0.04] p-5 sm:p-6 transition-all hover:border-electric/40 hover:bg-electric/[0.07]">
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="h-5 w-5 text-electric shrink-0" />
+              <div>
+                <p className="font-mono text-sm font-semibold text-foreground group-hover:text-electric transition-colors">Try the Scanner with your own content</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Paste any post and get instant Pass / Warning / Fail results across platforms.</p>
+              </div>
+            </div>
+            <ArrowRight className="h-5 w-5 text-electric/60 group-hover:text-electric group-hover:translate-x-1 transition-all shrink-0 ml-4" />
+          </Link>
+        </motion.div>
+
+        <motion.div variants={fadeUp} custom={6}>
           <div className="rounded-xl border border-electric/20 bg-electric/[0.03] p-6 sm:p-8">
             <div className="flex items-start gap-3"><Sparkles className="h-5 w-5 text-electric mt-0.5 shrink-0" /><div><p className="font-mono text-[11px] uppercase tracking-wider text-electric mb-2">Important</p><h2 className="text-xl font-bold mb-2">The data stays yours.</h2><p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">When you paste a real offer into the Generator, use its actual details as the source of truth. Nectar should not manufacture reviews, clinical evidence, guarantees, or other facts to make copy sound more convincing.</p></div></div>
           </div>
         </motion.div>
       </motion.div>
     </div>
+    </>
   );
 }

@@ -72,7 +72,7 @@ export function TransformationRail() {
   return (
     <motion.div className="mx-auto max-w-6xl px-4 sm:px-6 pb-20 sm:pb-28" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
       <motion.div className="font-mono text-sm tracking-widest uppercase text-electric mb-3 text-center" variants={nodeVariants}>The Pipeline</motion.div>
-      <motion.div className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center mb-12 sm:mb-16" variants={nodeVariants}>One Offer.<span className="bg-gradient-to-r from-electric via-fuchsia-400 to-lime-300 bg-clip-text text-transparent"> Multiple Campaign Directions.</span> One Campaign.</motion.div>
+      <motion.div className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center mb-12 sm:mb-16" variants={nodeVariants}>One Offer.<span className="bg-gradient-to-r from-electric via-fuchsia-400 to-lime-300 bg-clip-text text-transparent"> Multiple Campaign Directions.</span> Nine Platforms.</motion.div>
       <div className="hidden sm:flex items-center justify-center">
         {RAIL_STAGES.map((stage, i) => <div key={stage.id} className="flex items-center"><StageNode stage={stage} />{i < RAIL_STAGES.length - 1 && <Connector index={i} />}</div>)}
       </div>
