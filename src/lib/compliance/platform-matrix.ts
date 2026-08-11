@@ -111,54 +111,89 @@ export const PLATFORM_MATRIX: readonly PlatformCompliance[] = [
     notes:
       "5 to 15 pins per day is standard for active accounts. Batch-pin content using scheduling tools. Avoid pinning the same URL more than once per board.",
   },
+  /*
+   * Source: Snap Advertising Policies + Snap Commercial Content Policy
+   * (snap.com/ad-policies, snap.com/terms/commercial-content), current 2026
+   *
+   * Key finding: Dating ads ARE explicitly permitted as long as there are no
+   * references to sexual activity. Suggestive content must be age-gated 18+.
+   * Snapchat is MORE permissive for legitimate dating-vertical content than
+   * most platforms, provided content stays non-explicit and is properly age-gated.
+   */
   {
     id: "snapchat",
     name: "Snapchat",
     risk: "MEDIUM",
     bannedTriggers: [
+      "Explicit sexual content or references to sexual activity",
+      "Sex work, pornography, or nudity",
+      "Dating services emphasizing casual sexual encounters",
+      "Sponsored lenses with suggestive content",
       "Undisclosed sponsored content in Stories or Spotlight",
-      "Adult content",
-      "Gambling",
-      "Tobacco or alcohol targeting minors",
-      "Crypto promotions",
-      "Misleading health claims",
+      "Content targeting under-18 without age-gate",
     ],
     safeApproach:
-      "Use the Sponsored label on all branded Story and Spotlight content. Keep health claims non-specific. Avoid direct affiliate links in public Snaps and use Stories with proper disclosure instead.",
+      "Age-gate all dating-vertical content 18+. Keep the dating angle emotional and lifestyle-focused (companionship, connection) rather than sexual. Use the Sponsored label on all branded Story and Spotlight content. Avoid 'casual encounters' framing entirely.",
     notes:
-      "3 to 5 Stories per day. Spotlight: 1 to 2 per day. Avoid repetitive affiliate content in back-to-back Stories since Snapchat users swipe past ads quickly.",
+      "More permissive than most platforms for legitimate dating offers if content stays non-explicit and age-gated. 3 to 5 Stories/day. Spotlight: 1 to 2/day. Snapchat users swipe quickly so front-load the value.",
   },
+  /*
+   * Source: Discord Ads Policy (support.discord.com/hc/en-us/articles/25516720403223),
+   * current as of ~March 2026
+   *
+   * Key finding: Discord has NO public profile, NO algorithmic feed, NO
+   * 'going viral' mechanism. Servers are largely invite-only/opt-in
+   * communities. Risk is therefore server-level ToS enforcement and
+   * community moderation, NOT algorithmic account suppression like
+   * TikTok/Instagram. Enforcement is real but structurally contained
+   * to closed communities rather than broadcast/discovery risk.
+   */
   {
     id: "discord",
     name: "Discord",
-    risk: "HIGH",
+    risk: "MEDIUM",
     bannedTriggers: [
+      "Explicit or implicit adult sexual content",
+      "Compensated sexual acts or escort service references",
+      "Intimate massage or sex work references",
+      "Products shaped like intimate body parts",
       "Unsolicited DMs with affiliate links",
-      "Spam in non-designated channels",
-      "Self-promotion without server permission",
       "Bot-driven mass messaging",
-      "Phishing links",
     ],
     safeApproach:
-      "Only post affiliate content in channels explicitly designated for it. Always disclose the relationship. Get server admin approval before sharing any commercial links. Never send affiliate DMs without prior consent.",
+      "Safe within private, consent-based servers discussing dating/relationships in non-explicit terms. Avoid direct escort or compensated-sex framing. Only post affiliate content in channels designated for it. Get server admin approval. Do not promote via public Discord discovery features.",
     notes:
-      "Varies entirely by server rules. In designated promo channels: 1 post per 24 to 48 hours is safe. In general channels: zero affiliate posts unless explicitly allowed.",
+      "MEDIUM risk because enforcement is structurally contained to closed communities, not broadcast/discovery risk. Server rules control everything. In designated promo channels: 1 post/24 to 48 hours. No public profile or algorithmic feed to exploit.",
   },
+  /*
+   * Source: Telegram Ads Guide (ads.telegram.org policies, via
+   * umnico.com/blog/telegram-ads), Telegram ToS re: illegal
+   * pornographic content on public channels, current 2026
+   *
+   * Key finding: Telegram's OFFICIAL ads platform (ads.telegram.org)
+   * explicitly disallows advertising for 'adult materials' outright.
+   * However, broader content moderation is comparatively hands-off
+   * for organic channel/group promotion. There is a real gap between
+   * formal ad platform rules and actual enforcement. Not a safe
+   * long-term bet due to app-store pressure (Apple/Google) forcing
+   * periodic crackdowns on adult content channels.
+   */
   {
     id: "telegram",
     name: "Telegram",
-    risk: "MEDIUM",
+    risk: "HIGH",
     bannedTriggers: [
-      "Spam reporting threshold triggers auto-ban",
+      "Adult materials on the official Telegram Ads product",
+      "Illegal pornographic content on publicly viewable channels",
       "Phishing or malware links",
-      "Illegal content",
       "Unsolicited DM blasts to non-opted-in users",
       "Crypto scam patterns",
+      "Content that could trigger app-store policy crackdowns",
     ],
     safeApproach:
-      "Only share affiliate links in channels where subscribers have opted in. Include clear disclosure. Avoid mass-adding users to groups. Use channel posts rather than group spam for link distribution.",
+      "Do NOT use Telegram's paid Ads product for adult-adjacent dating content at all. Organic channel promotion carries real but inconsistent risk. Treat as HIGH, not a reliable channel to build a durable presence on. Prefer opted-in channels with clear disclosure.",
     notes:
-      "Channels: 1 to 3 posts per day. Groups: match the existing conversation rhythm. Never post the same link to multiple groups simultaneously since Telegram spam filter will flag it.",
+      "HIGH risk for the official ads product (adult content banned outright). MEDIUM-HIGH for organic channel/group promotion since enforcement is inconsistent but the platform is not a safe long-term bet due to periodic app-store crackdowns. Channels: 1 to 3 posts/day.",
   },
 ] as const;
 

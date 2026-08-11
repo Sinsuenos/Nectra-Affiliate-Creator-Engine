@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { PLATFORM_MATRIX, PLATFORM_MATRIX_BY_ID } from "@/lib/compliance/platform-matrix";
 
 export const maxDuration = 60;
 
@@ -19,6 +20,14 @@ interface PlatformResult {
 }
 
 /* ------------------------------------------------------------------ */
+/*  BUILD PLATFORM CONTEXT FROM MATRIX                                 */
+/* ------------------------------------------------------------------ */
+const PLATFORM_CONTEXT_STRING = PLATFORM_MATRIX.map((p) => {
+  const triggers = p.bannedTriggers.join("; ");
+  return `  - ${p.name} [${p.risk} risk]: ${p.safeApproach} Banned: ${triggers}`;
+}).join("\n");
+
+/* ------------------------------------------------------------------ */
 /*  SYSTEM PROMPT                                                      */
 /* ------------------------------------------------------------------ */
 const SYSTEM_PROMPT = `You are a compliance scanner for affiliate content. Flag explicit banned triggers like: health/income guarantees, hard-sell CTAs, urgency, "click here", "sign up", "act now", "free trial", "no risk", "guaranteed".
@@ -28,12 +37,8 @@ STATUS THRESHOLDS:
 - "warn" = borderline language (mild urgency, implied claims)
 - "pass" = clean
 
-PLATFORM CONTEXT:
-- TikTok/Instagram: Branded content disclosure required. No health/income guarantees.
-- Facebook: No fake urgency. No cloaked URLs.
-- Reddit: HIGH risk. No self-promotion, no affiliate links, no CTAs.
-- X: Low risk. Use #ad. Keep factual.
-- Pinterest: FTC disclosure required. No misleading claims.
+PLATFORM CONTEXT (from Nectar Engine compliance matrix):
+${PLATFORM_CONTEXT_STRING}
 
 RULES:
 1. Only flag phrases that EXACTLY appear in the input. Copy them character-for-character.

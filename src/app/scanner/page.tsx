@@ -34,6 +34,9 @@ const ALL_PLATFORMS = [
   "Reddit",
   "X",
   "Pinterest",
+  "Snapchat",
+  "Discord",
+  "Telegram",
 ] as const;
 
 type PlatformName = (typeof ALL_PLATFORMS)[number];
