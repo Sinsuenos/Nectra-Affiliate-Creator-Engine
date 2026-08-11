@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------ */
-/*  LIGHTWEIGHT OFFER FIELD EXTRACTION                                */
+/*  ROBUST OFFER FIELD EXTRACTION                                     */
 /* ------------------------------------------------------------------ */
 
 export interface ParsedField {
@@ -11,18 +11,18 @@ export interface ParsedField {
 interface FieldDef {
   key: string;
   label: string;
+  aliases: string[];
   patterns: RegExp[];
 }
 
 /*
- * Affiliate offer sheets are deliberately NOT standardized.
- * This parser must therefore recognize label aliases, Markdown/table
- * formatting, optional bullets, whitespace variations, and title-first
- * exports without being tied to one network or one offer format.
+ * Affiliate offer data is heterogeneous by design. Networks export
+ * different labels, separators, table shapes, and ordering. This parser
+ * therefore uses several deterministic passes instead of assuming one
+ * network's format.
  *
- * Important: this is deterministic extraction only. It never invents a
- * value. If a field cannot be grounded in the pasted text, it remains
- * "Not detected".
+ * Grounding rule: never invent a value. If a field cannot be found in the
+ * pasted source, return "Not detected".
  */
 const LABEL_PREFIX = String.raw`(?:[-*•]\s*)?`;
 
@@ -30,69 +30,74 @@ const FIELD_DEFS: FieldDef[] = [
   {
     key: "offer_name",
     label: "Offer Name",
+    aliases: ["offer name", "offer", "product", "campaign", "title", "offer title", "product name"],
     patterns: [
-      new RegExp(`^${LABEL_PREFIX}(?:offer[\\s_-]?name|offer|product|campaign|title)[\\s:#|\\-]+(.+)$`, "im"),
-      /^\s*(?:\|\s*)?(.+?)\s*[-|]\s*(?:PPS|CPA|CPL|CPI|CPS|CPM|RevShare|REVSHARE)\s*(?:\|.*)?$/im,
+      new RegExp(`^${LABEL_PREFIX}(?:offer[\\s_-]?name|offer[\\s_-]?title|product[\\s_-]?name|campaign|title)[\\s:#|=\\-]+(.+)$`, "im"),
     ],
   },
   {
     key: "network_id",
     label: "Offer ID",
+    aliases: ["offer id", "network id", "network offer id", "campaign id", "campaign", "id"],
     patterns: [
-      new RegExp(`^${LABEL_PREFIX}(?:offer[\\s_-]?id|network[\\s_-]?id|network[\\s_-]?offer[\\s_-]?id|campaign[\\s_-]?id|id)[\\s:#|\\-]+([^\\n|]+)`, "im"),
+      new RegExp(`^${LABEL_PREFIX}(?:offer[\\s_-]?id|network[\\s_-]?id|network[\\s_-]?offer[\\s_-]?id|campaign[\\s_-]?id|id)[\\s:#|=\\-]+([^\\n|]+)`, "im"),
     ],
   },
   {
     key: "vertical",
     label: "Vertical",
+    aliases: ["vertical", "category", "vertical category"],
     patterns: [
-      new RegExp(`^${LABEL_PREFIX}vertical(?:\\s*\\/\\s*category|\\s*category)?[\\s:#|\\-]+([^\\n|]+)`, "im"),
-      new RegExp(`^${LABEL_PREFIX}category[\\s:#|\\-]+([^\\n|]+)`, "im"),
-      new RegExp(`^${LABEL_PREFIX}vertical[\\s:#|\\-]+([^\\n|]+)`, "im"),
+      new RegExp(`^${LABEL_PREFIX}(?:vertical(?:\\s*\\/\\s*category|\\s*category)?|category)[\\s:#|=\\-]+([^\\n|]+)`, "im"),
     ],
   },
   {
     key: "payout_model",
     label: "Payout Model",
+    aliases: ["payout", "default payout", "payout model", "commission", "commission rate", "rate", "default commission"],
     patterns: [
-      new RegExp(`^${LABEL_PREFIX}(?:default[\\s_-]?)?(?:payout|commission|rate)[\\s:#|\\-]+([^\\n|]+)`, "im"),
+      new RegExp(`^${LABEL_PREFIX}(?:(?:default[\\s_-]?)?payout(?:[\\s_-]?model)?|commission(?:[\\s_-]?rate)?|rate)[\\s:#|=\\-]+([^\\n|]+)`, "im"),
     ],
   },
   {
     key: "conversion_flow",
     label: "Conversion Flow",
+    aliases: ["conversion flow", "conversion", "flow", "funnel", "conversion event", "conversion type"],
     patterns: [
-      new RegExp(`^${LABEL_PREFIX}(?:conversion[\\s_-]?flow|conversion|flow|funnel)[\\s:#|\\-]+([^\\n|]+)`, "im"),
+      new RegExp(`^${LABEL_PREFIX}(?:conversion[\\s_-]?flow|conversion[\\s_-]?event|conversion[\\s_-]?type|conversion|flow|funnel)[\\s:#|=\\-]+([^\\n|]+)`, "im"),
     ],
   },
   {
     key: "top_geo",
     label: "Top Geo",
+    aliases: ["top geo", "geo", "geos", "countries", "target countries", "accepted countries", "allowed countries", "available countries"],
     patterns: [
-      new RegExp(`^${LABEL_PREFIX}(?:top[\\s_-]?)?(?:geo|geos|countries|target[\\s_-]?countries|accepted[\\s_-]?countries)[\\s:#|\\-]+([^\\n|]+)`, "im"),
+      new RegExp(`^${LABEL_PREFIX}(?:(?:top[\\s_-]?)?(?:geo|geos)|target[\\s_-]?countries|accepted[\\s_-]?countries|allowed[\\s_-]?countries|available[\\s_-]?countries)[\\s:#|=\\-]+([^\\n|]+)`, "im"),
     ],
   },
   {
     key: "landing_page",
     label: "Landing Page URL",
+    aliases: ["landing page", "landing page url", "default landing page", "default landing page url", "landing url", "destination url", "target url", "offer url", "url"],
     patterns: [
-      new RegExp(`^${LABEL_PREFIX}(?:default[\\s_-]?)?(?:landing[\\s_-]?page|landing[\\s_-]?url|destination[\\s_-]?url|target[\\s_-]?url)[\\s:#|\\-]+(https?:\\/\\/[^\\s|]+)`, "im"),
+      new RegExp(`^${LABEL_PREFIX}(?:(?:default[\\s_-]?)?landing[\\s_-]?(?:page|url)|destination[\\s_-]?url|target[\\s_-]?url|offer[\\s_-]?url)[\\s:#|=\\-]+(https?:\\/\\/[^\\s|]+)`, "im"),
     ],
   },
   {
     key: "banned_traffic",
     label: "Banned Traffic Types",
+    aliases: ["banned traffic", "banned traffic types", "prohibited traffic", "restricted traffic", "forbidden traffic", "traffic restrictions", "traffic allowed", "traffic sources"],
     patterns: [
-      new RegExp(`^${LABEL_PREFIX}(?:banned|prohibited|restricted|forbidden)[\\s_-]?traffic(?:[\\s_-]?types)?[\\s:#|\\-]+([^\\n|]+)`, "im"),
-      new RegExp(`^${LABEL_PREFIX}(?:traffic[\\s_-]?restrictions|traffic[\\s_-]?allowed|traffic[\\s_-]?sources)[\\s:#|\\-]+([^\\n|]+)`, "im"),
+      new RegExp(`^${LABEL_PREFIX}(?:banned|prohibited|restricted|forbidden)[\\s_-]?traffic(?:[\\s_-]?types)?[\\s:#|=\\-]+([^\\n|]+)`, "im"),
+      new RegExp(`^${LABEL_PREFIX}(?:traffic[\\s_-]?restrictions|traffic[\\s_-]?allowed|traffic[\\s_-]?sources)[\\s:#|=\\-]+([^\\n|]+)`, "im"),
     ],
   },
   {
     key: "subid_format",
     label: "Sub-ID Format",
+    aliases: ["sub id", "sub-id", "sub ids", "sub-ids", "sub id format", "sub-id format", "tracking token", "tracking format", "tracking parameters"],
     patterns: [
-      new RegExp(`^${LABEL_PREFIX}(?:sub[\\s_-]?id|sub[\\s_-]?ids)(?:[\\s_-]?format)?[\\s:#|\\-]+([^\\n|]+)`, "im"),
-      new RegExp(`^${LABEL_PREFIX}(?:tracking[\\s_-]?(?:token|format)|tracking[\\s_-]?parameters?)[\\s:#|\\-]+([^\\n|]+)`, "im"),
+      new RegExp(`^${LABEL_PREFIX}(?:sub[\\s_-]?id(?:s)?(?:[\\s_-]?format)?|tracking[\\s_-]?(?:token|format)|tracking[\\s_-]?parameters?)[\\s:#|=\\-]+([^\\n|]+)`, "im"),
     ],
   },
 ];
@@ -110,60 +115,130 @@ function normalizedLines(text: string): string[] {
   return text
     .replace(/\r\n?/g, "\n")
     .split("\n")
-    .map((line) => line.replace(/^\s+|\s+$/g, ""))
+    .map((line) => line.trim())
     .filter(Boolean);
 }
 
-function extractOfferNameFromFirstLine(text: string): string | null {
-  const lines = normalizedLines(text);
-  if (!lines.length) return null;
+function normalizeLabel(label: string): string {
+  return label
+    .toLowerCase()
+    .replace(/[|*_`]/g, " ")
+    .replace(/[–—]/g, "-")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-  const firstLine = lines[0].replace(/^[|\s]+|[|\s]+$/g, "");
+function stripFormatting(value: string): string {
+  return cleanCapturedValue(value.replace(/^\*+|\*+$/g, ""));
+}
 
-  if (/^(?:offer[\s_-]?name|offer|product|campaign|title)\s*[:#|\-]/i.test(firstLine)) {
-    return null;
+function extractTableValue(lines: string[], aliases: string[]): string | null {
+  const aliasSet = new Set(aliases.map(normalizeLabel));
+
+  for (const line of lines) {
+    if (!line.includes("|")) continue;
+    const cells = line.split("|").map((cell) => stripFormatting(cell));
+    if (cells.length < 2) continue;
+    const label = normalizeLabel(cells[0]);
+    if (!aliasSet.has(label)) continue;
+    const value = cells.slice(1).find((cell) => cell && !/^[-:]+$/.test(cell));
+    if (value) return value;
   }
 
-  /* Common network shorthand: "OhChat - PPS", "Offer X | CPA". */
-  const shorthand = firstLine.match(
-    /^(?:\|\s*)?(.+?)\s*(?:-|\|)\s*(?:PPS|CPA|CPL|CPI|CPS|CPM|RevShare|REVSHARE)\s*$/i,
-  );
-  if (shorthand?.[1]) return cleanCapturedValue(shorthand[1]);
+  return null;
+}
 
-  /* A bare first line can be the offer title. Reject obvious metadata,
-     URLs, table separators, and section headings. */
-  if (/^https?:\/\//i.test(firstLine)) return null;
-  if (/^[-|]+$/.test(firstLine)) return null;
-  if (/^(?:network|vertical|category|payout|commission|rate|conversion|flow|funnel|top\s+geo|geo|countries|landing|default\s+landing|banned|prohibited|restricted|accepted\s+countries|parsed\s+fields)\b/i.test(firstLine)) {
-    return null;
+function extractInlineKeyValue(lines: string[], aliases: string[]): string | null {
+  const aliasPatterns = aliases
+    .map((alias) => alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/[ _-]+/g, "[\\s_-]*"))
+    .sort((a, b) => b.length - a.length);
+
+  if (!aliasPatterns.length) return null;
+  const aliasGroup = aliasPatterns.join("|");
+  const pattern = new RegExp(`^${LABEL_PREFIX}(?:${aliasGroup})[\\s:#|=\\-]+(.+)$`, "i");
+
+  for (const line of lines) {
+    const match = line.match(pattern);
+    if (match?.[1]) {
+      const value = cleanCapturedValue(match[1]);
+      if (value) return value;
+    }
   }
 
-  return cleanCapturedValue(firstLine);
+  return null;
+}
+
+function extractOfferNameFromFirstMeaningfulLine(lines: string[]): string | null {
+  for (const rawLine of lines.slice(0, 8)) {
+    let line = rawLine.replace(/^[|\s]+|[|\s]+$/g, "");
+    if (!line || /^[-|:]+$/.test(line)) continue;
+
+    /* Common network shorthand: "OhChat - PPS", "Offer X | CPA". */
+    const shorthand = line.match(
+      /^(?:\|\s*)?(.+?)\s*(?:-|\|)\s*(?:PPS|CPA|CPL|CPI|CPS|CPM|RevShare|REVSHARE)\s*$/i,
+    );
+    if (shorthand?.[1]) return cleanCapturedValue(shorthand[1]);
+
+    /* A title line can be followed by metadata, but metadata itself should
+       never become the offer name. */
+    if (/^https?:\/\//i.test(line)) continue;
+    if (/^(?:network|network id|offer id|vertical|category|payout|default payout|commission|rate|conversion|conversion flow|flow|funnel|top geo|geo|countries|accepted countries|landing|default landing page|banned|prohibited|restricted|traffic|sub[- ]?id|parsed fields)\b/i.test(line)) continue;
+    if (/^(?:key offer details|offer details|details|description)\s*[:#-]?$/i.test(line)) continue;
+
+    /* Avoid treating a markdown/table header as the title. */
+    if (/^\|?\s*(field|value|label|name)\s*\|/i.test(line)) continue;
+
+    return cleanCapturedValue(line);
+  }
+
+  return null;
+}
+
+function extractOfferNameFromAnyLine(lines: string[]): string | null {
+  for (const line of lines) {
+    const shorthand = line.match(
+      /^(?:[-*•]\s*)?(?:\|\s*)?(.+?)\s*(?:-|\|)\s*(?:PPS|CPA|CPL|CPI|CPS|CPM|RevShare|REVSHARE)(?:\s*\|.*)?$/i,
+    );
+    if (shorthand?.[1]) return cleanCapturedValue(shorthand[1]);
+  }
+  return null;
+}
+
+function extractField(def: FieldDef, source: string, lines: string[]): string | null {
+  for (const pattern of def.patterns) {
+    const match = source.match(pattern);
+    if (match?.[1]) {
+      const value = cleanCapturedValue(match[1]);
+      if (value) return value;
+    }
+  }
+
+  const tableValue = extractTableValue(lines, def.aliases);
+  if (tableValue) return tableValue;
+
+  const inlineValue = extractInlineKeyValue(lines, def.aliases);
+  if (inlineValue) return inlineValue;
+
+  return null;
 }
 
 export function extractFields(text: string): ParsedField[] {
   const source = text.replace(/\r\n?/g, "\n");
+  const lines = normalizedLines(source);
 
   return FIELD_DEFS.map((def) => {
-    for (const pat of def.patterns) {
-      const m = source.match(pat);
-      if (m?.[1] && m[1].trim().length > 0) {
-        return {
-          key: def.key,
-          label: def.label,
-          value: cleanCapturedValue(m[1]),
-        };
-      }
+    let value = extractField(def, source, lines);
+
+    if (def.key === "offer_name" && !value) {
+      value = extractOfferNameFromAnyLine(lines) ?? extractOfferNameFromFirstMeaningfulLine(lines);
     }
 
-    if (def.key === "offer_name") {
-      const inferred = extractOfferNameFromFirstLine(source);
-      if (inferred) {
-        return { key: def.key, label: def.label, value: inferred };
-      }
-    }
-
-    return { key: def.key, label: def.label, value: "Not detected" };
+    return {
+      key: def.key,
+      label: def.label,
+      value: value || "Not detected",
+    };
   });
 }
 
@@ -172,8 +247,10 @@ export function extractFields(text: string): ParsedField[] {
 /* ------------------------------------------------------------------ */
 
 export function slugify(text: string): string {
-  const firstLine = normalizedLines(text)[0] ?? "";
-  const cleaned = firstLine
+  const parsedName = extractFields(text).find((field) => field.key === "offer_name")?.value;
+  const fallback = normalizedLines(text)[0] ?? "";
+  const source = parsedName && parsedName !== "Not detected" ? parsedName : fallback;
+  const cleaned = source
     .replace(/[^a-zA-Z0-9\s]/g, "")
     .trim()
     .split(/\s+/)
@@ -195,4 +272,7 @@ export const SUBID_PLATFORMS = [
   { platform: "Reddit", prefix: "rd" },
   { platform: "Instagram", prefix: "ig" },
   { platform: "Facebook", prefix: "fb" },
+  { platform: "Snapchat", prefix: "sc" },
+  { platform: "Discord", prefix: "dc" },
+  { platform: "Telegram", prefix: "tg" },
 ];
