@@ -293,9 +293,18 @@ function EditableChip({
 /*  OUTPUT SECTION COMPONENTS                                          */
 /* ------------------------------------------------------------------ */
 
+const OUTPUT_SECTIONS = [
+  { id: "angles", label: "Angles" },
+  { id: "posts", label: "Social Posts" },
+  { id: "headlines", label: "Headlines" },
+  { id: "body", label: "Body Copy" },
+  { id: "ctas", label: "CTAs" },
+  { id: "compliance", label: "Compliance" },
+] as const;
+
 function PromoAnglesSection({ angles }: { angles: PromoAngle[] }) {
   return (
-    <div>
+    <div id="gen-angles">
       <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
         Promo Angles
       </p>
@@ -329,7 +338,7 @@ function PromoAnglesSection({ angles }: { angles: PromoAngle[] }) {
 
 function SocialPostsSection({ posts }: { posts: SocialPost[] }) {
   return (
-    <div>
+    <div id="gen-posts">
       <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
         Social Posts
       </p>
@@ -359,7 +368,7 @@ function SocialPostsSection({ posts }: { posts: SocialPost[] }) {
 
 function HeadlinesSection({ headlines }: { headlines: Headline[] }) {
   return (
-    <div>
+    <div id="gen-headlines">
       <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
         Headlines
       </p>
@@ -385,7 +394,7 @@ function HeadlinesSection({ headlines }: { headlines: Headline[] }) {
 
 function BodyCopySection({ text }: { text: string }) {
   return (
-    <div>
+    <div id="gen-body">
       <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
         Body Copy
       </p>
@@ -400,7 +409,7 @@ function BodyCopySection({ text }: { text: string }) {
 
 function CTASection({ ctas }: { ctas: CTA[] }) {
   return (
-    <div>
+    <div id="gen-ctas">
       <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
         CTA Variations
       </p>
@@ -429,7 +438,7 @@ function CTASection({ ctas }: { ctas: CTA[] }) {
 
 function ComplianceSection({ notes }: { notes: ComplianceNote[] }) {
   return (
-    <div>
+    <div id="gen-compliance">
       <div className="flex items-center gap-2 mb-4">
         <ShieldCheck className="h-4 w-4 text-amber-400" />
         <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -832,8 +841,23 @@ export default function GeneratorPage() {
                 )}
               </div>
 
+              {/* Section navigation */}
+              <div className="sticky top-[72px] z-20 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 mb-6 -mt-2 bg-[#121827]/90 backdrop-blur-md border-b border-border/30 rounded-b-xl">
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                  {OUTPUT_SECTIONS.map((s, i) => (
+                    <a
+                      key={s.id}
+                      href={`#gen-${s.id}`}
+                      className="shrink-0 px-3 py-1.5 rounded-md text-[11px] font-mono font-medium text-muted-foreground/70 hover:text-electric hover:bg-electric/[0.06] transition-colors"
+                    >
+                      {s.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+
               {/* Output sections */}
-              <div className="space-y-8">
+              <div className="space-y-8 scroll-mt-28">
                 <PromoAnglesSection angles={displayToolkit.promo_angles} />
                 <SocialPostsSection posts={displayToolkit.social_posts} />
                 <HeadlinesSection headlines={displayToolkit.headlines} />

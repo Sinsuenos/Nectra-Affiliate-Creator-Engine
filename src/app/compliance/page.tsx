@@ -38,7 +38,7 @@ export default function CompliancePage() {
 
         <Separator className="my-8 bg-border/60" />
 
-        <motion.div className="overflow-x-auto rounded-xl border border-border/60" variants={fadeUp} custom={1} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
+        <div className="overflow-x-auto rounded-xl border border-border/60 sm:sticky sm:top-[64px] sm:z-20"
           <table className="w-full text-sm">
             <thead className="border-b border-border/60 bg-surface-raised"><tr>
               {['Platform','Risk Level','Risk Signals','Safer Approach','Posting Guidance'].map((heading) => <th key={heading} className="text-left px-5 py-3 text-xs uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">{heading}</th>)}
@@ -63,7 +63,7 @@ export default function CompliancePage() {
               </tr>
             ); })}</tbody>
           </table>
-        </motion.div>
+        </div>
 
         <motion.div className="mt-6 flex items-center gap-3" variants={fadeUp} custom={2} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}>
           <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold tracking-wider bg-electric/10 text-electric border border-electric/20">SOURCED</span>

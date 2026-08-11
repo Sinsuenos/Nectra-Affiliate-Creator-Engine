@@ -124,6 +124,10 @@
   --sidebar-ring: #25bfff;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -150,4 +154,12 @@
 ::selection {
   background: #25bfff59;
   color: #ffffff;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

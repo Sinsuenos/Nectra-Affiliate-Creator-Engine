@@ -13,6 +13,7 @@ import {
   ShieldX,
   Copy,
   Check,
+  FileText,
 } from "lucide-react";
 
 interface PlatformResult {
@@ -38,11 +39,12 @@ const ALL_PLATFORMS = [
 type PlatformName = (typeof ALL_PLATFORMS)[number];
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 20, x: -8 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.06, duration: 0.5, ease: "easeOut" as const },
+    x: 0,
+    transition: { delay: i * 0.07, duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] as const },
   }),
 };
 
@@ -244,6 +246,24 @@ function ScannerInner() {
   const hasAnyFail = results?.some((r) => r.status === "fail") ?? false;
   const issueCount = results?.filter((r) => r.status !== "pass").length ?? 0;
   const totalScanned = results?.length ?? 0;
+  const passCount = results?.filter((r) => r.status === "pass").length ?? 0;
+  const warnCount = results?.filter((r) => r.status === "warn").length ?? 0;
+  const failCount = results?.filter((r) => r.status === "fail").length ?? 0;
+
+  const [allCopied, setAllCopied] = useState(false);
+  function handleCopyAll() {
+    if (!results) return;
+    const lines = results.map((r) => {
+      const icon = r.status === "pass" ? "PASS" : r.status === "warn" ? "WARN" : "FAIL";
+      const line = `[${icon}] ${r.platform}`;
+      if (r.status === "pass") return `${line}: Clear to post.`;
+      let detail = `${line}: ${r.reason}`;
+      if (r.flagged_phrases.length > 0) detail += `\n  Flagged: ${r.flagged_phrases.map((p) => \`"${p}"\`).join(", ")}`;
+      if (r.safer_rewrite && r.safer_rewrite.trim()) detail += `\n  Safer: ${r.safer_rewrite}`;
+      return detail;
+    });
+    navigator.clipboard.writeText(lines.join("\n\n")).then(() => { setAllCopied(true); setTimeout(() => setAllCopied(false), 2000); });
+  }
 
   return (
     <>
@@ -372,12 +392,46 @@ function ScannerInner() {
           <>
             <Separator className="bg-border/40" />
             <motion.section className="mx-auto max-w-4xl px-4 sm:px-6 py-12 sm:py-16" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-              <div className="mb-8">
-                <p className="font-mono text-xs tracking-widest uppercase text-electric mb-3">Scan Results</p>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {issueCount === 0 ? `${totalScanned} of ${totalScanned} platforms - all clear` : `${issueCount} of ${totalScanned} platforms need changes before you post`}
-                </h2>
-                <p className="mt-2 text-xs text-muted-foreground/70 leading-relaxed">This is guidance based on observed platform patterns, not a guarantee of approval. Always verify current platform policies before publishing.</p>
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+                <div>
+                  <p className="font-mono text-xs tracking-widest uppercase text-electric mb-3">Scan Results</p>
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                    {issueCount === 0 ? `${totalScanned} of ${totalScanned} platforms - all clear` : `${issueCount} of ${totalScanned} platforms need changes before you post`}
+                  </h2>
+                  <p className="mt-2 text-xs text-muted-foreground/70 leading-relaxed">This is guidance based on observed platform patterns, not a guarantee of approval. Always verify current platform policies before publishing.</p>
+                </div>
+                <button
+                  onClick={handleCopyAll}
+                  className="shrink-0 inline-flex items-center gap-2 rounded-lg border border-border/50 bg-surface hover:bg-surface-raised px-4 py-2.5 text-xs font-mono font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  {allCopied ? <><Check className="h-3.5 w-3.5 text-emerald-400" />Copied</> : <><FileText className="h-3.5 w-3.5" />Copy Report</>}
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 sm:gap-3 mb-6 p-3 rounded-xl border border-border/40 bg-surface/50">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  <span className="font-mono text-sm font-bold text-emerald-400">{passCount}</span>
+                  <span className="text-[10px] font-mono text-emerald-400/70 uppercase hidden sm:inline">Pass</span>
+                </div>
+                {warnCount > 0 && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                    <ShieldAlert className="h-3.5 w-3.5 text-amber-400" />
+                    <span className="font-mono text-sm font-bold text-amber-400">{warnCount}</span>
+                    <span className="text-[10px] font-mono text-amber-400/70 uppercase hidden sm:inline">Warn</span>
+                  </div>
+                )}
+                {failCount > 0 && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <ShieldX className="h-3.5 w-3.5 text-red-400" />
+                    <span className="font-mono text-sm font-bold text-red-400">{failCount}</span>
+                    <span className="text-[10px] font-mono text-red-400/70 uppercase hidden sm:inline">Fail</span>
+                  </div>
+                )}
+                <div className="flex-1" />
+                <div className="h-2 flex-1 max-w-[120px] rounded-full bg-border/30 overflow-hidden hidden sm:block">
+                  <div className="h-full rounded-full bg-emerald-500/60 transition-all duration-500" style={{ width: `${totalScanned > 0 ? (passCount / totalScanned) * 100 : 0}%` }} />
+                </div>
               </div>
 
               <div className="space-y-4">
