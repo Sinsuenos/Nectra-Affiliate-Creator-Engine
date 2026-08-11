@@ -35,12 +35,6 @@ export function SiteFooter() {
             >
               Refund Policy
             </Link>
-            <a
-              href="mailto:support@nectar-engine.example"
-              className="hover:text-foreground transition-colors"
-            >
-              Contact
-            </a>
           </nav>
         </div>
 
