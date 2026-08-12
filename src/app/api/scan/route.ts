@@ -48,6 +48,59 @@ GROUNDING RULES:
 Return ONLY valid JSON:
 {"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":["<exact phrase from input>"],"reason":"<short grounded reason>","safer_rewrite":"<full rewritten content or empty>"}]}`;
 
+function classifyScanError(message: string): {
+  error: string;
+  diagnostic: string;
+  status: number;
+} {
+  const lower = message.toLowerCase();
+  if (lower.includes("not set") || lower.includes("not configured")) {
+    return {
+      error: "Scanner is not configured on the server. No compliance clearance was issued.",
+      diagnostic: "OPENROUTER_API_KEY_missing",
+      status: 503,
+    };
+  }
+  if (
+    lower.includes("429") ||
+    lower.includes("rate") ||
+    lower.includes("quota") ||
+    lower.includes("free-models")
+  ) {
+    return {
+      error: "The scanner model is rate-limited. Wait a moment and try again, or scan fewer platforms.",
+      diagnostic: "provider_rate_limit",
+      status: 429,
+    };
+  }
+  if (lower.includes("empty response")) {
+    return {
+      error: "The scanner model returned an empty response. No compliance clearance was issued. Try again.",
+      diagnostic: "empty_model_response",
+      status: 503,
+    };
+  }
+  if (lower.includes("abort") || lower.includes("timeout")) {
+    return {
+      error: "The scanner timed out waiting for the model. Try fewer platforms or try again.",
+      diagnostic: "timeout",
+      status: 504,
+    };
+  }
+  if (lower.includes("401") || lower.includes("403") || lower.includes("unauthorized")) {
+    return {
+      error: "Scanner API access is invalid or unauthorized.",
+      diagnostic: "auth_error",
+      status: 503,
+    };
+  }
+  return {
+    error: "The scanner could not complete the AI check. No compliance clearance was issued. Please try again.",
+    diagnostic: message.slice(0, 240),
+    status: 503,
+  };
+}
+
 async function callOpenRouter(content: string, platforms: string[]): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("Scanner is not configured. OPENROUTER_API_KEY is not set.");
@@ -120,13 +173,13 @@ export async function POST(request: NextRequest) {
 
     if (content.length < 10) {
       return NextResponse.json(
-        { error: "Content is required and must be at least 10 characters." },
+        { error: "Content is required and must be at least 10 characters.", diagnostic: "invalid_input" },
         { status: 400 },
       );
     }
     if (platforms.length === 0) {
       return NextResponse.json(
-        { error: "At least one platform must be selected." },
+        { error: "At least one platform must be selected.", diagnostic: "no_platforms" },
         { status: 400 },
       );
     }
@@ -137,22 +190,20 @@ export async function POST(request: NextRequest) {
     } catch (err) {
       console.error("Scanner model call failed:", err);
       const message = err instanceof Error ? err.message : "Scanner model call failed.";
-      if (message.includes("429") || message.toLowerCase().includes("rate") || message.toLowerCase().includes("quota")) {
-        return NextResponse.json(
-          { error: "The scanner model is rate-limited. Please wait a moment and try again." },
-          { status: 429 },
-        );
-      }
+      const classified = classifyScanError(message);
       return NextResponse.json(
-        { error: "The scanner could not complete the AI check. No compliance clearance was issued. Please try again." },
-        { status: 503 },
+        { error: classified.error, diagnostic: classified.diagnostic },
+        { status: classified.status },
       );
     }
 
     const modelResults = parseResults(raw);
     if (modelResults.length === 0) {
       return NextResponse.json(
-        { error: "The scanner returned an unreadable result. No compliance clearance was issued. Please try again." },
+        {
+          error: "The scanner returned an unreadable result. No compliance clearance was issued. Please try again.",
+          diagnostic: "unparseable_model_json",
+        },
         { status: 503 },
       );
     }
@@ -166,7 +217,10 @@ export async function POST(request: NextRequest) {
     const missing = platforms.filter((platform) => !byPlatform.has(platform.toLowerCase()));
     if (missing.length > 0) {
       return NextResponse.json(
-        { error: `The scanner did not return a complete check for: ${missing.join(", ")}. No compliance clearance was issued. Please try again.` },
+        {
+          error: `The scanner did not return a complete check for: ${missing.join(", ")}. No compliance clearance was issued. Please try again.`,
+          diagnostic: `incomplete_platforms:${missing.join(",")}`,
+        },
         { status: 503 },
       );
     }
@@ -194,7 +248,8 @@ export async function POST(request: NextRequest) {
           status: "warn" as const,
           flagged_phrases: [],
           safer_rewrite: "",
-          reason: "The model identified a risk, but it did not cite an exact phrase from the supplied content. No compliance clearance was issued for this platform.",
+          reason:
+            "The model identified a risk, but it did not cite an exact phrase from the supplied content. No compliance clearance was issued for this platform.",
         };
       }
 
@@ -209,14 +264,10 @@ export async function POST(request: NextRequest) {
   } catch (err: unknown) {
     console.error("Scan Error:", err);
     const message = err instanceof Error ? err.message : "Unknown error";
-
-    if (message.includes("401") || message.includes("403") || message.toLowerCase().includes("invalid")) {
-      return NextResponse.json(
-        { error: "Scanner API access is invalid or unauthorized." },
-        { status: 503 },
-      );
-    }
-
-    return NextResponse.json({ error: message }, { status: 500 });
+    const classified = classifyScanError(message);
+    return NextResponse.json(
+      { error: classified.error, diagnostic: classified.diagnostic },
+      { status: classified.status >= 500 ? classified.status : 500 },
+    );
   }
 }
