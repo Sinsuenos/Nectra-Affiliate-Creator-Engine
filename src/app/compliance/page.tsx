@@ -76,6 +76,17 @@ function ExpandableRow({ row, index }: { row: (typeof PLATFORM_MATRIX)[number]; 
 export default function CompliancePage() {
   return (
     <>
+      <div
+        className="fixed inset-0 -z-10 pointer-events-none"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/nectar-atmo-compliance.png)' }}
+        />
+        <div className="absolute inset-0 bg-[#121827]/[0.78]" />
+      </div>
+
       <NectarOrbs />
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24">
         <motion.header className="max-w-3xl" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
