@@ -61,16 +61,11 @@ function classifyScanError(message: string): {
       status: 503,
     };
   }
-  if (
-    lower.includes("429") ||
-    lower.includes("rate") ||
-    lower.includes("quota") ||
-    lower.includes("free-models")
-  ) {
+  if (lower.includes("429") || lower.includes("rate") || lower.includes("quota") || lower.includes("free-models")) {
     return {
-      error: "The scanner model is rate-limited. Wait a moment and try again, or scan fewer platforms.",
+      error: "Scan temporarily unavailable — try again in a moment.",
       diagnostic: "provider_rate_limit",
-      status: 429,
+      status: 503,
     };
   }
   if (lower.includes("empty response")) {
@@ -82,7 +77,7 @@ function classifyScanError(message: string): {
   }
   if (lower.includes("abort") || lower.includes("timeout")) {
     return {
-      error: "The scanner timed out waiting for the model. Try fewer platforms or try again.",
+      error: "The scanner timed out waiting for the model. Try again.",
       diagnostic: "timeout",
       status: 504,
     };
@@ -101,7 +96,11 @@ function classifyScanError(message: string): {
   };
 }
 
-async function callOpenRouter(content: string, platforms: string[]): Promise<string> {
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function callOpenRouterOnce(content: string, platforms: string[]): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("Scanner is not configured. OPENROUTER_API_KEY is not set.");
 
@@ -134,7 +133,9 @@ async function callOpenRouter(content: string, platforms: string[]): Promise<str
 
     if (!response.ok) {
       const errBody = await response.text();
-      throw new Error(`OpenRouter ${response.status}: ${errBody}`);
+      const error = new Error(`OpenRouter ${response.status}: ${errBody}`) as Error & { status?: number };
+      error.status = response.status;
+      throw error;
     }
 
     const data = await response.json();
@@ -143,6 +144,18 @@ async function callOpenRouter(content: string, platforms: string[]): Promise<str
     return raw;
   } finally {
     clearTimeout(timeoutId);
+  }
+}
+
+async function callOpenRouter(content: string, platforms: string[]): Promise<string> {
+  try {
+    return await callOpenRouterOnce(content, platforms);
+  } catch (err) {
+    const status = err instanceof Error ? (err as Error & { status?: number }).status : undefined;
+    if (status !== 429) throw err;
+    console.warn("Scanner received OpenRouter 429; retrying once after 4 seconds.");
+    await sleep(4000);
+    return await callOpenRouterOnce(content, platforms);
   }
 }
 
@@ -161,6 +174,47 @@ function parseResults(raw: string): PlatformResult[] {
   } catch {
     return [];
   }
+}
+
+function groundResults(content: string, platforms: string[], modelResults: PlatformResult[]): PlatformResult[] | null {
+  const byPlatform = new Map<string, PlatformResult>();
+  for (const result of modelResults) {
+    if (result?.platform) byPlatform.set(result.platform.toLowerCase(), result);
+  }
+
+  const contentLower = content.toLowerCase();
+  const missing = platforms.filter((platform) => !byPlatform.has(platform.toLowerCase()));
+  if (missing.length > 0) return null;
+
+  return platforms.map((platform) => {
+    const result = byPlatform.get(platform.toLowerCase())!;
+    const grounded = (result.flagged_phrases || []).filter(
+      (phrase) => typeof phrase === "string" && contentLower.includes(phrase.toLowerCase()),
+    );
+
+    if (result.status === "pass") {
+      return {
+        ...result,
+        platform,
+        flagged_phrases: [],
+        safer_rewrite: "",
+        reason: "No meaningful platform-specific risk signal found.",
+      };
+    }
+
+    if (grounded.length === 0) {
+      return {
+        ...result,
+        platform,
+        status: "warn" as const,
+        flagged_phrases: [],
+        safer_rewrite: "",
+        reason: "The model identified a risk, but it did not cite an exact phrase from the supplied content. No compliance clearance was issued for this platform.",
+      };
+    }
+
+    return { ...result, platform, flagged_phrases: grounded };
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -184,81 +238,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let raw: string;
-    try {
-      raw = await callOpenRouter(content, platforms);
-    } catch (err) {
-      console.error("Scanner model call failed:", err);
-      const message = err instanceof Error ? err.message : "Scanner model call failed.";
-      const classified = classifyScanError(message);
-      return NextResponse.json(
-        { error: classified.error, diagnostic: classified.diagnostic },
-        { status: classified.status },
-      );
+    // Sequential batching: never more than 2 platforms per model call.
+    const batches: string[][] = [];
+    for (let i = 0; i < platforms.length; i += 2) {
+      batches.push(platforms.slice(i, i + 2));
     }
 
-    const modelResults = parseResults(raw);
-    if (modelResults.length === 0) {
-      return NextResponse.json(
-        {
-          error: "The scanner returned an unreadable result. No compliance clearance was issued. Please try again.",
-          diagnostic: "unparseable_model_json",
-        },
-        { status: 503 },
-      );
-    }
-
-    const byPlatform = new Map<string, PlatformResult>();
-    for (const result of modelResults) {
-      if (result?.platform) byPlatform.set(result.platform.toLowerCase(), result);
-    }
-
-    const contentLower = content.toLowerCase();
-    const missing = platforms.filter((platform) => !byPlatform.has(platform.toLowerCase()));
-    if (missing.length > 0) {
-      return NextResponse.json(
-        {
-          error: `The scanner did not return a complete check for: ${missing.join(", ")}. No compliance clearance was issued. Please try again.`,
-          diagnostic: `incomplete_platforms:${missing.join(",")}`,
-        },
-        { status: 503 },
-      );
-    }
-
-    const results = platforms.map((platform) => {
-      const result = byPlatform.get(platform.toLowerCase())!;
-      const grounded = (result.flagged_phrases || []).filter(
-        (phrase) => typeof phrase === "string" && contentLower.includes(phrase.toLowerCase()),
-      );
-
-      if (result.status === "pass") {
-        return {
-          ...result,
-          platform,
-          flagged_phrases: [],
-          safer_rewrite: "",
-          reason: "No meaningful platform-specific risk signal found.",
-        };
+    const results: PlatformResult[] = [];
+    for (const batch of batches) {
+      try {
+        const raw = await callOpenRouter(content, batch);
+        const modelResults = parseResults(raw);
+        if (modelResults.length === 0) {
+          return NextResponse.json(
+            { error: "The scanner returned an unreadable result. No compliance clearance was issued. Please try again.", diagnostic: "unparseable_model_json" },
+            { status: 503 },
+          );
+        }
+        const grounded = groundResults(content, batch, modelResults);
+        if (!grounded) {
+          const missing = batch.filter((platform) => !modelResults.some((r) => r?.platform?.toLowerCase() === platform.toLowerCase()));
+          return NextResponse.json(
+            { error: `The scanner did not return a complete check for: ${missing.join(", ")}. No compliance clearance was issued. Please try again.`, diagnostic: `incomplete_platforms:${missing.join(",")}` },
+            { status: 503 },
+          );
+        }
+        results.push(...grounded);
+      } catch (err) {
+        console.error("Scanner model call failed:", err);
+        const message = err instanceof Error ? err.message : "Scanner model call failed.";
+        const classified = classifyScanError(message);
+        return NextResponse.json(
+          { error: classified.error, diagnostic: classified.diagnostic },
+          { status: classified.status },
+        );
       }
-
-      if (grounded.length === 0) {
-        return {
-          ...result,
-          platform,
-          status: "warn" as const,
-          flagged_phrases: [],
-          safer_rewrite: "",
-          reason:
-            "The model identified a risk, but it did not cite an exact phrase from the supplied content. No compliance clearance was issued for this platform.",
-        };
-      }
-
-      return {
-        ...result,
-        platform,
-        flagged_phrases: grounded,
-      };
-    });
+    }
 
     return NextResponse.json({ data: results });
   } catch (err: unknown) {
