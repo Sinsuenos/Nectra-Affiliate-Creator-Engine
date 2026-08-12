@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
@@ -16,6 +17,7 @@ import {
   Package,
   LockKeyhole,
   ArrowRight,
+  ChevronDown,
 } from "lucide-react";
 
 const fadeUp = {
@@ -85,61 +87,78 @@ const MODULES = [
 ];
 
 function ModuleCard({ mod, index }: { mod: (typeof MODULES)[number]; index: number }) {
+  const [expanded, setExpanded] = useState(false);
   const Icon = mod.icon;
   const live = mod.state === "LIVE";
   const partial = mod.state === "PARTIAL";
   const cardBorder = live ? "border-electric/30 bg-surface shadow-lg shadow-electric/5" : partial ? "border-lime-400/20 bg-surface/85" : "border-border/50 bg-surface/70";
+  const badgeClass = live
+    ? "border-electric/30 bg-electric/10 text-electric"
+    : partial
+      ? "border-amber-400/30 bg-amber-400/[0.08] text-amber-300"
+      : "border-border/50 bg-background text-muted-foreground";
+
   return (
     <motion.article
       className={`rounded-xl border overflow-hidden ${cardBorder}`}
       variants={fadeUp}
       custom={index}
     >
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-border/40 bg-surface-raised">
-        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${live ? "bg-electric/10" : partial ? "bg-lime-400/[0.08]" : "bg-background"}`}>
-          <Icon className={`h-4 w-4 ${live ? "text-electric" : partial ? "text-lime-300" : "text-muted-foreground"}`} />
-        </span>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-[11px] text-muted-foreground">{mod.id}</span>
-            <span className="h-3 w-px bg-border" />
-            <h3 className="text-base font-bold tracking-tight truncate">{mod.name}</h3>
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="w-full text-left"
+        aria-expanded={expanded}
+      >
+        <div className="flex items-center gap-3 px-5 py-4 bg-surface-raised">
+          <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${live ? "bg-electric/10" : partial ? "bg-lime-400/[0.08]" : "bg-background"}`}>
+            <Icon className={`h-4 w-4 ${live ? "text-electric" : partial ? "text-lime-300" : "text-muted-foreground"}`} />
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[11px] text-muted-foreground">{mod.id}</span>
+              <span className="h-3 w-px bg-border" />
+              <h3 className="text-base font-bold tracking-tight truncate">{mod.name}</h3>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground leading-relaxed line-clamp-1">{mod.summary}</p>
           </div>
-        </div>
-        {live && mod.link ? (
-          <Link
-            href={mod.link}
-            className="inline-flex items-center gap-1.5 rounded-full border border-electric/30 bg-electric/10 px-3 py-1 font-mono text-[10px] font-semibold tracking-wider text-electric hover:bg-electric/20 transition-colors"
-          >
-            {mod.state}
-            <ArrowRight className="h-3 w-3" />
-          </Link>
-        ) : (
-          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider ${live ? "border-electric/30 bg-electric/10 text-electric" : partial ? "border-lime-400/30 bg-lime-400/[0.08] text-lime-300" : "border-border/50 bg-background text-muted-foreground"}`}>
+          <span className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider ${badgeClass}`}>
             {!live && !partial && <LockKeyhole className="h-3 w-3" />}
             {partial && <Zap className="h-3 w-3" />}
             {mod.state}
           </span>
-        )}
-      </div>
-
-      <div className="px-5 py-5 space-y-5">
-        <p className="text-sm text-muted-foreground leading-relaxed">{mod.summary}</p>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Inputs</p>
-            <ul className="space-y-1">
-              {mod.inputs.map((item) => <li key={item} className="flex items-start gap-2 text-sm text-foreground/70"><span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-electric/50" />{item}</li>)}
-            </ul>
-          </div>
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Outputs</p>
-            <ul className="space-y-1">
-              {mod.outputs.map((item) => <li key={item} className="flex items-start gap-2 text-sm text-foreground/70"><span className={`mt-1.5 h-1 w-1 shrink-0 rounded-full ${live ? "bg-electric" : partial ? "bg-lime-400" : "bg-muted-foreground/40"}`} />{item}</li>)}
-            </ul>
-          </div>
+          <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
         </div>
-      </div>
+      </button>
+
+      {expanded && (
+        <div className="px-5 py-5 space-y-5 border-t border-border/40">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Inputs</p>
+              <ul className="space-y-1">
+                {mod.inputs.map((item) => <li key={item} className="flex items-start gap-2 text-sm text-foreground/70"><span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-electric/50" />{item}</li>)}
+              </ul>
+            </div>
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Outputs</p>
+              <ul className="space-y-1">
+                {mod.outputs.map((item) => <li key={item} className="flex items-start gap-2 text-sm text-foreground/70"><span className={`mt-1.5 h-1 w-1 shrink-0 rounded-full ${live ? "bg-electric" : partial ? "bg-lime-400" : "bg-muted-foreground/40"}`} />{item}</li>)}
+              </ul>
+            </div>
+          </div>
+          {mod.link && (
+            <Link
+              href={mod.link}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1.5 rounded-full border border-electric/30 bg-electric/10 px-3 py-1.5 font-mono text-[10px] font-semibold tracking-wider text-electric hover:bg-electric/20 transition-colors"
+            >
+              Open module
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          )}
+        </div>
+      )}
     </motion.article>
   );
 }
@@ -159,7 +178,7 @@ export default function ModulesPage() {
       <Separator className="bg-border/40" />
 
       <section className="mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-20">
-        <motion.div className="grid gap-6" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
+        <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
           {MODULES.map((mod, i) => <ModuleCard key={mod.id} mod={mod} index={i} />)}
         </motion.div>
       </section>
