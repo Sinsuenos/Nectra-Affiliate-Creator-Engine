@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/compliance", label: "Compliance" },
   { href: "/generator", label: "Generator" },
   { href: "/scanner", label: "Scanner" },
+  { href: "/faq", label: "FAQ" },
 ] as const;
 
 export function SiteNav() {

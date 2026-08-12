@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
 import { CompactTransformationRail } from "@/components/transformation-rail";
+import { BottomNextNav } from "@/components/BottomNextNav";
 import { GUMROAD_URL } from "@/lib/constants";
 import {
   ClipboardPaste,
@@ -683,7 +684,7 @@ export default function GeneratorPage() {
       <NectarOrbs />
 
       {/* ---- SECTION 1: HEADING ---- */}
-      <section id="compliance-intro" className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-28">
+      <section className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-12">
         <motion.p
           className="font-mono text-xs tracking-widest uppercase text-electric mb-3"
           initial={{ opacity: 0 }}
@@ -997,15 +998,7 @@ export default function GeneratorPage() {
           </section>
         </>
       )}
-      {/* Bottom navigation bar */}
-      <div className="fixed bottom-0 left-0 w-full z-30 bg-slate-900/60 backdrop-blur-sm border-t border-slate-700/50 py-3 flex justify-center">
-        <button
-          onClick={() => document.getElementById('compliance-intro')?.scrollIntoView({ behavior: 'smooth' })}
-          className="bg-slate-800 hover:bg-slate-700 text-white text-sm px-6 py-2 rounded-md transition-colors cursor-pointer"
-        >
-          How the Compliance Engine Works
-        </button>
-      </div>
+      <BottomNextNav currentPage="/generator" />
     </>
   );
 }

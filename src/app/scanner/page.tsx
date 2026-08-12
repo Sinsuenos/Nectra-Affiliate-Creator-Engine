@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
+import { BottomNextNav } from "@/components/BottomNextNav";
 import {
   ClipboardPaste,
   Loader2,
@@ -290,7 +291,7 @@ function ScannerInner() {
 
       <NectarOrbs />
 
-      <section id="compliance-intro" className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-24">
+      <section className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-8">
         <motion.p className="font-mono text-xs tracking-widest uppercase text-electric mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
           Compliance Scanner
         </motion.p>
@@ -456,15 +457,7 @@ function ScannerInner() {
           </>
         )}
       </AnimatePresence>
-      {/* Bottom navigation bar */}
-      <div className="fixed bottom-0 left-0 w-full z-30 bg-slate-900/60 backdrop-blur-sm border-t border-slate-700/50 py-3 flex justify-center">
-        <button
-          onClick={() => document.getElementById('compliance-intro')?.scrollIntoView({ behavior: 'smooth' })}
-          className="bg-slate-800 hover:bg-slate-700 text-white text-sm px-6 py-2 rounded-md transition-colors cursor-pointer"
-        >
-          How the Compliance Engine Works
-        </button>
-      </div>
+      <BottomNextNav currentPage="/scanner" />
     </>
   );
 }

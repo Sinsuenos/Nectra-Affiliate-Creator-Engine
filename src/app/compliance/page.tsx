@@ -5,6 +5,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
+import { BottomNextNav } from "@/components/BottomNextNav";
 import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { PLATFORM_MATRIX } from "@/lib/compliance/platform-matrix";
 
@@ -88,8 +89,8 @@ export default function CompliancePage() {
       </div>
 
       <NectarOrbs />
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-16 sm:py-24 pb-24">
-        <motion.header id="compliance-intro" className="max-w-3xl" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24">
+        <motion.header className="max-w-3xl" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <p className="font-mono text-xs tracking-widest uppercase text-electric mb-4">Protect Before You Post</p>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Platform Compliance Matrix</h1>
           <p className="text-base text-muted-foreground leading-relaxed mb-3">
@@ -123,15 +124,7 @@ export default function CompliancePage() {
           Reference data is maintained as strategic guidance. Verify current platform policies directly before publishing.
         </motion.p>
       </section>
-      {/* Bottom navigation bar */}
-      <div className="fixed bottom-0 left-0 w-full z-30 bg-slate-900/60 backdrop-blur-sm border-t border-slate-700/50 py-3 flex justify-center">
-        <button
-          onClick={() => document.getElementById('compliance-intro')?.scrollIntoView({ behavior: 'smooth' })}
-          className="bg-slate-800 hover:bg-slate-700 text-white text-sm px-6 py-2 rounded-md transition-colors cursor-pointer"
-        >
-          How the Compliance Engine Works
-        </button>
-      </div>
+      <BottomNextNav currentPage="/compliance" />
     </>
   );
 }

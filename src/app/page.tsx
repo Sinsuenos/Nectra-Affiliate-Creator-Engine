@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, ArrowRight, ShieldCheck, Sparkles, WandSparkles, ScanLine, Layers3, BookOpen, Zap } from "lucide-react";
 import Link from "next/link";
 import { TransformationRail } from "@/components/transformation-rail";
+import { BottomNextNav } from "@/components/BottomNextNav";
 import { GUMROAD_URL } from "@/lib/constants";
 
 const fadeUp = {
@@ -55,6 +56,27 @@ export default function Home() {
 
       <TransformationRail />
 
+      {/* FAQ Snippet */}
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
+        <motion.div
+          className="relative rounded-2xl overflow-hidden p-[2px]"
+          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.5 }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 rounded-2xl" aria-hidden="true" />
+          <div className="relative rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-8">
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-4 flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">🔥</span>
+              From the FAQ: Five-Alarm Burnout
+            </h3>
+            <p className="text-sm font-semibold text-amber-300 mb-2">Is it true that Nectar Engine was built during what you call a five-alarm creative burnout fire?</p>
+            <p className="text-sm text-zinc-300 leading-relaxed mb-5">Absolutely. We started coding after our third straight late-night brainstorm where every 'safe' post felt like beige wallpaper. Nectar Engine was born from exhaustion, sarcasm, and the desperate need for a tool that understood why &ldquo;compliant&rdquo; doesn't have to mean &ldquo;boring.&rdquo;</p>
+            <Link href="/faq" className="inline-flex items-center gap-1.5 text-sm font-semibold text-pink-400 hover:text-pink-300 transition-colors">
+              Read all Frequently Awkward Questions <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_.9fr] items-stretch">
           <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-[#0a0f19] min-h-[320px] shadow-2xl shadow-black/30">
@@ -68,6 +90,7 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 sm:px-6 pb-20 sm:pb-28"><div className="relative overflow-hidden rounded-2xl border border-electric/25 bg-[#080c15] min-h-[250px]"><img src="/nectar-cta.svg" alt="Nectar visual" className="absolute inset-0 h-full w-full object-cover opacity-85" /><div className="absolute inset-0 bg-gradient-to-r from-[#070a12] via-[#070a12]/65 to-transparent" /><div className="relative z-10 max-w-xl p-8 sm:p-12 text-left"><p className="font-mono text-xs tracking-[0.2em] uppercase text-lime-200 font-semibold">Ready when the offer is</p><h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-white">Turn the offer on.</h2><p className="mt-4 text-base text-zinc-200 leading-relaxed">Bring the facts. Nectar handles the transformation.</p><a href={GUMROAD_URL} target="_blank" rel="noreferrer" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-electric px-6 py-3 text-sm font-bold text-[#071019] hover:bg-sky-300 transition-colors">Get Nectar Engine <ChevronRight className="h-4 w-4" /></a></div></div></section>
 
       <section className="mx-auto max-w-5xl px-4 sm:px-6 pt-2 pb-24 sm:pb-32"><div className="grid gap-4 sm:grid-cols-3">{[{ tag: "SEE THE SYSTEM", title: "How Nectar Works", desc: "See the architecture behind the transformation, with shipped capabilities separated from the next layer.", href: "/modules", icon: BookOpen }, { tag: "SEE THE OUTPUT", title: "Sample Output", desc: "Explore a transparent example of the kind of structured content Nectar produces from one offer.", href: "/sample", icon: Layers3 }, { tag: "PROTECT THE COPY", title: "Compliance Scanner", desc: "Check generated content for platform-specific risk signals and get a safer rewrite when needed.", href: "/scanner", icon: Zap }].map((card, i) => { const CardIcon = card.icon; return <motion.div key={card.href} variants={fadeUp} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}><Link href={card.href} className="group block h-full rounded-xl border border-white/12 bg-[#181c27] p-6 transition-all hover:-translate-y-1 hover:bg-[#202533] hover:border-electric/40 hover:shadow-lg hover:shadow-electric/10"><div className="mb-4 flex items-center justify-between"><p className="font-mono text-[11px] uppercase tracking-widest text-electric font-semibold">{card.tag}</p><CardIcon className="h-4 w-4 text-electric/25 group-hover:text-electric/60 transition-colors" /></div><h3 className="text-lg font-bold tracking-tight mb-2 text-white group-hover:text-electric transition-colors">{card.title}</h3><p className="text-sm text-zinc-200 leading-relaxed mb-4">{card.desc}</p><span className="inline-flex items-center gap-1 text-xs text-electric/80 group-hover:text-electric transition-colors font-semibold">Explore <ArrowRight className="h-3 w-3" /></span></Link></motion.div>; })}</div></section>
+      <BottomNextNav currentPage="/" />
     </>
   );
 }

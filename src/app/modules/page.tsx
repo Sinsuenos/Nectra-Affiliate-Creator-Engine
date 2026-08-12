@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
+import { BottomNextNav } from "@/components/BottomNextNav";
 import Link from "next/link";
 import {
   Terminal,
@@ -193,6 +194,7 @@ export default function ModulesPage() {
           </p>
         </motion.div>
       </section>
+      <BottomNextNav currentPage="/modules" />
     </>
   );
 }

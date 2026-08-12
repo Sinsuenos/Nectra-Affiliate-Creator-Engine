@@ -18,6 +18,12 @@ export function SiteFooter() {
             aria-label="Footer navigation"
           >
             <Link
+              href="/faq"
+              className="hover:text-foreground transition-colors"
+            >
+              FAQ
+            </Link>
+            <Link
               href="/terms"
               className="hover:text-foreground transition-colors"
             >
