@@ -282,15 +282,15 @@ function ScannerInner() {
         aria-hidden="true"
       >
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/nectar-atmo-scanner.png)' }}
+          className="absolute inset-0 bg-contain bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/nectar-atmo-scanner.png)', backgroundColor: '#0f172a', filter: 'brightness(1.5)' }}
         />
         <div className="absolute inset-0 bg-[#121827]/[0.78]" />
       </div>
 
       <NectarOrbs />
 
-      <section className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-8">
+      <section id="compliance-intro" className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-24">
         <motion.p className="font-mono text-xs tracking-widest uppercase text-electric mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
           Compliance Scanner
         </motion.p>
@@ -456,6 +456,15 @@ function ScannerInner() {
           </>
         )}
       </AnimatePresence>
+      {/* Bottom navigation bar */}
+      <div className="fixed bottom-0 left-0 w-full z-30 bg-slate-900/60 backdrop-blur-sm border-t border-slate-700/50 py-3 flex justify-center">
+        <button
+          onClick={() => document.getElementById('compliance-intro')?.scrollIntoView({ behavior: 'smooth' })}
+          className="bg-slate-800 hover:bg-slate-700 text-white text-sm px-6 py-2 rounded-md transition-colors cursor-pointer"
+        >
+          How the Compliance Engine Works
+        </button>
+      </div>
     </>
   );
 }

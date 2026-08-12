@@ -674,7 +674,7 @@ export default function GeneratorPage() {
       >
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/nectar-atmo-generator.png)' }}
+          style={{ backgroundImage: 'url(/nectar-atmo-generator.png)', filter: 'brightness(1.5)' }}
         />
         <div className="absolute inset-0 bg-[#121827]/[0.78]" />
       </div>
@@ -683,7 +683,7 @@ export default function GeneratorPage() {
       <NectarOrbs />
 
       {/* ---- SECTION 1: HEADING ---- */}
-      <section className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-12">
+      <section id="compliance-intro" className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-28">
         <motion.p
           className="font-mono text-xs tracking-widest uppercase text-electric mb-3"
           initial={{ opacity: 0 }}
@@ -721,7 +721,7 @@ export default function GeneratorPage() {
           <div className="flex items-center gap-2 mb-3">
             <BookOpen className="h-4 w-4 text-electric" />
             <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-              Include details like
+              For best results, include:
             </p>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
@@ -997,6 +997,15 @@ export default function GeneratorPage() {
           </section>
         </>
       )}
+      {/* Bottom navigation bar */}
+      <div className="fixed bottom-0 left-0 w-full z-30 bg-slate-900/60 backdrop-blur-sm border-t border-slate-700/50 py-3 flex justify-center">
+        <button
+          onClick={() => document.getElementById('compliance-intro')?.scrollIntoView({ behavior: 'smooth' })}
+          className="bg-slate-800 hover:bg-slate-700 text-white text-sm px-6 py-2 rounded-md transition-colors cursor-pointer"
+        >
+          How the Compliance Engine Works
+        </button>
+      </div>
     </>
   );
 }
