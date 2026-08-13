@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
 import { BottomNextNav } from "@/components/BottomNextNav";
 import {
-  ClipboardPaste,
   Loader2,
   ShieldCheck,
   ShieldAlert,
@@ -184,7 +183,8 @@ function PlatformChip({
 function ScannerInner() {
   const searchParams = useSearchParams();
   const [content, setContent] = useState("");
-  const [selectedPlatforms, setSelectedPlatforms] = useState<Set<PlatformName>>(new Set(ALL_PLATFORMS));
+  const DEFAULT_PLATFORMS: PlatformName[] = ["TikTok", "Instagram", "Facebook"];
+  const [selectedPlatforms, setSelectedPlatforms] = useState<Set<PlatformName>>(new Set(DEFAULT_PLATFORMS));
   const [isScanning, setIsScanning] = useState(false);
   const [results, setResults] = useState<PlatformResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -297,14 +297,14 @@ function ScannerInner() {
       <NectarOrbs />
 
       <section className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-8">
-        <motion.p className="font-mono text-xs tracking-widest uppercase text-electric mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-          Compliance Scanner
-        </motion.p>
         <motion.h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-          Paste a post. Pick platforms. Get Pass / Warning / Fail + a safer rewrite.
+          Compliance Scanner
         </motion.h1>
-        <motion.p className="mt-4 text-muted-foreground max-w-xl text-base sm:text-lg leading-relaxed" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
-          Check before you post. One bad phrase can cost the account.
+        <motion.p className="mt-3 text-electric/90 text-base sm:text-lg font-medium" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}>
+          Check it before you post.
+        </motion.p>
+        <motion.p className="mt-2 text-muted-foreground max-w-xl text-sm sm:text-base leading-relaxed" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
+          Pick the platforms. Get Pass, Warning, or Fail, plus a safer rewrite.
         </motion.p>
       </section>
 
@@ -313,21 +313,18 @@ function ScannerInner() {
       <section className="mx-auto max-w-4xl px-4 sm:px-6 py-12 sm:py-16">
         <motion.div className="space-y-6" initial="hidden" animate="visible">
           <motion.div variants={fadeUp} custom={0}>
-            <div className="flex items-center gap-2 mb-3">
-              <ClipboardPaste className="h-4 w-4 text-electric" />
-              <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Paste Your Content</p>
-            </div>
+            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-3">Content</p>
             <textarea
               value={content}
               onChange={(e) => { setContent(e.target.value); setResults(null); }}
               className="w-full h-48 sm:h-56 rounded-xl border border-border/60 bg-surface text-foreground/80 font-mono text-sm p-5 resize-none focus:outline-none focus:ring-1 focus:ring-electric/30"
               placeholder={'Paste your social post, ad copy, or any content here...\n\nExample:\n"Lose weight fast with this guaranteed supplement! Act now - free trial, no risk. Click here to sign up and start seeing results today!"'}
             />
-            <p className="mt-2 text-xs text-muted-foreground/60">Works with any content — your own draft, offer description, or output from the Generator.</p>
+
           </motion.div>
 
           <motion.div variants={fadeUp} custom={1}>
-            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-3">Select Platforms</p>
+            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-3">Platforms</p>
             <div className="flex flex-wrap gap-2">
               {ALL_PLATFORMS.map((p) => <PlatformChip key={p} platform={p} selected={selectedPlatforms.has(p)} onToggle={togglePlatform} />)}
             </div>
@@ -340,11 +337,8 @@ function ScannerInner() {
                 disabled={isScanning}
                 className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
               >
-                {isScanning ? <><Loader2 className="h-4 w-4 animate-spin" />Scanning {selectedPlatforms.size} platforms...</> : <><ShieldCheck className="h-4 w-4" />Scan {selectedPlatforms.size} Platform{selectedPlatforms.size !== 1 ? "s" : ""}</>}
+                {isScanning ? <><Loader2 className="h-4 w-4 animate-spin" />Checking...</> : <><ShieldCheck className="h-4 w-4" />Check Compliance</>}
               </button>
-              {!isScanning && selectedPlatforms.size > 0 && (
-                <span className="text-xs text-muted-foreground/60 font-mono hidden sm:inline">{selectedPlatforms.size <= 2 ? "~15s" : selectedPlatforms.size <= 5 ? "~30s" : "~45s"} AI check</span>
-              )}
             </div>
 
             {isScanning && (
@@ -357,7 +351,7 @@ function ScannerInner() {
                     transition={{ duration: 1.6, ease: "easeInOut", repeat: Infinity }}
                   />
                 </div>
-                <p className="text-[11px] text-muted-foreground/60 font-mono">One grounded AI request is checking the selected platforms together.</p>
+
               </div>
             )}
           </motion.div>
