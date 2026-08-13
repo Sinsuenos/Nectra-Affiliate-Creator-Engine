@@ -119,14 +119,12 @@ function CharBadge({ count, platform }: { count: number; platform: string }) {
   const limit = PLATFORM_CHAR_LIMITS[platform];
   if (!limit) return <span className="font-mono text-[11px] text-muted-foreground/70">{count} chars</span>;
   const ratio = count / limit;
-  const pct = Math.min(Math.round(ratio * 100), 100);
   const over = count > limit;
   const color = over ? "text-red-400 bg-red-500/10 border-red-500/20" : ratio > 0.85 ? "text-amber-400 bg-amber-500/10 border-amber-500/20" : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
   return (
     <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border font-mono text-[10px] font-semibold tracking-wide ${color}`}>
       {over && <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />}
       {count}<span className="text-muted-foreground/50">/{limit}</span>
-      <span className="hidden sm:inline opacity-70">({pct}%)</span>
     </span>
   );
 }

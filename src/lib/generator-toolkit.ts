@@ -1,27 +1,18 @@
 /** Shared generator toolkit types, demo content, and helpers. */
 
 /* ------------------------------------------------------------------ */
-/*  DEMO PASTE TEXT (Cozy 50+ offer)                                   */
+/*  DEMO PASTE TEXT (Velvet Encounters offer)                           */
 /* ------------------------------------------------------------------ */
 export const DEMO_PASTE =
-  "Cozy 50+ — Mature Dating & Companionship Platform\n" +
-  "Network: ClickDealer | Offer ID: CZ-5021\n" +
-  "Vertical: Dating / Mature\n" +
-  "Payout: $55 CPA (CC Submit)\n" +
-  "Conversion Flow: Free Account Registration → CC Age Verification → $1 Trial → Rebill $49.99/mo\n" +
-  "Available Countries: US, CA, UK, AU, NZ\n" +
-  "Landing Page: https://example.com/offer/cozy50\n" +
-  "Banned Traffic: Incentivized, Bot, Brand Search, Email Spam, Craigslist, Craigslist-adjacent, Social Sprinkling\n" +
-  "Sub-ID Format: {sub1}_{sub2}_{sub3}\n\n" +
-  "Key offer details:\n" +
-  "- 2.4M+ active members, 58% female demographic aged 45-65\n" +
-  "- AI-powered compatibility matching with 89% satisfaction rate\n" +
-  "- Verified profile badges, photo verification, and real-time chat\n" +
-  "- Free trial: 7-day full access, $1 age verification charge\n" +
-  "- Target audience: Adults 45+ seeking companionship or serious dating after divorce/widowhood\n" +
-  "- Unique angle: highest female-to-male ratio in the mature dating vertical (3.2:1)\n" +
-  "- Content restriction: NO explicit or sexually suggestive language. Frame as companionship, connection, and meeting new people.\n" +
-  "- Affiliate/redirect link: https://track.clickdealer.com/?a=1234&sub1={sub1}&sub2={sub2}";
+  "Offer Name: Velvet Encounters\n" +
+  "Network: CrakRevenue\n" +
+  "Vertical: Dating\n" +
+  "Payout: 45% Lifetime RevShare\n" +
+  "Device: Desktop, Mobile\n" +
+  "Landing Page angle: upscale, discreet, connection-focused\n" +
+  "Offer Description: Velvet Encounters is a premium dating platform built for adults seeking genuine, discreet connections. Members browse verified profiles, message freely, and unlock deeper conversations through an intuitive matching system. Positioned as a sophisticated alternative to mainstream dating apps, it's designed for users who want real connection without the noise of casual swiping.\n" +
+  "Banned Traffic: Incentivized, Bot, Brand Bidding, Email Spam\n" +
+  "Top Geo: US, UK, CA, AU, DE";
 
 /* ------------------------------------------------------------------ */
 /*  VALIDATE OFFER INPUT                                               */

@@ -31,6 +31,9 @@ A creative idea is allowed to be original wording. A factual assertion must be s
 If a useful fact is missing, work creatively around what is known instead of filling the gap with an invented fact.
 If the supplied sources conflict, do not silently choose. Avoid repeating the conflicting fact and flag the conflict in a compliance note when relevant.
 
+## PRICING AND OFFER MECHANICS: ZERO-TOLERANCE FACT GROUNDING
+This rule has zero exceptions, including for pricing, trial periods, discounts, or offer mechanics. If the offer data does not explicitly state a price, trial period, discount amount, or specific mechanic, you MUST NOT invent one — not even a plausible-sounding one like "$1 trial." Referencing false pricing or terms is a compliance and legal risk, not a creative liberty. If pricing/trial information is genuinely absent from the offer data, write around it — describe the value or experience without stating a specific number that wasn't provided.
+
 ## SOURCE PRIORITY
 1. Verified offer-page context, when supplied.
 2. Human-supplied offer data.

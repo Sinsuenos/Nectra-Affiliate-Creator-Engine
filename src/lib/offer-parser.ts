@@ -157,6 +157,15 @@ function extractStandaloneUrl(lines: string[]): string | null {
   return null;
 }
 
+function extractOfferNameFromFirstLine(lines: string[]): string | null {
+  if (lines.length === 0) return null;
+  const first = cleanCapturedValue(lines[0]);
+  if (!first || first.length < 2 || first.length > 120) return null;
+  if (/^https?:\/\//i.test(first)) return null;
+  if (/^(?:network|offer|vertical|payout|conversion|banned|sub[- ]?id|landing|default|id|epc|device|exclusive|hot pick|cam)\b/i.test(first)) return null;
+  return first;
+}
+
 function extractOfferNameFromProse(lines: string[]): string | null {
   for (const rawLine of lines.slice(0, 6)) {
     const line = rawLine.replace(/^\[[^\]]*\]\s*/, "").trim();
@@ -246,7 +255,15 @@ export function extractFields(text: string): ParsedField[] {
 
   return FIELD_DEFS.map((def) => {
     let value = extractField(def, source, lines);
-    if (def.key === "offer_name" && !value) value = extractOfferNameFromProse(lines) ?? extractOfferNameFromAnyLine(lines) ?? extractOfferNameFromFirstMeaningfulLine(lines);
+    if (def.key === "offer_name") {
+      if (!value) value = extractOfferNameFromProse(lines) ?? extractOfferNameFromAnyLine(lines) ?? extractOfferNameFromFirstMeaningfulLine(lines);
+      // If extracted name is suspiciously long (>10 words), it's likely a wrong match
+      // (e.g. "Offer Description" line captured by the broad "offer" alias).
+      // Fall back to the first line of pasted text.
+      if (value && value.split(/\s+/).length > 10) {
+        value = extractOfferNameFromFirstLine(lines) ?? value.split(/\s+/).slice(0, 6).join(" ");
+      }
+    }
     if (def.key === "vertical" && !value) value = extractProseVertical(source);
     if (def.key === "payout_model" && !value) value = extractProsePayout(source);
     if (def.key === "landing_page" && !value) value = extractStandaloneUrl(lines);

@@ -254,6 +254,9 @@ export default function GeneratorPage() {
                 Load Example
               </button>
             </div>
+            <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+              This is where you paste YOUR offer — drop in the raw details from your network dashboard, email, or offer page below.
+            </p>
             <textarea
               value={pasteText}
               onChange={(e) => setPasteText(e.target.value)}
