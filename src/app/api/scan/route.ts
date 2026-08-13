@@ -18,6 +18,26 @@ interface PlatformResult {
 }
 
 const VALID_STATUSES = new Set(["pass", "warn", "fail"]);
+const DEFAULT_MODEL = "gemini-2.5-flash";
+const RETIRED_MODELS = new Set([
+  "gemini-2.0-flash",
+  "models/gemini-2.0-flash",
+  "gemini-2.0-flash-001",
+  "models/gemini-2.0-flash-001",
+  "gemini-1.5-flash",
+  "models/gemini-1.5-flash",
+  "gemini-1.5-pro",
+  "models/gemini-1.5-pro",
+]);
+
+function resolveModel(): string {
+  const configured = (process.env.GEMINI_MODEL || "").trim();
+  if (!configured) return DEFAULT_MODEL;
+  if (RETIRED_MODELS.has(configured) || RETIRED_MODELS.has(`models/${configured}`)) {
+    return DEFAULT_MODEL;
+  }
+  return configured;
+}
 
 function buildPlatformContext(platforms: string[]): string {
   return platforms
@@ -167,9 +187,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // gemini-2.0-flash was retired by Google (404). Default to 2.5-flash.
-    // GEMINI_MODEL env can override if needed.
-    const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const model = resolveModel();
     const ai = new GoogleGenAI({ apiKey });
     const prompt = buildPrompt(platforms);
     const userText = `${prompt}\n\n--- CONTENT ---\n${content}\n--- END CONTENT ---`;
@@ -202,7 +220,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ data: results });
       } catch (err) {
         lastError = err instanceof Error ? err.message : String(err);
-        console.error(`Scanner attempt ${attempt + 1} failed:`, lastError);
+        console.error(`Scanner attempt ${attempt + 1} failed (model=${model}):`, lastError);
         if (attempt === 0) {
           await new Promise((resolve) => setTimeout(resolve, 800));
         }
