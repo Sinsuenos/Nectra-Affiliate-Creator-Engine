@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
-import { BottomNextNav } from "@/components/BottomNextNav";
+import { BottomNavRow } from "@/components/BottomNavRow";
 import {
   Loader2,
   ShieldCheck,
@@ -445,7 +445,7 @@ function ScannerInner() {
           </>
         )}
       </AnimatePresence>
-      <BottomNextNav currentPage="/scanner" />
+      <BottomNavRow />
     </>
   );
 }

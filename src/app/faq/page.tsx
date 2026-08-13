@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NectarOrbs } from "@/components/nectar-orbs";
-import { BottomNextNav } from "@/components/BottomNextNav";
+import { BottomNavRow } from "@/components/BottomNavRow";
 import { ChevronDown } from "lucide-react";
 
 const FAQ_DATA = [
@@ -114,7 +114,7 @@ export default function FAQPage() {
         </motion.div>
       </section>
 
-      <BottomNextNav currentPage="/faq" />
+      <BottomNavRow />
     </>
   );
 }

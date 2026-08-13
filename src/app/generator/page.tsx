@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
 import { CompactTransformationRail } from "@/components/transformation-rail";
-import { BottomNextNav } from "@/components/BottomNextNav";
+import { BottomNavRow } from "@/components/BottomNavRow";
 import { GUMROAD_URL } from "@/lib/constants";
 import {
   ClipboardPaste,
@@ -462,7 +462,7 @@ export default function GeneratorPage() {
           </section>
         </>
       )}
-      <BottomNextNav currentPage="/generator" />
+      <BottomNavRow />
     </>
   );
 }

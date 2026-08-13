@@ -5,7 +5,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { NectarOrbs } from "@/components/nectar-orbs";
-import { BottomNextNav } from "@/components/BottomNextNav";
+import { BottomNavRow } from "@/components/BottomNavRow";
 import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { PLATFORM_MATRIX } from "@/lib/compliance/platform-matrix";
 
@@ -124,7 +124,7 @@ export default function CompliancePage() {
           Reference data is maintained as strategic guidance. Verify current platform policies directly before publishing.
         </motion.p>
       </section>
-      <BottomNextNav currentPage="/compliance" />
+      <BottomNavRow />
     </>
   );
 }

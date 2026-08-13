@@ -4,14 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { TransformationRail } from "@/components/transformation-rail";
-
-const NAV_LINKS = [
-  { href: "/modules", label: "Modules" },
-  { href: "/compliance", label: "Compliance" },
-  { href: "/generator", label: "Generator" },
-  { href: "/scanner", label: "Scanner" },
-  { href: "/faq", label: "FAQ" },
-] as const;
+import { BottomNavRow } from "@/components/BottomNavRow";
 
 export default function Home() {
   return (
@@ -102,22 +95,8 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ── BOTTOM NAV ROW (replaces BottomNextNav pill) ── */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-16 sm:pb-20">
-        <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs font-medium tracking-wide">
-          {NAV_LINKS.map((link, i) => (
-            <span key={link.href} className="flex items-center">
-              {i > 0 && <span className="text-amber-400/25 mr-4 select-none">|</span>}
-              <Link
-                href={link.href}
-                className="text-amber-400/60 hover:text-amber-400 transition-colors duration-200"
-              >
-                {link.label}
-              </Link>
-            </span>
-          ))}
-        </nav>
-      </div>
+      {/* ── BOTTOM NAV ROW ── */}
+      <BottomNavRow />
     </div>
   );
 }

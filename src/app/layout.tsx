@@ -41,10 +41,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Toaster />
         <Link
           href="/faq"
-          className="fixed bottom-4 right-4 z-40 flex flex-col items-end text-sm text-amber-400/80 hover:text-amber-400 transition-colors duration-200"
+          className="fixed bottom-4 right-4 z-40 flex flex-col items-end text-sm text-amber-400 hover:text-amber-400 transition-colors duration-200"
         >
           <span className="font-medium">FAQ</span>
-          <span className="text-[10px] opacity-70">Frequently Asked Questions. Unfortunately.</span>
+          <span className="text-[10px] text-amber-400">Frequently Asked Questions. Unfortunately.</span>
         </Link>
         <Analytics />
       </body>
