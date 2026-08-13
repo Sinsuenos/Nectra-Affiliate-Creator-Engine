@@ -5,14 +5,7 @@ import { PLATFORM_MATRIX } from "@/lib/compliance/platform-matrix";
 export const maxDuration = 60;
 
 interface ScanRequest { content: string; platforms: string[]; }
-interface PlatformResult {
-  platform: string;
-  status: "pass" | "warn" | "fail";
-  flagged_phrases: string[];
-  reason: string;
-  safer_rewrite: string;
-}
-
+interface PlatformResult { platform: string; status: "pass" | "warn" | "fail"; flagged_phrases: string[]; reason: string; safer_rewrite: string; }
 const VALID_STATUSES = new Set(["pass", "warn", "fail"]);
 
 function buildPlatformContext(platforms: string[]): string {
@@ -48,46 +41,37 @@ function validateResults(content: string, platforms: string[], value: unknown): 
   if (!value || typeof value !== "object") return null;
   const results = (value as { results?: unknown }).results;
   if (!Array.isArray(results)) return null;
-
   const byPlatform = new Map<string, PlatformResult>();
   for (const item of results) {
     if (!item || typeof item !== "object") return null;
     const r = item as Partial<PlatformResult>;
-    if (typeof r.platform !== "string" || typeof r.status !== "string'" || !VALID_STATUSES.has(r.status) || !Array.isArray(r.flagged_phrases) || !r.flagged_phrases.every((p) => typeof p === "string") || typeof r.reason !== "string" || typeof r.safer_rewrite !== "string") return null;
+    if (typeof r.platform !== "string" || typeof r.status !== "string" || !VALID_STATUSES.has(r.status) || !Array.isArray(r.flagged_phrases) || !r.flagged_phrases.every((p) => typeof p === "string") || typeof r.reason !== "string" || typeof r.safer_rewrite !== "string") return null;
     byPlatform.set(r.platform.toLowerCase(), r as PlatformResult);
   }
-
   const contentLower = content.toLowerCase();
-  const output: PlatformResult[] = [];
-  for (const platform of platforms) {
+  return platforms.map((platform) => {
     const result = byPlatform.get(platform.toLowerCase());
-    if (!result) return null;
+    if (!result) throw new Error("invalid scanner result schema");
     const grounded = result.flagged_phrases.filter((phrase) => contentLower.includes(phrase.toLowerCase()));
     if (result.status !== "pass" && grounded.length === 0) {
-      output.push({ ...result, platform, status: "warn", flagged_phrases: [], safer_rewrite: "", reason: "The model identified a risk but could not cite an exact phrase from the supplied content. No compliance clearance was issued for this platform." });
-    } else {
-      output.push({ ...result, platform, flagged_phrases: result.status === "pass" ? [] : grounded, safer_rewrite: result.status === "pass" ? "" : result.safer_rewrite, reason: result.status === "pass" ? "No meaningful platform-specific risk signal found." : result.reason });
+      return { ...result, platform, status: "warn" as const, flagged_phrases: [], safer_rewrite: "", reason: "The model identified a risk but could not cite an exact phrase from the supplied content. No compliance clearance was issued for this platform." };
     }
-  }
-  return output;
+    return { ...result, platform, flagged_phrases: result.status === "pass" ? [] : grounded, safer_rewrite: result.status === "pass" ? "" : result.safer_rewrite, reason: result.status === "pass" ? "No meaningful platform-specific risk signal found." : result.reason };
+  });
 }
 
-function errorResponse(error: string, diagnostic: string, status: number) {
-  return NextResponse.json({ error, diagnostic }, { status });
-}
+function errorResponse(error: string, diagnostic: string, status: number) { return NextResponse.json({ error, diagnostic }, { status }); }
 
 export async function POST(request: NextRequest) {
   try {
     const body: ScanRequest = await request.json();
     const content = typeof body.content === "string" ? body.content.trim() : "";
     const platforms = Array.isArray(body.platforms) ? body.platforms.filter((p): p is string => typeof p === "string" && p.length > 0) : [];
-
     if (content.length < 10) return errorResponse("Content is required and must be at least 10 characters.", "invalid_input", 400);
     if (platforms.length === 0) return errorResponse("At least one platform must be selected.", "no_platforms", 400);
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return errorResponse("Scanner is not configured on the server. No compliance clearance was issued.", "GEMINI_API_KEY_missing", 503);
-
     const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
     const ai = new GoogleGenAI({ apiKey });
     const prompt = buildPrompt(platforms);
@@ -95,11 +79,7 @@ export async function POST(request: NextRequest) {
 
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const response = await ai.models.generateContent({
-          model,
-          contents: [{ role: "user", parts: [{ text: `${prompt}\n\n--- CONTENT ---\n${content}\n--- END CONTENT ---` }] }],
-          config: { temperature: 0.2, maxOutputTokens: 2500, responseMimeType: "application/json" },
-        });
+        const response = await ai.models.generateContent({ model, contents: [{ role: "user", parts: [{ text: `${prompt}\n\n--- CONTENT ---\n${content}\n--- END CONTENT ---` }] }], config: { temperature: 0.2, maxOutputTokens: 2500, responseMimeType: "application/json" } });
         const raw = response.text?.trim();
         if (!raw) throw new Error("empty response");
         let parsed: unknown;
