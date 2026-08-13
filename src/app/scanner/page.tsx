@@ -282,7 +282,6 @@ function ScannerInner() {
 
   return (
     <>
-      {/* Atmospheric background - original Nectar imagery */}
       <div
         className="fixed inset-0 -z-10 pointer-events-none"
         aria-hidden="true"
@@ -320,7 +319,6 @@ function ScannerInner() {
               className="w-full h-48 sm:h-56 rounded-xl border border-border/60 bg-surface text-foreground/80 font-mono text-sm p-5 resize-none focus:outline-none focus:ring-1 focus:ring-electric/30"
               placeholder={'Paste your social post, ad copy, or any content here...\n\nExample:\n"Lose weight fast with this guaranteed supplement! Act now - free trial, no risk. Click here to sign up and start seeing results today!"'}
             />
-
           </motion.div>
 
           <motion.div variants={fadeUp} custom={1}>
@@ -351,7 +349,6 @@ function ScannerInner() {
                     transition={{ duration: 1.6, ease: "easeInOut", repeat: Infinity }}
                   />
                 </div>
-
               </div>
             )}
           </motion.div>
@@ -361,6 +358,10 @@ function ScannerInner() {
               <p className="text-sm text-red-400 font-medium">{error}</p>
             </motion.div>
           )}
+
+          <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+            AI-generated compliance guidance is informational only. Platform policies can change, and final responsibility for posted content remains with the user.
+          </p>
         </motion.div>
       </section>
 
@@ -375,7 +376,9 @@ function ScannerInner() {
                   <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                     {issueCount === 0 ? `${totalScanned} of ${totalScanned} platforms - all clear` : `${issueCount} of ${totalScanned} platforms need changes before you post`}
                   </h2>
-                  <p className="mt-2 text-xs text-muted-foreground/70 leading-relaxed">This is guidance based on observed platform patterns, not a guarantee of approval. Always verify current platform policies before publishing.</p>
+                  <p className="mt-2 text-xs text-muted-foreground/70 leading-relaxed">
+                    AI-generated compliance guidance is informational only. Platform policies can change, and final responsibility for posted content remains with the user.
+                  </p>
                 </div>
                 <button
                   onClick={handleCopyAll}
