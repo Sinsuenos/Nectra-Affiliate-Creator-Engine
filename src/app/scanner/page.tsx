@@ -242,7 +242,12 @@ function ScannerInner() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: content.trim(), platforms: Array.from(selectedPlatforms) }),
       });
-      const data = await res.json();
+      let data: { error?: string; data?: PlatformResult[] };
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`The server returned an invalid response (HTTP ${res.status}). Please try again.`);
+      }
       if (!res.ok) throw new Error(data.error || `Request failed with status ${res.status}`);
       if (data.data) setResults(data.data);
       else throw new Error("No data received from the scan endpoint.");
@@ -322,40 +327,7 @@ function ScannerInner() {
           </motion.div>
 
           <motion.div variants={fadeUp} custom={1}>
-            <div className="flex items-center justify-between mb-3">
-              <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Select Platforms</p>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider hidden sm:inline">Quick:</span>
-                  {(["Top 3", "Top 5"] as const).map((preset) => {
-                    const count = preset === "Top 3" ? 3 : 5;
-                    const platforms = ALL_PLATFORMS.slice(0, count) as PlatformName[];
-                    const isActive = platforms.length === selectedPlatforms.size && platforms.every((p) => selectedPlatforms.has(p));
-                    return (
-                      <button
-                        key={preset}
-                        type="button"
-                        onClick={() => { setSelectedPlatforms(new Set(platforms)); setResults(null); }}
-                        className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded border transition-colors cursor-pointer ${isActive ? "border-electric/40 bg-electric/10 text-electric" : "border-border/40 text-muted-foreground/70 hover:text-foreground hover:border-border/60"}`}
-                      >
-                        {preset}
-                      </button>
-                    );
-                  })}
-                </div>
-                <span className="h-3 w-px bg-border/40 hidden sm:block" />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedPlatforms(selectedPlatforms.size === ALL_PLATFORMS.length ? new Set() : new Set(ALL_PLATFORMS));
-                    setResults(null);
-                  }}
-                  className="text-[11px] font-mono text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                >
-                  {selectedPlatforms.size === ALL_PLATFORMS.length ? "Deselect all" : "Select all"}
-                </button>
-              </div>
-            </div>
+            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-3">Select Platforms</p>
             <div className="flex flex-wrap gap-2">
               {ALL_PLATFORMS.map((p) => <PlatformChip key={p} platform={p} selected={selectedPlatforms.has(p)} onToggle={togglePlatform} />)}
             </div>
