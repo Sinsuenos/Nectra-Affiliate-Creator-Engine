@@ -18,22 +18,29 @@ interface PlatformResult {
 }
 
 const VALID_STATUSES = new Set(["pass", "warn", "fail"]);
-const DEFAULT_MODEL = "gemini-2.5-flash";
-const RETIRED_MODELS = new Set([
+// Current production Flash-Lite (Aug 2026). Older 2.0/2.5 Flash IDs return 404 for new keys.
+const DEFAULT_MODEL = "gemini-3.5-flash-lite";
+const BLOCKED_MODELS = new Set([
   "gemini-2.0-flash",
   "models/gemini-2.0-flash",
   "gemini-2.0-flash-001",
   "models/gemini-2.0-flash-001",
+  "gemini-2.0-flash-lite",
+  "models/gemini-2.0-flash-lite",
   "gemini-1.5-flash",
   "models/gemini-1.5-flash",
   "gemini-1.5-pro",
   "models/gemini-1.5-pro",
+  "gemini-2.5-flash",
+  "models/gemini-2.5-flash",
+  "gemini-2.5-pro",
+  "models/gemini-2.5-pro",
 ]);
 
 function resolveModel(): string {
   const configured = (process.env.GEMINI_MODEL || "").trim();
   if (!configured) return DEFAULT_MODEL;
-  if (RETIRED_MODELS.has(configured) || RETIRED_MODELS.has(`models/${configured}`)) {
+  if (BLOCKED_MODELS.has(configured) || BLOCKED_MODELS.has(`models/${configured}`)) {
     return DEFAULT_MODEL;
   }
   return configured;
