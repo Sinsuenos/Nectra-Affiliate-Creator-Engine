@@ -11,7 +11,7 @@ export default function Home() {
     <div>
       {/* Full-page background image */}
       <div
-        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-[0.67]"
         style={{ backgroundImage: 'url(/nectar-bg-landing.png)' }}
         aria-hidden="true"
       />
@@ -31,7 +31,7 @@ export default function Home() {
           <motion.h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.02] text-white drop-shadow-[0_4px_28px_rgba(0,0,0,0.35)]" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
             One Offer.<br /><span className="bg-gradient-to-r from-electric via-fuchsia-300 to-lime-200 bg-clip-text text-transparent">Multiple <span className="text-amber-400">Campaign</span> Directions. Nine Platforms.</span>
           </motion.h1>
-          <motion.p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg text-zinc-200 leading-relaxed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>Paste an affiliate offer once. Nectar extracts what matters, turns the source into distinct campaign directions and platform-ready content, then checks the copy before you publish it.</motion.p>
+          <motion.p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg text-zinc-100 leading-relaxed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>Paste an affiliate offer once. Nectar extracts what matters, turns the source into distinct campaign directions and platform-ready content, then checks the copy before you publish it.</motion.p>
           <div className="mt-6 space-y-1">
             <p className="text-2xl md:text-3xl font-light text-amber-400/90">
               Less beige corporate oatmeal.
@@ -66,7 +66,7 @@ export default function Home() {
               From the FAQ: Five-Alarm Burnout
             </h3>
             <p className="text-sm font-semibold text-amber-300 mb-2">Is it true that Nectar Engine was built during what you call a five-alarm creative burnout fire?</p>
-            <p className="text-sm text-zinc-300 leading-relaxed mb-5">Absolutely. We started coding after our third straight late-night brainstorm where every &apos;safe&apos; post felt like beige wallpaper. Nectar Engine was born from exhaustion, sarcasm, and the desperate need for a tool that understood why &ldquo;compliant&rdquo; doesn&apos;t have to mean &ldquo;boring.&rdquo;</p>
+            <p className="text-sm text-zinc-200 leading-relaxed mb-5">Absolutely. We started coding after our third straight late-night brainstorm where every &apos;safe&apos; post felt like beige wallpaper. Nectar Engine was born from exhaustion, sarcasm, and the desperate need for a tool that understood why &ldquo;compliant&rdquo; doesn&apos;t have to mean &ldquo;boring.&rdquo;</p>
             <Link href="/faq" className="inline-flex items-center gap-1.5 text-sm font-semibold text-pink-400 hover:text-pink-300 transition-colors">
               Read all Frequently Awkward Questions <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -85,10 +85,10 @@ export default function Home() {
             <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-4">
               Your offer is the source material.
             </h3>
-            <p className="text-sm text-zinc-300 leading-relaxed mb-3">
+            <p className="text-sm text-zinc-200 leading-relaxed mb-3">
               Nectar Engine takes a raw affiliate offer and extracts its core value, angles, and compliance risks. Then it turns that into platform-specific content that actually works.
             </p>
-            <p className="text-sm text-zinc-300 leading-relaxed">
+            <p className="text-sm text-zinc-200 leading-relaxed">
               Less prompting. More producing. No more staring at a blank page trying to figure out what to say.
             </p>
           </div>
