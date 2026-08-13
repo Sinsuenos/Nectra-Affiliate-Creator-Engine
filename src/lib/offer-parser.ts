@@ -79,13 +79,13 @@ const FIELD_DEFS: FieldDef[] = [
 
 const COMMON_VERTICALS: Array<[string, string[]]> = [
   ["Dating", ["dating", "singles", "matchmaking", "dating platform", "dating site", "dating app"]],
-  ["Adult", ["adult", "cams", "webcam", "porn", "explicit"]],
+  ["Adult", ["adult", "cams", "webcam", "porn", "explicit", "onlyfans", "ppv", "pay-per-view", "creator platform"]],
   ["Gaming", ["gaming", "games", "gamer", "geek culture"]],
-  ["Finance", ["finance", "financial", "loan", "credit", "forex", "trading", "banking"]],
+  ["Finance", ["finance", "financial", "loan", "forex", "trading", "banking"]],
   ["Crypto", ["crypto", "cryptocurrency", "bitcoin", "ethereum"]],
   ["Health", ["health", "wellness", "supplement", "telehealth"]],
-  ["E-commerce", ["ecommerce", "e-commerce", "online store", "shopping"]],
-  ["Software", ["software", "saas", "app", "platform"]],
+  ["E-commerce", ["ecommerce", "e-commerce", "online store"]],
+  ["Software", ["software", "saas"]],
   ["Travel", ["travel", "hotel", "flight", "vacation"]],
 ];
 
@@ -194,10 +194,19 @@ function extractOfferNameFromAnyLine(lines: string[]): string | null {
 
 function extractProseVertical(source: string): string | null {
   const lower = source.toLowerCase();
+  // Prose-based detection is the lowest-confidence path. Require at least 2
+  // keyword matches from the same vertical to avoid false positives on generic
+  // words. A wrong answer is worse than a blank one.
+  let bestVertical: string | null = null;
+  let bestScore = 0;
   for (const [vertical, terms] of COMMON_VERTICALS) {
-    if (terms.some((term) => lower.includes(term))) return vertical;
+    const matchCount = terms.filter((term) => lower.includes(term)).length;
+    if (matchCount > bestScore) {
+      bestScore = matchCount;
+      bestVertical = vertical;
+    }
   }
-  return null;
+  return bestScore >= 2 ? bestVertical : null;
 }
 
 function extractProsePayout(source: string): string | null {
