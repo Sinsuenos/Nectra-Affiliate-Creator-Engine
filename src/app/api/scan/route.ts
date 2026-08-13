@@ -238,14 +238,23 @@ async function callOpenRouter(
 ): Promise<string> {
   const systemPrompt = buildSystemPrompt(platforms);
   const errors: string[] = [];
+  const rawOutputs: string[] = [];
 
-  for (const model of MODEL_FALLBACK_CHAIN) {
+  for (let mi = 0; mi < MODEL_FALLBACK_CHAIN.length; mi++) {
+    const model = MODEL_FALLBACK_CHAIN[mi];
+    const modelLabel = mi === 0 ? 'primary' : `fallback${mi}`;
     try {
-      return await callModelWithRetries(model, systemPrompt, content, platforms);
+      const raw = await callModelWithRetries(model, systemPrompt, content, platforms);
+      console.log(`[SCAN-DEBUG] Model ${modelLabel} (${model}) succeeded. Raw length: ${raw.length}`);
+      console.log(`[SCAN-DEBUG] Raw output from ${modelLabel}:
+---BEGIN RAW---
+${raw}
+---END RAW---`);
+      return raw;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       errors.push(`${model}: ${msg.slice(0, 120)}`);
-      console.warn(`Scanner model ${model} failed, trying next fallback. Error: ${msg.slice(0, 120)}`);
+      console.warn(`Scanner model ${modelLabel} (${model}) failed: ${msg.slice(0, 200)}`);
     }
   }
 
@@ -358,13 +367,21 @@ export async function POST(request: NextRequest) {
     for (const batch of batches) {
       try {
         const raw = await callOpenRouter(content, batch);
+        console.log(`[SCAN-DEBUG] Batch [${batch.join(", ")}] raw length: ${raw.length}`);
+        console.log(`[SCAN-DEBUG] Batch [${batch.join(", ")}] raw output:
+---BEGIN RAW---
+${raw}
+---END RAW---`);
         const modelResults = parseResults(raw);
+        console.log(`[SCAN-DEBUG] parseResults returned ${modelResults.length} results for batch [${batch.join(", ")}]`);
         if (modelResults.length === 0) {
+          // TEMPORARY: include raw output in diagnostic for debugging
+          const safeRaw = raw.slice(0, 2000);
           return NextResponse.json(
             {
               error:
                 "The scanner returned an unreadable result. No compliance clearance was issued. Please try again.",
-              diagnostic: "unparseable_model_json",
+              diagnostic: `unparseable_model_json | RAW: ${safeRaw}`,
             },
             { status: 503 }
           );

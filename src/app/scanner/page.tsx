@@ -243,7 +243,11 @@ function ScannerInner() {
         body: JSON.stringify({ content: content.trim(), platforms: Array.from(selectedPlatforms) }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `Request failed with status ${res.status}`);
+      if (!res.ok) {
+        // TEMPORARY: include diagnostic in error for debugging
+        const diag = data.diagnostic || '';
+        throw new Error(data.error + (diag ? ` [${diag}]` : '') || `Request failed with status ${res.status}`);
+      }
       if (data.data) setResults(data.data);
       else throw new Error("No data received from the scan endpoint.");
     } catch (err: unknown) {
