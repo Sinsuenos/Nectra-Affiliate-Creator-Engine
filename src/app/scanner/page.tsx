@@ -190,6 +190,24 @@ function ScannerInner() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("nectar_scan_payload");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { content?: string; platforms?: string[] };
+        if (typeof parsed.content === "string" && parsed.content.trim().length >= 10) {
+          setContent(parsed.content);
+        }
+        if (Array.isArray(parsed.platforms)) {
+          const valid = parsed.platforms.filter((p) =>
+            (ALL_PLATFORMS as readonly string[]).includes(p),
+          ) as PlatformName[];
+          if (valid.length > 0) setSelectedPlatforms(new Set(valid));
+        }
+      }
+    } catch {
+      /* sessionStorage unavailable */
+    }
+
     const prefill = searchParams.get("content");
     if (prefill) {
       try {
@@ -273,7 +291,7 @@ function ScannerInner() {
       const line = `[${icon}] ${r.platform}`;
       if (r.status === "pass") return `${line}: Clear to post.`;
       let detail = `${line}: ${r.reason}`;
-      if (r.flagged_phrases.length > 0) detail += '\n  Flagged: ' + r.flagged_phrases.map((p) => '“' + p + '”').join(', ');
+      if (r.flagged_phrases.length > 0) detail += '\n  Flagged: ' + r.flagged_phrases.map((p) => '\u201c' + p + '\u201d').join(', ');
       if (r.safer_rewrite && r.safer_rewrite.trim()) detail += `\n  Safer: ${r.safer_rewrite}`;
       return detail;
     });
