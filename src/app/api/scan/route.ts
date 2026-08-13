@@ -168,7 +168,15 @@ async function callModelOnce(
       throw error;
     }
 
-    const data = await response.json();
+    let data: { choices?: Array<{ message?: { content?: string } }> };
+    try {
+      data = await response.json();
+    } catch {
+      // OpenRouter sometimes returns HTTP 200 with a plain-text error body
+      const bodyText = await response.text().catch(() => 'unreadable');
+      throw new Error(`OpenRouter returned invalid JSON: ${bodyText.slice(0, 200)}`);
+    }
+
     const raw = data?.choices?.[0]?.message?.content;
     if (!raw || raw.trim().length === 0) {
       throw new Error("The model returned an empty response.");
@@ -203,7 +211,8 @@ async function callModelWithRetries(
       const isRateLimit = status === 429 || lastError.message.includes("429");
       const isServerError = status !== undefined && status >= 500;
       const isTimeout = lastError.message.includes("abort") || lastError.message.includes("timeout");
-      const retriable = isEmpty || isRateLimit || isServerError || isTimeout;
+      const isInvalidJson = lastError.message.includes("invalid JSON");
+      const retriable = isEmpty || isRateLimit || isServerError || isTimeout || isInvalidJson;
 
       if (!retriable || attempt === MAX_RETRIES_PER_MODEL) {
         throw lastError;
