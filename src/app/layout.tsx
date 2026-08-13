@@ -15,11 +15,11 @@ export const metadata: Metadata = {
   description: "A 9-module engine that architects, generates, and packages compliant affiliate content systems. Built for affiliates working high-risk, tightly-restricted verticals.",
   icons: {
     icon: [
-      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png?v=2", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png?v=2", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.svg?v=2", type: "image/svg+xml" },
     ],
-    apple: "/apple-touch-icon.png",
+    apple: "/apple-touch-icon.png?v=2",
   },
   openGraph: { title: "Nectar Engine", description: "A 9-module engine that architects, generates, and packages compliant affiliate content systems.", type: "website" },
 };
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           className="fixed bottom-4 right-4 z-40 flex flex-col items-end text-sm text-amber-400 hover:text-amber-400 transition-colors duration-200"
         >
           <span className="font-medium">FAQ</span>
-          <span className="text-[10px] text-amber-400">Frequently Asked Questions. Unfortunately.</span>
+          <span className="text-[11px] font-semibold text-amber-400">Frequently Asked Questions. Unfortunately.</span>
         </Link>
         <Analytics />
       </body>
