@@ -13,7 +13,14 @@ const jetbrainsMono = JetBrains_Mono({ variable: "--font-jetbrains-mono", subset
 export const metadata: Metadata = {
   title: "Nectar Engine — Affiliate Content Architecture System",
   description: "A 9-module engine that architects, generates, and packages compliant affiliate content systems. Built for affiliates working high-risk, tightly-restricted verticals.",
-  icons: { icon: "/favicon.svg" },
+  icons: {
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: { title: "Nectar Engine", description: "A 9-module engine that architects, generates, and packages compliant affiliate content systems.", type: "website" },
 };
 
