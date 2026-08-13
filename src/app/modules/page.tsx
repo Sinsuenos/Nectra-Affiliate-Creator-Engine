@@ -171,6 +171,13 @@ function ModuleCard({ mod, index }: { mod: (typeof MODULES)[number]; index: numb
 export default function ModulesPage() {
   return (
     <>
+      {/* Full-page background image */}
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/nectar-bg-modules.png)' }}
+        aria-hidden="true"
+      />
+
       <NectarOrbs />
       <section className="mx-auto max-w-5xl px-4 sm:px-6 pt-16 sm:pt-24 pb-10">
         <motion.p className="font-mono text-xs tracking-widest uppercase text-electric mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Nectar Architecture</motion.p>

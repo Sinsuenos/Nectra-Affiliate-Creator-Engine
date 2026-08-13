@@ -165,13 +165,11 @@ export default function GeneratorPage() {
 
   return (
     <>
-      <div className="fixed inset-0 -z-10 pointer-events-none" aria-hidden="true">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url(/nectar-atmo-generator.png)", filter: "brightness(1.5)" }}
-        />
-        <div className="absolute inset-0 bg-[#121827]/[0.78]" />
-      </div>
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url(/nectar-bg-generator.png)" }}
+        aria-hidden="true"
+      />
 
       <NectarOrbs />
 

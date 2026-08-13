@@ -15,7 +15,14 @@ const NAV_LINKS = [
 
 export default function Home() {
   return (
-    <div className="bg-gradient-to-b from-[#0b0a12] to-[#12101f]">
+    <div>
+      {/* Full-page background image */}
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/nectar-bg-landing.png)' }}
+        aria-hidden="true"
+      />
+
       {/* ── HERO ── */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-[0.075]" style={{ backgroundImage: "linear-gradient(#22b8ff 1px, transparent 1px), linear-gradient(90deg, #22b8ff 1px, transparent 1px)", backgroundSize: "64px 64px" }} aria-hidden="true" />
