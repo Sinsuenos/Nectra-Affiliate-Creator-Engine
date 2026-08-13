@@ -28,8 +28,6 @@ const RETRY_DELAYS_MS = [600, 1500]; // backoff between retries
 
 /**
  * Build platform context for ONLY the platforms in this batch.
- * This is the critical payload-trimming fix: previously the full 9-platform
- * context was sent in every batch call, bloating the system prompt.
  */
 function buildPlatformContext(platforms: string[]): string {
   const lines: string[] = [];
@@ -51,29 +49,24 @@ function buildPlatformContext(platforms: string[]): string {
 
 function buildSystemPrompt(platforms: string[]): string {
   const context = buildPlatformContext(platforms);
-  return `You are Nectar Engine's platform compliance scanner.
+  return `You are a JSON-only compliance API. You MUST output a single JSON object and NOTHING else.
 
-Your job is to review ONE piece of affiliate content against the selected publishing platforms.
-Do not invent policy violations. Use the platform context below as guidance, not as a claim that every signal is universally banned in every format.
+Do NOT include any thinking, explanation, analysis, commentary, reasoning steps, or conversational text before or after the JSON. Do NOT use markdown code fences. Output the raw JSON directly.
 
-PLATFORM CONTEXT:
+PLATFORM CONTEXT (for reference only — do not repeat or discuss it):
 ${context}
 
-STATUS:
+RULES:
 - fail = the input contains an explicit high-risk/banned trigger for that platform
-- warn = the input contains a meaningful borderline risk that deserves review
+- warn = the input contains a meaningful borderline risk
 - pass = no meaningful platform-specific risk signal was found
+- Only flag phrases that EXACTLY appear in the input. Copy them character-for-character.
+- If no exact phrase from the input supports a warning/failure, return pass.
+- For safer_rewrite, preserve the rest of the input and only replace the risky phrase(s). Empty string for pass.
+- Return exactly one result for every requested platform, using the platform name supplied by the user.
 
-GROUNDING RULES:
-1. Only flag phrases that EXACTLY appear in the input. Copy them character-for-character.
-2. Do not flag a phrase merely because it appears in another platform's rules.
-3. Do not invent facts, policy claims, or prohibited categories beyond the supplied platform context.
-4. If no exact phrase from the input supports a warning/failure, return pass.
-5. For safer_rewrite, preserve the rest of the input and only replace the risky phrase(s). Empty string for pass.
-6. Return exactly one result for every requested platform, using the platform name supplied by the user.
-
-Return ONLY valid JSON:
-{"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":["<exact phrase from input>"],"reason":"<short grounded reason>","safer_rewrite":"<full rewritten content or empty>"}]}`;
+OUTPUT FORMAT (return ONLY this JSON, nothing else):
+{"results":[{"platform":"<name>","status":"pass|warn|fail","flagged_phrases":["<exact phrase>"],"reason":"<short reason>","safer_rewrite":"<rewrite or empty>"}]}`;
 }
 
 function classifyScanError(message: string): {
@@ -155,7 +148,7 @@ async function callModelOnce(
       },
       body: JSON.stringify({
         model,
-        max_tokens: 2000,
+        max_tokens: 4000,
         messages: [
           { role: "system", content: systemPrompt },
           {
@@ -206,7 +199,6 @@ async function callModelWithRetries(
       lastError = err instanceof Error ? err : new Error(String(err));
       const status = (err as Error & { status?: number }).status;
 
-      // Only retry on retriable conditions: empty response, 429, 5xx
       const isEmpty = lastError.message.includes("empty response");
       const isRateLimit = status === 429 || lastError.message.includes("429");
       const isServerError = status !== undefined && status >= 500;
@@ -219,7 +211,7 @@ async function callModelWithRetries(
 
       const delay = RETRY_DELAYS_MS[Math.min(attempt, RETRY_DELAYS_MS.length - 1)];
       console.warn(
-        `Scanner retry ${attempt + 1}/${MAX_RETRIES_PER_MODEL} for model ${model} after: ${lastError.message.slice(0, 120)} (waiting ${delay}ms)`
+        `Scanner retry ${attempt + 1}/${MAX_RETRIES_PER_MODEL} for ${model}: ${lastError.message.slice(0, 120)} (${delay}ms)`
       );
       await sleep(delay);
     }
@@ -229,8 +221,7 @@ async function callModelWithRetries(
 }
 
 /**
- * Full failover chain: tries each model in MODEL_FALLBACK_CHAIN
- * with per-model retries. Returns raw content from first successful call.
+ * Full failover chain: tries each model with per-model retries.
  */
 async function callOpenRouter(
   content: string,
@@ -238,23 +229,14 @@ async function callOpenRouter(
 ): Promise<string> {
   const systemPrompt = buildSystemPrompt(platforms);
   const errors: string[] = [];
-  const rawOutputs: string[] = [];
 
-  for (let mi = 0; mi < MODEL_FALLBACK_CHAIN.length; mi++) {
-    const model = MODEL_FALLBACK_CHAIN[mi];
-    const modelLabel = mi === 0 ? 'primary' : `fallback${mi}`;
+  for (const model of MODEL_FALLBACK_CHAIN) {
     try {
-      const raw = await callModelWithRetries(model, systemPrompt, content, platforms);
-      console.log(`[SCAN-DEBUG] Model ${modelLabel} (${model}) succeeded. Raw length: ${raw.length}`);
-      console.log(`[SCAN-DEBUG] Raw output from ${modelLabel}:
----BEGIN RAW---
-${raw}
----END RAW---`);
-      return raw;
+      return await callModelWithRetries(model, systemPrompt, content, platforms);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       errors.push(`${model}: ${msg.slice(0, 120)}`);
-      console.warn(`Scanner model ${modelLabel} (${model}) failed: ${msg.slice(0, 200)}`);
+      console.warn(`Scanner model ${model} failed, trying next. Error: ${msg.slice(0, 120)}`);
     }
   }
 
@@ -263,14 +245,65 @@ ${raw}
   );
 }
 
-function parseResults(raw: string): PlatformResult[] {
-  let cleaned = raw.trim();
-  if (cleaned.startsWith("```")) {
-    cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+/**
+ * Extract a JSON object from anywhere in a model response.
+ * Handles: raw JSON, markdown fences, thinking-then-JSON, conversational prefix.
+ * Finds the first "{" and extracts to its matching "}".
+ */
+function extractJsonObject(raw: string): string | null {
+  // Fast path: entire response is JSON
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("{")) {
+    // Find matching closing brace
+    let depth = 0;
+    for (let i = 0; i < trimmed.length; i++) {
+      if (trimmed[i] === "{") depth++;
+      else if (trimmed[i] === "}") {
+        depth--;
+        if (depth === 0) return trimmed.slice(0, i + 1);
+      }
+    }
   }
-  cleaned = cleaned.replace(/[\x00-\x1f]/g, (ch) =>
-    ch === "\n" || ch === "\r" || ch === "\t" ? ch : ""
-  );
+
+  // Strip markdown fences first
+  let unfenced = trimmed;
+  if (unfenced.startsWith("```")) {
+    unfenced = unfenced.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+    unfenced = unfenced.trim();
+    if (unfenced.startsWith("{")) {
+      let depth = 0;
+      for (let i = 0; i < unfenced.length; i++) {
+        if (unfenced[i] === "{") depth++;
+        else if (unfenced[i] === "}") {
+          depth--;
+          if (depth === 0) return unfenced.slice(0, i + 1);
+        }
+      }
+    }
+  }
+
+  // Slow path: find first "{" anywhere in the response and extract to matching "}"
+  const firstBrace = trimmed.indexOf("{");
+  if (firstBrace === -1) return null;
+
+  let depth = 0;
+  for (let i = firstBrace; i < trimmed.length; i++) {
+    if (trimmed[i] === "{") depth++;
+    else if (trimmed[i] === "}") {
+      depth--;
+      if (depth === 0) return trimmed.slice(firstBrace, i + 1);
+    }
+  }
+
+  return null; // no complete JSON object found
+}
+
+function parseResults(raw: string): PlatformResult[] {
+  const jsonStr = extractJsonObject(raw);
+  if (!jsonStr) return [];
+
+  // Clean control characters (preserve newlines/tabs inside string values)
+  const cleaned = jsonStr.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, "");
 
   try {
     const parsed = JSON.parse(cleaned) as { results?: PlatformResult[] };
@@ -340,19 +373,13 @@ export async function POST(request: NextRequest) {
 
     if (content.length < 10) {
       return NextResponse.json(
-        {
-          error: "Content is required and must be at least 10 characters.",
-          diagnostic: "invalid_input",
-        },
+        { error: "Content is required and must be at least 10 characters.", diagnostic: "invalid_input" },
         { status: 400 }
       );
     }
     if (platforms.length === 0) {
       return NextResponse.json(
-        {
-          error: "At least one platform must be selected.",
-          diagnostic: "no_platforms",
-        },
+        { error: "At least one platform must be selected.", diagnostic: "no_platforms" },
         { status: 400 }
       );
     }
@@ -367,21 +394,12 @@ export async function POST(request: NextRequest) {
     for (const batch of batches) {
       try {
         const raw = await callOpenRouter(content, batch);
-        console.log(`[SCAN-DEBUG] Batch [${batch.join(", ")}] raw length: ${raw.length}`);
-        console.log(`[SCAN-DEBUG] Batch [${batch.join(", ")}] raw output:
----BEGIN RAW---
-${raw}
----END RAW---`);
         const modelResults = parseResults(raw);
-        console.log(`[SCAN-DEBUG] parseResults returned ${modelResults.length} results for batch [${batch.join(", ")}]`);
         if (modelResults.length === 0) {
-          // TEMPORARY: include raw output in diagnostic for debugging
-          const safeRaw = raw.slice(0, 2000);
           return NextResponse.json(
             {
-              error:
-                "The scanner returned an unreadable result. No compliance clearance was issued. Please try again.",
-              diagnostic: `unparseable_model_json | RAW: ${safeRaw}`,
+              error: "The scanner returned an unreadable result. No compliance clearance was issued. Please try again.",
+              diagnostic: "unparseable_model_json",
             },
             { status: 503 }
           );
@@ -420,10 +438,7 @@ ${raw}
     const message = err instanceof Error ? err.message : "Unknown error";
     const classified = classifyScanError(message);
     return NextResponse.json(
-      {
-        error: classified.error,
-        diagnostic: classified.diagnostic,
-      },
+      { error: classified.error, diagnostic: classified.diagnostic },
       { status: classified.status >= 500 ? classified.status : 500 }
     );
   }

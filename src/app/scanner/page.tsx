@@ -243,11 +243,7 @@ function ScannerInner() {
         body: JSON.stringify({ content: content.trim(), platforms: Array.from(selectedPlatforms) }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        // TEMPORARY: include diagnostic in error for debugging
-        const diag = data.diagnostic || '';
-        throw new Error(data.error + (diag ? ` [${diag}]` : '') || `Request failed with status ${res.status}`);
-      }
+      if (!res.ok) throw new Error(data.error || `Request failed with status ${res.status}`);
       if (data.data) setResults(data.data);
       else throw new Error("No data received from the scan endpoint.");
     } catch (err: unknown) {
@@ -322,6 +318,7 @@ function ScannerInner() {
               className="w-full h-48 sm:h-56 rounded-xl border border-border/60 bg-surface text-foreground/80 font-mono text-sm p-5 resize-none focus:outline-none focus:ring-1 focus:ring-electric/30"
               placeholder={'Paste your social post, ad copy, or any content here...\n\nExample:\n"Lose weight fast with this guaranteed supplement! Act now - free trial, no risk. Click here to sign up and start seeing results today!"'}
             />
+            <p className="mt-2 text-xs text-muted-foreground/60">Works with any content — your own draft, offer description, or output from the Generator.</p>
           </motion.div>
 
           <motion.div variants={fadeUp} custom={1}>
