@@ -159,9 +159,13 @@ async function callModelOnce(
       }),
     });
 
+    // Read body as text FIRST — fetch body stream can only be consumed once.
+    // This avoids the bug where response.json() fails, then response.text() also fails
+    // because the stream is already consumed.
+    const bodyText = await response.text();
+
     if (!response.ok) {
-      const errBody = await response.text();
-      const error = new Error(`OpenRouter ${response.status}: ${errBody}`) as Error & {
+      const error = new Error(`OpenRouter ${response.status}: ${bodyText}`) as Error & {
         status?: number;
       };
       error.status = response.status;
@@ -170,11 +174,10 @@ async function callModelOnce(
 
     let data: { choices?: Array<{ message?: { content?: string } }> };
     try {
-      data = await response.json();
+      data = JSON.parse(bodyText);
     } catch {
       // OpenRouter sometimes returns HTTP 200 with a plain-text error body
-      const bodyText = await response.text().catch(() => 'unreadable');
-      throw new Error(`OpenRouter returned invalid JSON: ${bodyText.slice(0, 200)}`);
+      throw new Error(`OpenRouter returned invalid JSON (HTTP ${response.status}): ${bodyText.slice(0, 200)}`);
     }
 
     const raw = data?.choices?.[0]?.message?.content;
