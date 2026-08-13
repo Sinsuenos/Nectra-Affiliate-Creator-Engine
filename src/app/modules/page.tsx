@@ -165,7 +165,7 @@ export default function ModulesPage() {
           <div className="relative rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-8">
             <p className="font-mono text-[11px] uppercase tracking-widest text-electric mb-3">The real product story</p>
             <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-4">Offer → Angles → Output → Protection</h3>
-            <p className="text-sm text-zinc-300 leading-relaxed max-w-3xl">
+            <p className="text-sm text-zinc-200 leading-relaxed max-w-3xl">
               Today, that core loop is real. Context intelligence and deeper campaign orchestration are the next expansion, which is why they are visible in the product story without being disguised as finished features.
             </p>
           </div>

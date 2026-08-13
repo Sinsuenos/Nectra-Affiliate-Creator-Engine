@@ -57,7 +57,7 @@ export function SiteNav() {
         </div>
 
         <button
-          className="sm:hidden p-2 rounded-md text-zinc-300 hover:text-white hover:bg-white/[0.07] transition-colors"
+          className="sm:hidden p-2 rounded-md text-zinc-200 hover:text-white hover:bg-white/[0.07] transition-colors"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
@@ -78,7 +78,7 @@ export function SiteNav() {
                   className={`px-3 py-2.5 rounded-md text-sm font-semibold transition-colors ${
                     active
                       ? "bg-electric/15 text-electric"
-                      : "text-zinc-300 hover:text-white hover:bg-white/[0.07]"
+                      : "text-zinc-200 hover:text-white hover:bg-white/[0.07]"
                   }`}
                 >
                   {link.label}

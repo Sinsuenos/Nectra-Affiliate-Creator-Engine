@@ -97,7 +97,7 @@ export default function CompliancePage() {
             A strategic reference for the risk signals Nectar looks for across nine publishing environments. Use it to understand the kinds of language and behavior that deserve a second look before publishing.
           </p>
           <p className="text-sm text-electric hover:text-electric/80 transition-colors mb-3"><Link href="/scanner" className="inline-flex items-center gap-1">Have content ready? Open the Scanner <ExternalLink className="h-3 w-3" /></Link></p>
-          <p className="text-sm text-zinc-300 leading-relaxed rounded-lg border border-amber-400/25 bg-amber-400/5 px-4 py-3">
+          <p className="text-sm text-zinc-200 leading-relaxed rounded-lg border border-amber-400/25 bg-amber-400/5 px-4 py-3">
             This is educational guidance, not a guarantee of compliance. Platform rules and enforcement change, and requirements vary by region, account history, content category, and format. Always verify the current rules directly with the platform before publishing.
           </p>
         </motion.header>
