@@ -202,6 +202,18 @@ async function callModelWithRetries(
   for (let attempt = 0; attempt <= MAX_RETRIES_PER_MODEL; attempt++) {
     try {
       const result = await callModelOnce(model, systemPrompt, content, platforms);
+
+      // Validate model output is actually usable before accepting as success.
+      // If parseResults/groundResults fail, the model returned garbage — retry/failover.
+      const parsed = parseResults(result);
+      if (parsed.length === 0) {
+        throw new Error("Model returned unparseable content — no valid JSON object found.");
+      }
+      const grounded = groundResults(content, platforms, parsed);
+      if (!grounded) {
+        throw new Error("Model returned incomplete platform coverage in result.");
+      }
+
       return result;
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
@@ -212,7 +224,8 @@ async function callModelWithRetries(
       const isServerError = status !== undefined && status >= 500;
       const isTimeout = lastError.message.includes("abort") || lastError.message.includes("timeout");
       const isInvalidJson = lastError.message.includes("invalid JSON");
-      const retriable = isEmpty || isRateLimit || isServerError || isTimeout || isInvalidJson;
+      const isUnparseable = lastError.message.includes("unparseable") || lastError.message.includes("incomplete platform");
+      const retriable = isEmpty || isRateLimit || isServerError || isTimeout || isInvalidJson || isUnparseable;
 
       if (!retriable || attempt === MAX_RETRIES_PER_MODEL) {
         throw lastError;
