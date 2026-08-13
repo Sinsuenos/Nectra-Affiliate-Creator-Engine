@@ -8,7 +8,6 @@ import { GUMROAD_URL } from "@/lib/constants";
 
 const LINKS = [
   { href: "/modules", label: "Modules" },
-  { href: "/sample", label: "Sample Output" },
   { href: "/compliance", label: "Compliance" },
   { href: "/generator", label: "Generator" },
   { href: "/scanner", label: "Scanner" },

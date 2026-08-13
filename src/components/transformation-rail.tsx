@@ -1,86 +1,125 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import Link from "next/link";
 import {
   ClipboardPaste,
   Sparkles,
   ShieldCheck,
   LayoutList,
-  ArrowRight,
 } from "lucide-react";
-import Link from "next/link";
 
 export interface RailStage {
   id: string;
   label: string;
   sublabel: string;
-  tooltipLine: string;
+  description: string;
   icon: React.ElementType;
   live: boolean;
   href?: string;
 }
 
 export const RAIL_STAGES: RailStage[] = [
-  { id: "offer", label: "OFFER", sublabel: "Paste raw offer details", tooltipLine: "", icon: ClipboardPaste, live: true, href: "/generator" },
-  { id: "angles", label: "ANGLES", sublabel: "Campaign directions", tooltipLine: "", icon: Sparkles, live: true },
-  { id: "compliance", label: "COMPLIANCE", sublabel: "Platform risk scanner", tooltipLine: "", icon: ShieldCheck, live: true, href: "/scanner" },
-  { id: "output", label: "OUTPUT", sublabel: "9-platform toolkit", tooltipLine: "", icon: LayoutList, live: true },
+  { id: "offer", label: "OFFER", sublabel: "Paste raw offer details", description: "Drop in any affiliate offer — product, audience, angle — and Nectar extracts the structural signals.", icon: ClipboardPaste, live: true, href: "/generator" },
+  { id: "angles", label: "ANGLES", sublabel: "Campaign directions", description: "The engine identifies distinct campaign angles so every platform gets a version that fits, not a copy-paste.", icon: Sparkles, live: true },
+  { id: "compliance", label: "COMPLIANCE", sublabel: "Platform risk scanner", description: "Before you post, every piece of copy is checked against real platform policy patterns — pass, warn, or rewrite.", icon: ShieldCheck, live: true, href: "/scanner" },
+  { id: "output", label: "OUTPUT", sublabel: "9-platform toolkit", description: "Structured, platform-ready content with character counts, compliance context, and editable fields — ready to publish.", icon: LayoutList, live: true },
 ];
 
-const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } } };
-const nodeVariants = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } } };
-const connectorVariants = { hidden: { scaleX: 0 }, visible: { scaleX: 1, transition: { duration: 0.4, ease: "easeOut" as const } } };
+const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } };
+const nodeVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } } };
 
-function Connector({ index }: { index: number }) {
-  const stage = RAIL_STAGES[index];
-  const nextStage = RAIL_STAGES[index + 1];
-  const bothLive = stage.live && nextStage?.live;
+/** Per-card accent colors — each stage has a restrained glow while feeling like one system. */
+const CARD_ACCENTS = {
+  offer: {
+    border: "from-amber-500/40 via-amber-400/20 to-transparent",
+    glow: "bg-amber-500/[0.06]",
+    iconBg: "bg-amber-500/10",
+    iconText: "text-amber-400",
+    dot: "bg-amber-400",
+  },
+  angles: {
+    border: "from-fuchsia-500/40 via-fuchsia-400/20 to-transparent",
+    glow: "bg-fuchsia-500/[0.06]",
+    iconBg: "bg-fuchsia-500/10",
+    iconText: "text-fuchsia-400",
+    dot: "bg-fuchsia-400",
+  },
+  compliance: {
+    border: "from-electric/40 via-electric/20 to-transparent",
+    glow: "bg-electric/[0.06]",
+    iconBg: "bg-electric/10",
+    iconText: "text-electric",
+    dot: "bg-electric",
+  },
+  output: {
+    border: "from-lime-400/40 via-lime-400/20 to-transparent",
+    glow: "bg-lime-400/[0.06]",
+    iconBg: "bg-lime-400/10",
+    iconText: "text-lime-400",
+    dot: "bg-lime-400",
+  },
+} as const;
 
-  return (
-    <motion.div className="hidden sm:flex items-center justify-center shrink-0 w-10 lg:w-14" variants={connectorVariants} style={{ originX: 0 }}>
-      {bothLive ? (
-        <div className="relative w-full h-px overflow-hidden rounded-full">
-          <div className="absolute inset-0 bg-gradient-to-r from-electric/45 via-fuchsia-400/55 to-lime-300/45" />
-          <motion.div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-electric via-fuchsia-400 to-lime-300" animate={{ x: ["-100%", "220%"] }} transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", delay: index * 0.4 }} />
-        </div>
-      ) : <div className="w-full h-px bg-border/60" />}
-    </motion.div>
-  );
-}
-
-function LiveStageNode({ stage }: { stage: RailStage }) {
+function PipelineCard({ stage, index }: { stage: RailStage; index: number }) {
   const Icon = stage.icon;
-  const content = (
-    <motion.div className="relative flex flex-col items-center gap-2.5 group px-1 sm:px-0" variants={nodeVariants}>
-      <div className="hidden sm:block absolute -inset-3 rounded-2xl bg-electric/[0.07] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-      <div className="relative flex items-center justify-center h-14 w-14 sm:h-16 sm:w-16 rounded-xl border border-electric/35 bg-surface shadow-lg shadow-electric/10">
-        <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-electric" />
+  const accent = CARD_ACCENTS[stage.id as keyof typeof CARD_ACCENTS];
+  const card = (
+    <motion.div
+      className="group relative h-full"
+      variants={nodeVariants}
+      custom={index}
+    >
+      {/* Ambient glow behind card */}
+      <div className={`absolute -inset-3 rounded-2xl ${accent.glow} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} aria-hidden="true" />
+      {/* Gradient top border line */}
+      <div className={`absolute inset-x-0 top-0 h-px rounded-full bg-gradient-to-r ${accent.border}`} aria-hidden="true" />
+      <div className="relative rounded-xl border border-white/[0.08] bg-[#13121f]/90 backdrop-blur-sm p-5 sm:p-6 h-full flex flex-col">
+        <div className="flex items-start gap-3 mb-3">
+          <div className={`shrink-0 flex items-center justify-center h-9 w-9 rounded-lg ${accent.iconBg} border border-white/[0.06]`}>
+            <Icon className={`h-4 w-4 ${accent.iconText}`} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground/70 mb-0.5">{stage.label}</p>
+            <p className="text-sm font-semibold text-foreground/90">{stage.sublabel}</p>
+          </div>
+        </div>
+        <p className="text-[13px] text-muted-foreground leading-relaxed flex-1">{stage.description}</p>
+        {/* Subtle data-line decoration */}
+        <div className="mt-4 flex items-center gap-1.5" aria-hidden="true">
+          <div className={`h-1 w-1 rounded-full ${accent.dot}`} />
+          <div className={`h-px flex-1 bg-gradient-to-r ${accent.border}`} />
+          <div className={`h-1 w-1 rounded-full ${accent.dot} opacity-40`} />
+        </div>
       </div>
-      <span className="font-mono text-[11px] sm:text-[12px] uppercase tracking-widest text-electric">{stage.label}</span>
-      <span className="hidden sm:block text-[11px] text-muted-foreground/85 text-center leading-tight max-w-[118px]">{stage.sublabel}</span>
     </motion.div>
   );
-  return stage.href ? <Link href={stage.href} className="hover:no-underline">{content}</Link> : content;
-}
 
-function StageNode({ stage }: { stage: RailStage }) {
-  return <LiveStageNode stage={stage} />;
+  if (stage.href) {
+    return <Link href={stage.href} className="hover:no-underline block h-full" tabIndex={-1}>{card}</Link>;
+  }
+  return <div className="h-full">{card}</div>;
 }
 
 export function TransformationRail() {
   return (
-    <motion.div className="mx-auto max-w-6xl px-4 sm:px-6 pb-20 sm:pb-28" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
-      <motion.div className="font-mono text-sm tracking-widest uppercase text-electric mb-3 text-center" variants={nodeVariants}>The Pipeline</motion.div>
-      <motion.div className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center mb-12 sm:mb-16" variants={nodeVariants}>One Offer.<span className="bg-gradient-to-r from-electric via-fuchsia-400 to-lime-300 bg-clip-text text-transparent"> Multiple Campaign Directions.</span> Nine Platforms.</motion.div>
-      <div className="hidden sm:flex items-center justify-center">
-        {RAIL_STAGES.map((stage, i) => <div key={stage.id} className="flex items-center"><StageNode stage={stage} />{i < RAIL_STAGES.length - 1 && <Connector index={i} />}</div>)}
-      </div>
-      <div className="sm:hidden grid grid-cols-2 gap-x-3 gap-y-8 justify-items-center">
-        {RAIL_STAGES.map((stage) => <div key={stage.id} className="w-full flex justify-center"><StageNode stage={stage} /></div>)}
-      </div>
-      <div className="mt-10 flex items-center justify-center gap-2 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground/80">
-        <ArrowRight className="h-3.5 w-3.5 text-electric/75" /> Live now: Offer · Directions · Compliance · Output
+    <motion.div
+      className="mx-auto max-w-6xl px-4 sm:px-6 pb-20 sm:pb-28"
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
+    >
+      <motion.div className="font-mono text-sm tracking-widest uppercase text-electric mb-2 text-center" variants={nodeVariants}>
+        The Pipeline
+      </motion.div>
+      <motion.p className="text-lg sm:text-xl text-muted-foreground/80 text-center mb-10 sm:mb-14 max-w-lg mx-auto" variants={nodeVariants}>
+        From raw offer to campaign-ready content.
+      </motion.p>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {RAIL_STAGES.map((stage, i) => (
+          <PipelineCard key={stage.id} stage={stage} index={i} />
+        ))}
       </div>
     </motion.div>
   );
