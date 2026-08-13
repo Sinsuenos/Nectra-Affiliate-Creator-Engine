@@ -22,7 +22,7 @@ const previewStages = [
 
 export default function Home() {
   return (
-    <>
+    <div className="bg-gradient-to-b from-[#0b0a12] to-[#12101f]">
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-[0.075]" style={{ backgroundImage: "linear-gradient(#22b8ff 1px, transparent 1px), linear-gradient(90deg, #22b8ff 1px, transparent 1px)", backgroundSize: "64px 64px" }} aria-hidden="true" />
         <div className="pointer-events-none absolute left-[8%] top-10 h-96 w-96 rounded-full bg-fuchsia-500/[0.13] blur-3xl" aria-hidden="true" />
@@ -35,9 +35,17 @@ export default function Home() {
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 text-center">
           <motion.p className="font-mono text-xs tracking-widest uppercase text-electric mb-5 font-semibold" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>Nectar Engine · Affiliate Content Transformation</motion.p>
           <motion.h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.02] text-white drop-shadow-[0_4px_28px_rgba(0,0,0,0.35)]" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
-            One Offer.<br /><span className="bg-gradient-to-r from-electric via-fuchsia-300 to-lime-200 bg-clip-text text-transparent">Multiple Campaign Directions. Nine Platforms.</span>
+            One Offer.<br /><span className="bg-gradient-to-r from-electric via-fuchsia-300 to-lime-200 bg-clip-text text-transparent">Multiple <span className="text-amber-400">Campaign</span> Directions. Nine Platforms.</span>
           </motion.h1>
           <motion.p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg text-zinc-200 leading-relaxed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>Paste an affiliate offer once. Nectar extracts what matters, turns the source into distinct campaign directions and platform-ready content, then checks the copy before you publish it.</motion.p>
+          <div className="mt-6 space-y-1">
+            <p className="text-2xl md:text-3xl font-light text-amber-400/90">
+              Less beige corporate oatmeal.
+            </p>
+            <p className="text-2xl md:text-3xl font-light text-amber-400/90">
+              Fewer five‑alarm compliance fires.
+            </p>
+          </div>
           <motion.div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.45 }}>
             <Button asChild size="lg" className="bg-electric hover:bg-sky-300 text-[#071019] font-bold tracking-wide px-8 h-12 text-sm cursor-pointer shadow-[0_0_30px_rgba(34,184,255,0.25)]"><a href={GUMROAD_URL} target="_blank" rel="noreferrer">Get Nectar Engine<ChevronRight className="ml-2 h-4 w-4" /></a></Button>
             <Button asChild size="lg" variant="outline" className="h-12 px-7 border-white/20 bg-white/[0.035] text-zinc-100 hover:border-electric/60 hover:bg-electric/[0.08] hover:text-white"><Link href="/generator">Try the Generator<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
@@ -91,6 +99,6 @@ export default function Home() {
 
       <section className="mx-auto max-w-5xl px-4 sm:px-6 pt-2 pb-24 sm:pb-32"><div className="grid gap-4 sm:grid-cols-3">{[{ tag: "SEE THE SYSTEM", title: "How Nectar Works", desc: "See the architecture behind the transformation, with shipped capabilities separated from the next layer.", href: "/modules", icon: BookOpen }, { tag: "SEE THE OUTPUT", title: "Sample Output", desc: "Explore a transparent example of the kind of structured content Nectar produces from one offer.", href: "/sample", icon: Layers3 }, { tag: "PROTECT THE COPY", title: "Compliance Scanner", desc: "Check generated content for platform-specific risk signals and get a safer rewrite when needed.", href: "/scanner", icon: Zap }].map((card, i) => { const CardIcon = card.icon; return <motion.div key={card.href} variants={fadeUp} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}><Link href={card.href} className="group block h-full rounded-xl border border-white/12 bg-[#181c27] p-6 transition-all hover:-translate-y-1 hover:bg-[#202533] hover:border-electric/40 hover:shadow-lg hover:shadow-electric/10"><div className="mb-4 flex items-center justify-between"><p className="font-mono text-[11px] uppercase tracking-widest text-electric font-semibold">{card.tag}</p><CardIcon className="h-4 w-4 text-electric/25 group-hover:text-electric/60 transition-colors" /></div><h3 className="text-lg font-bold tracking-tight mb-2 text-white group-hover:text-electric transition-colors">{card.title}</h3><p className="text-sm text-zinc-200 leading-relaxed mb-4">{card.desc}</p><span className="inline-flex items-center gap-1 text-xs text-electric/80 group-hover:text-electric transition-colors font-semibold">Explore <ArrowRight className="h-3 w-3" /></span></Link></motion.div>; })}</div></section>
       <BottomNextNav currentPage="/" />
-    </>
+    </div>
   );
 }

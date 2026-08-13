@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { SiteNav } from "@/components/layout/site-nav";
@@ -31,6 +32,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </div>
         </div>
         <Toaster />
+        <Link
+          href="/faq"
+          className="fixed bottom-4 right-4 z-40 flex flex-col items-end text-xs text-amber-400/60 hover:text-amber-400 transition-colors duration-200"
+        >
+          <span className="font-medium">FAQ</span>
+          <span className="text-[10px] opacity-60">Frequently Asked Questions. Unfortunately.</span>
+        </Link>
         <Analytics />
       </body>
     </html>
