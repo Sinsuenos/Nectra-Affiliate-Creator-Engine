@@ -50,7 +50,7 @@ const FIELD_DEFS: FieldDef[] = [
   },
   {
     key: "top_geo",
-    label: "Top Geo",
+    label: "Available Countries",
     aliases: ["top geo", "geo", "geos", "countries", "target countries", "accepted countries", "allowed countries", "available countries"],
     patterns: [new RegExp(`^${LABEL_PREFIX}(?:(?:top[\\s_-]?)?(?:geo|geos)|target[\\s_-]?countries|accepted[\\s_-]?countries|allowed[\\s_-]?countries|available[\\s_-]?countries)[\\s:#|=\\-]+([^\\n|]+)`, "im")],
   },

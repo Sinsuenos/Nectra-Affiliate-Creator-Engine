@@ -258,7 +258,7 @@ export default function GeneratorPage() {
               value={pasteText}
               onChange={(e) => setPasteText(e.target.value)}
               className="w-full h-56 sm:h-64 rounded-xl border border-border/60 bg-surface text-foreground/80 font-mono text-sm p-5 resize-none focus:outline-none focus:ring-1 focus:ring-electric/30"
-              placeholder={"Offer Name — Product Description\nNetwork: NetworkName | Offer ID: XX-0001\nVertical: Health & Wellness\nPayout: $40 CPA (CC Submit)\nConversion Flow: Free Trial → CC Submit → Rebill\nTop Geo: US, CA, UK\nLanding Page: https://...\nBanned Traffic: Incentivized, Bot, Brand Search\nSub-ID Format: {sub1}_{sub2}_{sub3}\n\nKey product details:\n- Feature 1\n- Feature 2\n- Target audience: ...\n- Unique angle: ..."}
+              placeholder={"Offer Name — Product Description\nNetwork: NetworkName | Offer ID: XX-0001\nVertical: Health & Wellness\nPayout: $40 CPA (CC Submit)\nConversion Flow: Free Trial → CC Submit → Rebill\nAvailable Countries: US, CA, UK\nLanding Page: https://...\nBanned Traffic: Incentivized, Bot, Brand Search\nSub-ID Format: {sub1}_{sub2}_{sub3}\n\nKey product details:\n- Feature 1\n- Feature 2\n- Target audience: ...\n- Unique angle: ..."}
             />
           </motion.div>
 

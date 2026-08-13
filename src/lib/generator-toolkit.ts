@@ -9,7 +9,7 @@ export const DEMO_PASTE =
   "Vertical: Dating / Mature\n" +
   "Payout: $55 CPA (CC Submit)\n" +
   "Conversion Flow: Free Account Registration → CC Age Verification → $1 Trial → Rebill $49.99/mo\n" +
-  "Top Geo: US, CA, UK, AU, NZ\n" +
+  "Available Countries: US, CA, UK, AU, NZ\n" +
   "Landing Page: https://example.com/offer/cozy50\n" +
   "Banned Traffic: Incentivized, Bot, Brand Search, Email Spam, Craigslist, Craigslist-adjacent, Social Sprinkling\n" +
   "Sub-ID Format: {sub1}_{sub2}_{sub3}\n\n" +
