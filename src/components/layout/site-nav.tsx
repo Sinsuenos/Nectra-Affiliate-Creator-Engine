@@ -26,10 +26,7 @@ export function SiteNav() {
           href="/"
           className="flex items-center gap-2.5 text-sm font-bold tracking-[0.18em] uppercase text-white hover:text-electric transition-colors"
         >
-          <span
-            className="inline-block h-5 w-5 rounded-sm bg-electric shadow-[0_0_16px_rgba(34,184,255,0.55)]"
-            aria-hidden="true"
-          />
+          <img src="/favicon.svg" alt="" className="h-5 w-5 rounded-sm" aria-hidden="true" />
           Nectar
         </Link>
 
