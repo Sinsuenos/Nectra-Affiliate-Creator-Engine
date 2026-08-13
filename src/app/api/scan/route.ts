@@ -167,7 +167,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+    // gemini-2.0-flash was retired by Google (404). Default to 2.5-flash.
+    // GEMINI_MODEL env can override if needed.
+    const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
     const ai = new GoogleGenAI({ apiKey });
     const prompt = buildPrompt(platforms);
     const userText = `${prompt}\n\n--- CONTENT ---\n${content}\n--- END CONTENT ---`;
