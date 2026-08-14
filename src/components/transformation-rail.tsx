@@ -20,10 +20,10 @@ export interface RailStage {
 }
 
 export const RAIL_STAGES: RailStage[] = [
-  { id: "offer", label: "OFFER", sublabel: "Paste raw offer details", description: "Drop in any affiliate offer — product, audience, angle — and Nectar extracts the structural signals.", icon: ClipboardPaste, live: true, href: "/generator" },
+  { id: "offer", label: "OFFER", sublabel: "Paste raw offer details", description: "Drop in any affiliate offer, whether product, audience, or angle, and Nectar extracts the structural signals.", icon: ClipboardPaste, live: true, href: "/generator" },
   { id: "angles", label: "ANGLES", sublabel: "Campaign directions", description: "The engine identifies distinct campaign angles so every platform gets a version that fits, not a copy-paste.", icon: Sparkles, live: true },
-  { id: "compliance", label: "COMPLIANCE", sublabel: "Platform risk scanner", description: "Before you post, every piece of copy is checked against real platform policy patterns — pass, warn, or rewrite.", icon: ShieldCheck, live: true, href: "/scanner" },
-  { id: "output", label: "OUTPUT", sublabel: "9-platform toolkit", description: "Structured, platform-ready content with character counts, compliance context, and editable fields — ready to publish.", icon: LayoutList, live: true },
+  { id: "compliance", label: "COMPLIANCE", sublabel: "Platform risk scanner", description: "Before you post, every piece of copy is checked against real platform policy patterns. Pass, warn, or rewrite.", icon: ShieldCheck, live: true, href: "/scanner" },
+  { id: "output", label: "OUTPUT", sublabel: "9-platform toolkit", description: "Structured, platform-ready content with character counts, compliance context, and editable fields, ready to publish.", icon: LayoutList, live: true },
 ];
 
 const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } };
@@ -80,11 +80,11 @@ function PipelineCard({ stage, index }: { stage: RailStage; index: number }) {
             <Icon className={`h-4 w-4 ${accent.iconText}`} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground/70 mb-0.5">{stage.label}</p>
+            <p className="font-mono text-xs tracking-widest uppercase text-muted-foreground/85 mb-0.5">{stage.label}</p>
             <p className="text-sm font-semibold text-foreground/90">{stage.sublabel}</p>
           </div>
         </div>
-        <p className="text-[13px] text-muted-foreground leading-relaxed flex-1">{stage.description}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed flex-1">{stage.description}</p>
         {/* Subtle data-line decoration */}
         <div className="mt-4 flex items-center gap-1.5" aria-hidden="true">
           <div className={`h-1 w-1 rounded-full ${accent.dot}`} />

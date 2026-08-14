@@ -27,7 +27,7 @@ const LIVE_MODULES = [
 const PARTIAL_MODULE = {
   id: "M09",
   name: "Output Package",
-  oneLiner: "The packaging concept behind Nectar — structured platform output with deeper campaign packaging next.",
+  oneLiner: "The packaging concept behind Nectar, structured platform output with deeper campaign packaging next.",
   capabilities: ["Usable content output", "Platform variants"],
 };
 
@@ -59,10 +59,10 @@ function LiveModuleCard({ mod, index }: { mod: (typeof LIVE_MODULES)[number]; in
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed mb-4">{mod.oneLiner}</p>
         <div className="mb-5">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-2">Capabilities</p>
+          <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground/80 mb-2">Capabilities</p>
           <ul className="space-y-1.5">
             {mod.capabilities.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-[13px] text-foreground/70">
+              <li key={item} className="flex items-start gap-2 text-sm text-foreground/85">
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-electric" />
                 {item}
               </li>
@@ -93,10 +93,10 @@ export default function ModulesPage() {
 
       <NectarOrbs />
       <section className="mx-auto max-w-5xl px-4 sm:px-6 pt-16 sm:pt-24 pb-10">
-        <motion.p className="font-mono text-xs tracking-widest uppercase text-electric mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Nectar Architecture</motion.p>
-        <motion.h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>What Nectar does today</motion.h1>
+        <motion.p className="font-mono text-base sm:text-lg tracking-widest uppercase text-electric mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Nectar Architecture</motion.p>
+        <motion.h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>What Nectar performs for all of us today</motion.h1>
         <motion.p className="mt-4 text-muted-foreground max-w-2xl text-base sm:text-lg leading-relaxed" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-          Two modules are live and ready to use. A third is in progress. Everything else is on the drawing board — not advertised as coming soon, not behind a paywall, just future product direction.
+          Two modules are live and ready to use. A third is in progress. Everything else is on the drawing board, not advertised as coming soon, not behind a paywall, just future product direction.
         </motion.p>
       </section>
 
@@ -132,7 +132,7 @@ export default function ModulesPage() {
             <div>
               <ul className="space-y-1.5">
                 {PARTIAL_MODULE.capabilities.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-[13px] text-foreground/60">
+                  <li key={item} className="flex items-start gap-2 text-sm text-foreground/75">
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400/60" />
                     {item}
                   </li>
@@ -146,10 +146,10 @@ export default function ModulesPage() {
       {/* NEXT modules — single condensed line */}
       <section className="mx-auto max-w-5xl px-4 sm:px-6 pb-12">
         <motion.p
-          className="text-xs text-muted-foreground/50 leading-relaxed"
+          className="text-sm text-muted-foreground/70 leading-relaxed"
           initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
         >
-          <Layers className="inline h-3.5 w-3.5 mr-1.5 -mt-0.5 text-muted-foreground/40" aria-hidden="true" />
+          <Layers className="inline h-3.5 w-3.5 mr-1.5 -mt-0.5 text-muted-foreground/60" aria-hidden="true" />
           Additional modules in development: Niche Intelligence, Content Architecture, Funnel Blueprint, Email Sequence Engine, Landing Page Builder, and Analytics Framework.
         </motion.p>
       </section>

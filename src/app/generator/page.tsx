@@ -197,8 +197,8 @@ export default function GeneratorPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           The generator needs offer-level context to produce relevant content.
-          Paste everything you have — network dashboards, emails, landing-page
-          copy, offer sheets — and the engine will parse the fields.
+          Paste everything you have: network dashboards, emails, landing-page
+          copy, or offer sheets, and the engine will parse the fields.
         </motion.p>
 
         <CompactTransformationRail currentStep={currentStep} />
@@ -255,13 +255,13 @@ export default function GeneratorPage() {
               </button>
             </div>
             <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
-              This is where you paste YOUR offer — drop in the raw details from your network dashboard, email, or offer page below.
+              This is where you paste YOUR offer. Drop in the raw details from your network dashboard, email, or offer page below.
             </p>
             <textarea
               value={pasteText}
               onChange={(e) => setPasteText(e.target.value)}
               className="w-full h-56 sm:h-64 rounded-xl border border-border/60 bg-surface text-foreground/80 font-mono text-sm p-5 resize-none focus:outline-none focus:ring-1 focus:ring-electric/30"
-              placeholder={"Offer Name — Product Description\nNetwork: NetworkName | Offer ID: XX-0001\nVertical: Health & Wellness\nPayout: $40 CPA (CC Submit)\nConversion Flow: Free Trial → CC Submit → Rebill\nAvailable Countries: US, CA, UK\nLanding Page: https://...\nBanned Traffic: Incentivized, Bot, Brand Search\nSub-ID Format: {sub1}_{sub2}_{sub3}\n\nKey product details:\n- Feature 1\n- Feature 2\n- Target audience: ...\n- Unique angle: ..."}
+              placeholder={"Offer Name \u2014 Product Description\nNetwork: NetworkName | Offer ID: XX-0001\nVertical: Health & Wellness\nPayout: $40 CPA (CC Submit)\nConversion Flow: Free Trial → CC Submit → Rebill\nAvailable Countries: US, CA, UK\nLanding Page: https://...\nBanned Traffic: Incentivized, Bot, Brand Search\nSub-ID Format: {sub1}_{sub2}_{sub3}\n\nKey product details:\n- Feature 1\n- Feature 2\n- Target audience: ...\n- Unique angle: ..."}
             />
           </motion.div>
 
