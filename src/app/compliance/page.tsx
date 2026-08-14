@@ -38,7 +38,7 @@ function ExpandableRow({ row, index }: { row: (typeof PLATFORM_MATRIX)[number]; 
         <td className="px-5 py-4 text-foreground font-medium whitespace-nowrap">
           <span className="flex items-center gap-2">
             {isLong && (
-              <span className="text-muted-foreground/50">
+              <span className="text-muted-foreground/70">
                 {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
               </span>
             )}

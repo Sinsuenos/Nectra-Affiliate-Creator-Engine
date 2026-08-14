@@ -19,7 +19,7 @@ export function BottomNavRow() {
             {i > 0 && <span className="text-amber-400/25 mr-4 select-none">|</span>}
             <Link
               href={link.href}
-              className="text-amber-400/60 hover:text-amber-400 transition-colors duration-200"
+              className="text-amber-400/80 hover:text-amber-400 transition-colors duration-200"
             >
               {link.label}
             </Link>

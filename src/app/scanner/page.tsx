@@ -377,7 +377,7 @@ function ScannerInner() {
             </motion.div>
           )}
 
-          <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+          <p className="text-xs text-muted-foreground/75 leading-relaxed">
             AI-generated compliance guidance is informational only. Platform policies can change, and final responsibility for posted content remains with the user.
           </p>
         </motion.div>
