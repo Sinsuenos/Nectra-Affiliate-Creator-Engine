@@ -52,8 +52,12 @@ const sections = [
     body: `Depending on your jurisdiction, you may have the right to access, correct, or delete any personal information we hold about you. To exercise these rights, contact us using the information provided below. We will respond within a reasonable timeframe.`,
   },
   {
+    heading: "Session Data",
+    body: `Each user receives 3 free content generations. Your generated content lives only in your browser session. Copy or save anything you want to keep. Once you navigate away, refresh the page, or clear your browser data, your pasted offers and generated output are gone. We do not store your pasted offers or generated output on our servers.`,
+  },
+  {
     heading: "Contact",
-    body: `For privacy-related questions or requests, contact us through the support channel provided with your purchase.`,
+    body: `For privacy-related questions or requests, email us at sinaloainspireddreams@gmail.com.`,
   },
 ];
 
