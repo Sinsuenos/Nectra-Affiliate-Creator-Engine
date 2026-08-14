@@ -27,9 +27,9 @@ export default function Home() {
         </div>
 
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 text-center">
-          <motion.p className="font-mono text-xs tracking-widest uppercase text-electric mb-5 font-semibold" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>Nectar Engine · Affiliate Content Transformation</motion.p>
+          <motion.p className="font-mono text-sm sm:text-base tracking-widest uppercase text-electric mb-5 font-semibold" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>Nectar Engine · Affiliate Content Transformation</motion.p>
           <motion.h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.02] text-white drop-shadow-[0_4px_28px_rgba(0,0,0,0.35)]" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
-            One Offer.<br /><span className="bg-gradient-to-r from-electric via-fuchsia-300 to-lime-200 bg-clip-text text-transparent">Multiple <span className="text-amber-400">Campaign</span> Directions. Nine Platforms.</span>
+            One Offer.<br /><span className="bg-gradient-to-r from-electric via-fuchsia-300 to-lime-200 bg-clip-text text-transparent">Nine Platform-Ready Campaigns.</span>
           </motion.h1>
           <motion.p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg text-zinc-100 leading-relaxed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>Paste an affiliate offer once. Nectar extracts what matters, turns the source into distinct campaign directions and platform-ready content, then checks the copy before you publish it.</motion.p>
           <div className="mt-6 space-y-1">
