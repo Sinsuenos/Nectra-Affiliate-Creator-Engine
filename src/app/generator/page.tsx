@@ -57,6 +57,8 @@ const fadeUp = {
 
 const FREE_GENERATION_LIMIT = 3;
 const STORAGE_KEY = "nectar_generation_count";
+const UNLOCK_STORAGE_KEY = "nectar_access_unlocked";
+const ACCESS_TOKEN = "xf7-bk3m-qd82-pz14-wr59";
 const TOOLKIT_STORAGE_KEY = "nectar_last_toolkit";
 const SCAN_PAYLOAD_KEY = "nectar_scan_payload";
 
@@ -70,11 +72,27 @@ export default function GeneratorPage() {
   const [toolkit, setToolkit] = useState<GeneratedToolkit | null>(null);
   const [usedFallback, setUsedFallback] = useState(false);
   const [generationCount, setGenerationCount] = useState(0);
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) setGenerationCount(Number(stored) || 0);
+
+      // Check persisted unlock first
+      const unlockStored = localStorage.getItem(UNLOCK_STORAGE_KEY);
+      if (unlockStored === "true") {
+        setIsUnlocked(true);
+      } else {
+        // Check for access token in URL
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("access");
+        if (token === ACCESS_TOKEN) {
+          localStorage.setItem(UNLOCK_STORAGE_KEY, "true");
+          setIsUnlocked(true);
+        }
+      }
+
       const saved = localStorage.getItem(TOOLKIT_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved) as { toolkit?: GeneratedToolkit; pasteText?: string };
@@ -89,7 +107,7 @@ export default function GeneratorPage() {
     }
   }, []);
 
-  const limitReached = generationCount >= FREE_GENERATION_LIMIT;
+  const limitReached = !isUnlocked && generationCount >= FREE_GENERATION_LIMIT;
   const currentStep = hasGenerated ? 3 : isGenerating ? 2 : 1;
   const offerName = hasGenerated
     ? pasteText.split("\n")[0].replace(/[^a-zA-Z0-9]/g, "_").toLowerCase().slice(0, 40)
@@ -265,6 +283,7 @@ export default function GeneratorPage() {
             />
           </motion.div>
 
+          {!isUnlocked && (
           <motion.div variants={fadeUp} custom={1}>
             <p className="font-mono text-xs text-muted-foreground">
               {remainingGenerations > 0
@@ -272,6 +291,7 @@ export default function GeneratorPage() {
                 : "Free generation limit reached"}
             </p>
           </motion.div>
+          )}
 
           <motion.div variants={fadeUp} custom={2}>
             {parsedFields.length > 0 &&
