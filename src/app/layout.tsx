@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
@@ -47,6 +48,20 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <span className="text-sm font-semibold text-amber-400">Frequently Asked Questions. Unfortunately.</span>
         </Link>
         <Analytics />
+        {/* Google Analytics 4 — site-wide, fires on every page via root layout */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-BN8WC7DQB6"
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-BN8WC7DQB6');
+          `}
+        </Script>
       </body>
     </html>
   );
