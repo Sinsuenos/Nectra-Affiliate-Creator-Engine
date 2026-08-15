@@ -170,11 +170,14 @@ function PlatformChip({
     <button
       type="button"
       onClick={() => onToggle(platform)}
+      aria-pressed={selected}
       className={selected
-        ? "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-base font-mono font-medium border bg-electric/10 text-electric border-electric/30 transition-all cursor-pointer"
-        : "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-base font-mono font-medium border bg-surface text-muted-foreground border-border/40 hover:text-foreground hover:border-border/60 transition-all cursor-pointer"}
+        ? "inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-mono font-semibold border-2 bg-electric text-background border-electric shadow-[0_0_12px_rgba(37,191,255,0.45)] transition-all cursor-pointer"
+        : "inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-mono font-medium border bg-surface text-muted-foreground/70 border-border/40 hover:text-foreground hover:border-border/80 hover:bg-surface-raised transition-all cursor-pointer"}
     >
-      <span className={selected ? "h-1.5 w-1.5 rounded-full bg-electric" : "h-1.5 w-1.5 rounded-full bg-muted-foreground/30"} />
+      <span className={selected
+        ? "h-2 w-2 rounded-full bg-background ring-2 ring-background/40"
+        : "h-2 w-2 rounded-full bg-muted-foreground/40"} />
       {platform}
     </button>
   );
@@ -340,10 +343,18 @@ function ScannerInner() {
           </motion.div>
 
           <motion.div variants={fadeUp} custom={1}>
-            <p className="font-mono text-base uppercase tracking-wider text-muted-foreground mb-3">Platforms</p>
+            <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
+              <p className="font-mono text-base uppercase tracking-wider text-muted-foreground">Platforms</p>
+              <p className="text-base text-muted-foreground/80 italic">Tap to select. Fewer platforms scan faster.</p>
+            </div>
             <div className="flex flex-wrap gap-2">
               {ALL_PLATFORMS.map((p) => <PlatformChip key={p} platform={p} selected={selectedPlatforms.has(p)} onToggle={togglePlatform} />)}
             </div>
+            <p className="mt-3 text-base text-electric/85 font-mono">
+              {selectedPlatforms.size === 0
+                ? "No platforms selected — pick at least one."
+                : `${selectedPlatforms.size} platform${selectedPlatforms.size === 1 ? "" : "s"} selected`}
+            </p>
           </motion.div>
 
           <motion.div variants={fadeUp} custom={2} className="space-y-3">
