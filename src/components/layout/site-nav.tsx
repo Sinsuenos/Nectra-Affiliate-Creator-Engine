@@ -23,7 +23,7 @@ export function SiteNav() {
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2.5 text-sm font-bold tracking-[0.18em] uppercase text-white hover:text-electric transition-colors"
+          className="flex items-center gap-2.5 text-lg font-bold tracking-[0.18em] uppercase text-white hover:text-electric transition-colors"
         >
           <img src="/favicon.svg" alt="" className="h-5 w-5 rounded-sm" aria-hidden="true" />
           Nectar
@@ -36,10 +36,10 @@ export function SiteNav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-2 rounded-md text-xs font-semibold tracking-wide transition-all ${
+                className={`px-3 py-2 rounded-md text-base font-semibold tracking-wide transition-all ${
                   active
                     ? "bg-electric/15 text-electric shadow-[inset_0_0_18px_rgba(34,184,255,0.08)]"
-                    : "text-zinc-300 hover:text-white hover:bg-white/[0.07]"
+                    : "text-zinc-100 hover:text-white hover:bg-white/[0.07]"
                 }`}
               >
                 {link.label}
@@ -50,14 +50,14 @@ export function SiteNav() {
             href={GUMROAD_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-2 px-4 py-2 rounded-md text-xs font-bold tracking-wide bg-electric hover:bg-sky-300 text-[#071019] transition-all shadow-[0_0_20px_rgba(34,184,255,0.22)]"
+            className="ml-2 px-4 py-2 rounded-md text-base font-bold tracking-wide bg-electric hover:bg-sky-300 text-[#071019] transition-all shadow-[0_0_20px_rgba(34,184,255,0.22)]"
           >
             Get Nectar Engine
           </a>
         </div>
 
         <button
-          className="sm:hidden p-2 rounded-md text-zinc-200 hover:text-white hover:bg-white/[0.07] transition-colors"
+          className="sm:hidden p-2 rounded-md text-zinc-100 hover:text-white hover:bg-white/[0.07] transition-colors"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
@@ -75,10 +75,10 @@ export function SiteNav() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className={`px-3 py-2.5 rounded-md text-sm font-semibold transition-colors ${
+                  className={`px-3 py-2.5 rounded-md text-lg font-semibold transition-colors ${
                     active
                       ? "bg-electric/15 text-electric"
-                      : "text-zinc-200 hover:text-white hover:bg-white/[0.07]"
+                      : "text-zinc-100 hover:text-white hover:bg-white/[0.07]"
                   }`}
                 >
                   {link.label}
@@ -90,7 +90,7 @@ export function SiteNav() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setOpen(false)}
-              className="mt-1 px-3 py-2.5 rounded-md text-sm font-bold bg-electric hover:bg-sky-300 text-[#071019] transition-colors text-center"
+              className="mt-1 px-3 py-2.5 rounded-md text-lg font-bold bg-electric hover:bg-sky-300 text-[#071019] transition-colors text-center"
             >
               Get Nectar Engine
             </a>

@@ -42,7 +42,7 @@ const scanExamples = [
 ];
 
 function Block({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="rounded-xl bg-background/60 border border-border/40 p-5 sm:p-6"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">{label}</p>{children}</div>;
+  return <div className="rounded-xl bg-background/60 border border-border/40 p-5 sm:p-6"><p className="font-mono text-sm uppercase tracking-wider text-muted-foreground mb-4">{label}</p>{children}</div>;
 }
 
 export default function SamplePage() {
@@ -51,9 +51,9 @@ export default function SamplePage() {
       <NectarOrbs />
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-24">
       <motion.header initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-        <p className="font-mono text-xs tracking-widest uppercase text-electric mb-3">Transformation Preview</p>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-4">Watch one offer become usable content.</h1>
-        <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">
+        <p className="font-mono text-base tracking-widest uppercase text-electric mb-3">Transformation Preview</p>
+        <h1 className="text-5xl sm:text-6xl md:text-6xl font-bold tracking-tight mb-4">Watch one offer become usable content.</h1>
+        <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
           This page is a visual example of the transformation Nectar is designed to perform. It uses intentionally generic language so we never pass invented testimonials, ratings, clinical results, or product facts off as real data.
         </p>
       </motion.header>
@@ -63,10 +63,10 @@ export default function SamplePage() {
       <motion.div className="grid gap-5" initial="hidden" animate="visible">
         <motion.div variants={fadeUp} custom={1}>
           <Block label="01 · Offer Input">
-            <div className="grid sm:grid-cols-3 gap-3 font-mono text-sm">
-              <div className="rounded-lg border border-border/40 bg-surface p-4"><span className="text-muted-foreground block text-xs mb-1">offer</span>Example Product</div>
-              <div className="rounded-lg border border-border/40 bg-surface p-4"><span className="text-muted-foreground block text-xs mb-1">audience</span>Defined by the seller</div>
-              <div className="rounded-lg border border-border/40 bg-surface p-4"><span className="text-muted-foreground block text-xs mb-1">goal</span>Platform-ready promotion</div>
+            <div className="grid sm:grid-cols-3 gap-3 font-mono text-lg">
+              <div className="rounded-lg border border-border/40 bg-surface p-4"><span className="text-muted-foreground block text-base mb-1">offer</span>Example Product</div>
+              <div className="rounded-lg border border-border/40 bg-surface p-4"><span className="text-muted-foreground block text-base mb-1">audience</span>Defined by the seller</div>
+              <div className="rounded-lg border border-border/40 bg-surface p-4"><span className="text-muted-foreground block text-base mb-1">goal</span>Platform-ready promotion</div>
             </div>
           </Block>
         </motion.div>
@@ -76,9 +76,9 @@ export default function SamplePage() {
             <div className="grid md:grid-cols-3 gap-4">
               {angleExamples.map((angle) => (
                 <div key={angle.label} className="rounded-xl border border-electric/20 bg-electric/[0.03] p-5 hover:border-electric/35 hover:bg-electric/[0.06] transition-all duration-200">
-                  <p className="font-mono text-[10px] tracking-widest text-electric mb-2">{angle.label}</p>
+                  <p className="font-mono text-xs tracking-widest text-electric mb-2">{angle.label}</p>
                   <h2 className="font-bold mb-2">{angle.title}</h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{angle.hook}</p>
+                  <p className="text-lg text-muted-foreground leading-relaxed">{angle.hook}</p>
                 </div>
               ))}
             </div>
@@ -90,8 +90,8 @@ export default function SamplePage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {platformExamples.map((item) => (
                 <div key={item.platform} className="rounded-lg border border-border/40 bg-surface p-4 hover:border-border/60 transition-colors duration-200">
-                  <div className="flex items-center justify-between mb-2"><span className="font-mono text-sm text-electric">{item.platform}</span><ArrowRight className="h-3.5 w-3.5 text-muted-foreground" /></div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
+                  <div className="flex items-center justify-between mb-2"><span className="font-mono text-lg text-electric">{item.platform}</span><ArrowRight className="h-3.5 w-3.5 text-muted-foreground" /></div>
+                  <p className="text-lg text-muted-foreground leading-relaxed">{item.text}</p>
                 </div>
               ))}
             </div>
@@ -103,8 +103,8 @@ export default function SamplePage() {
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
               {scanExamples.map((item) => { const borderColor = item.status === "FAIL" ? "border-l-red-500/50 bg-red-500/[0.03]" : item.status === "WARN" ? "border-l-amber-400/40 bg-amber-500/[0.03]" : "border-l-emerald-500/30"; return (
                 <div key={item.platform} className={`rounded-lg border border-border/40 border-l-2 ${borderColor} bg-surface p-4 hover:border-border/60 transition-colors duration-200`}>
-                  <div className="flex items-center gap-2 mb-2"><ShieldCheck className={`h-4 w-4 ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`} /><span className="font-mono text-sm">{item.platform}</span><span className={`ml-auto text-[10px] font-mono font-semibold ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`}>{item.status}</span></div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.detail}</p>
+                  <div className="flex items-center gap-2 mb-2"><ShieldCheck className={`h-4 w-4 ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`} /><span className="font-mono text-lg">{item.platform}</span><span className={`ml-auto text-xs font-mono font-semibold ${item.status === "FAIL" ? "text-red-400" : item.status === "WARN" ? "text-amber-400" : "text-emerald-400"}`}>{item.status}</span></div>
+                  <p className="text-lg text-muted-foreground leading-relaxed">{item.detail}</p>
                 </div>
               ); })}
             </div>
@@ -116,17 +116,17 @@ export default function SamplePage() {
             <div className="flex items-center gap-3">
               <ShieldCheck className="h-5 w-5 text-electric shrink-0" />
               <div>
-                <p className="font-mono text-sm font-semibold text-foreground group-hover:text-electric transition-colors">Try the Scanner with your own content</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Paste any post and get instant Pass / Warning / Fail results across platforms.</p>
+                <p className="font-mono text-lg font-semibold text-foreground group-hover:text-electric transition-colors">Try the Scanner with your own content</p>
+                <p className="text-base text-muted-foreground mt-0.5">Paste any post and get instant Pass / Warning / Fail results across platforms.</p>
               </div>
             </div>
-            <ArrowRight className="h-5 w-5 text-electric/60 group-hover:text-electric group-hover:translate-x-1 transition-all shrink-0 ml-4" />
+            <ArrowRight className="h-5 w-5 text-electric/80 group-hover:text-electric group-hover:translate-x-1 transition-all shrink-0 ml-4" />
           </Link>
         </motion.div>
 
         <motion.div variants={fadeUp} custom={6}>
           <div className="rounded-xl border border-electric/20 bg-electric/[0.03] p-6 sm:p-8">
-            <div className="flex items-start gap-3"><Sparkles className="h-5 w-5 text-electric mt-0.5 shrink-0" /><div><p className="font-mono text-[11px] uppercase tracking-wider text-electric mb-2">Important</p><h2 className="text-xl font-bold mb-2">The data stays yours.</h2><p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">When you paste a real offer into the Generator, use its actual details as the source of truth. Nectar should not manufacture reviews, clinical evidence, guarantees, or other facts to make copy sound more convincing.</p></div></div>
+            <div className="flex items-start gap-3"><Sparkles className="h-5 w-5 text-electric mt-0.5 shrink-0" /><div><p className="font-mono text-sm uppercase tracking-wider text-electric mb-2">Important</p><h2 className="text-3xl font-bold mb-2">The data stays yours.</h2><p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">When you paste a real offer into the Generator, use its actual details as the source of truth. Nectar should not manufacture reviews, clinical evidence, guarantees, or other facts to make copy sound more convincing.</p></div></div>
           </div>
         </motion.div>
       </motion.div>

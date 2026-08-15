@@ -80,11 +80,11 @@ function PipelineCard({ stage, index }: { stage: RailStage; index: number }) {
             <Icon className={`h-4 w-4 ${accent.iconText}`} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-mono text-xs tracking-widest uppercase text-muted-foreground/85 mb-0.5">{stage.label}</p>
-            <p className="text-sm font-semibold text-foreground/90">{stage.sublabel}</p>
+            <p className="font-mono text-base tracking-widest uppercase text-muted-foreground/95 mb-0.5">{stage.label}</p>
+            <p className="text-lg font-semibold text-foreground">{stage.sublabel}</p>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed flex-1">{stage.description}</p>
+        <p className="text-lg text-muted-foreground leading-relaxed flex-1">{stage.description}</p>
         {/* Subtle data-line decoration */}
         <div className="mt-4 flex items-center gap-1.5" aria-hidden="true">
           <div className={`h-1 w-1 rounded-full ${accent.dot}`} />
@@ -110,10 +110,10 @@ export function TransformationRail() {
       whileInView="visible"
       viewport={{ once: true, margin: "-60px" }}
     >
-      <motion.div className="font-mono text-sm tracking-widest uppercase text-electric mb-2 text-center" variants={nodeVariants}>
+      <motion.div className="font-mono text-lg tracking-widest uppercase text-electric mb-2 text-center" variants={nodeVariants}>
         The Pipeline
       </motion.div>
-      <motion.p className="text-lg sm:text-xl text-muted-foreground/80 text-center mb-10 sm:mb-14 max-w-lg mx-auto" variants={nodeVariants}>
+      <motion.p className="text-2xl sm:text-3xl text-muted-foreground/95 text-center mb-10 sm:mb-14 max-w-lg mx-auto" variants={nodeVariants}>
         From raw offer to campaign-ready content.
       </motion.p>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
@@ -144,12 +144,12 @@ function getProgressLabel(currentStep: number): string {
 
 function CompactNode({ stage, state }: { stage: RailStage; state: "done" | "active" | "next" | "locked" }) {
   const Icon = stage.icon;
-  if (state === "locked") return <div className="flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-full border border-fuchsia-400/20 text-fuchsia-200/65 select-none"><Icon className="h-3 w-3 shrink-0" /><span className="font-mono text-[8px] sm:text-[10px] uppercase tracking-wider">{stage.label}</span><span className="font-mono text-[7px] sm:text-[8px] uppercase tracking-widest px-1 sm:px-1.5 py-px rounded-full border border-fuchsia-400/25 text-fuchsia-200/75 bg-fuchsia-400/[0.06]">Next</span></div>;
-  const styles = state === "active" ? "bg-electric/10 text-electric border border-electric/30 shadow-sm shadow-electric/10" : state === "done" ? "text-electric/75" : "text-muted-foreground/70";
-  return <div className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-full transition-colors ${styles}`}><Icon className="h-3.5 w-3.5 shrink-0" /><span className="font-mono text-[8px] sm:text-[10px] uppercase tracking-wider">{stage.label}</span></div>;
+  if (state === "locked") return <div className="flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-full border border-fuchsia-400/20 text-fuchsia-200/65 select-none"><Icon className="h-3 w-3 shrink-0" /><span className="font-mono text-xs sm:text-xs uppercase tracking-wider">{stage.label}</span><span className="font-mono text-[11px] sm:text-xs uppercase tracking-widest px-1 sm:px-1.5 py-px rounded-full border border-fuchsia-400/25 text-fuchsia-200/75 bg-fuchsia-400/[0.06]">Next</span></div>;
+  const styles = state === "active" ? "bg-electric/10 text-electric border border-electric/30 shadow-sm shadow-electric/10" : state === "done" ? "text-electric/90" : "text-muted-foreground/90";
+  return <div className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-full transition-colors ${styles}`}><Icon className="h-3.5 w-3.5 shrink-0" /><span className="font-mono text-xs sm:text-xs uppercase tracking-wider">{stage.label}</span></div>;
 }
 
 export function CompactTransformationRail({ currentStep }: CompactRailProps) {
   const progressLabel = getProgressLabel(currentStep);
-  return <div><div className="flex items-center gap-0.5 sm:gap-2 mt-6 mb-1 flex-wrap">{RAIL_STAGES.map((stage, i) => { const stageState = getStageState(stage.id, currentStep); return <div key={stage.id} className="flex items-center">{i > 0 && <span className={`h-px w-1.5 sm:w-4 mr-0.5 sm:mr-1 ${stageState === "locked" ? "bg-fuchsia-400/20" : stageState === "done" || stageState === "active" ? "bg-electric/55" : "bg-border/45"}`} />}{<CompactNode stage={stage} state={stageState} />}</div>; })}</div>{progressLabel && <p className="font-mono text-[10px] text-muted-foreground/75 mb-2">Current stage: <span className="text-electric">{progressLabel}</span></p>}</div>;
+  return <div><div className="flex items-center gap-0.5 sm:gap-2 mt-6 mb-1 flex-wrap">{RAIL_STAGES.map((stage, i) => { const stageState = getStageState(stage.id, currentStep); return <div key={stage.id} className="flex items-center">{i > 0 && <span className={`h-px w-1.5 sm:w-4 mr-0.5 sm:mr-1 ${stageState === "locked" ? "bg-fuchsia-400/20" : stageState === "done" || stageState === "active" ? "bg-electric/55" : "bg-border/45"}`} />}{<CompactNode stage={stage} state={stageState} />}</div>; })}</div>{progressLabel && <p className="font-mono text-xs text-muted-foreground/90 mb-2">Current stage: <span className="text-electric">{progressLabel}</span></p>}</div>;
 }

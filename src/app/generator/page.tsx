@@ -193,7 +193,7 @@ export default function GeneratorPage() {
 
       <section className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-12">
         <motion.p
-          className="font-mono text-xs tracking-widest uppercase text-electric mb-3"
+          className="font-mono text-base tracking-widest uppercase text-electric mb-3"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
@@ -201,7 +201,7 @@ export default function GeneratorPage() {
           Smart Paste
         </motion.p>
         <motion.h1
-          className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
+          className="text-5xl sm:text-6xl md:text-6xl font-bold tracking-tight"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -209,7 +209,7 @@ export default function GeneratorPage() {
           Paste Your Offer Details
         </motion.h1>
         <motion.p
-          className="mt-4 text-muted-foreground max-w-xl text-base sm:text-lg leading-relaxed"
+          className="mt-4 text-muted-foreground max-w-xl text-xl sm:text-2xl leading-relaxed"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -226,11 +226,11 @@ export default function GeneratorPage() {
         <div className="rounded-lg border border-border/40 bg-surface/60 p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-3">
             <BookOpen className="h-4 w-4 text-electric" />
-            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            <p className="font-mono text-base uppercase tracking-wider text-muted-foreground">
               For best results, include:
             </p>
           </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-lg text-muted-foreground">
             {[
               "Offer name",
               "Network",
@@ -259,33 +259,33 @@ export default function GeneratorPage() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <ClipboardPaste className="h-4 w-4 text-electric" />
-                <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                <p className="font-mono text-base uppercase tracking-wider text-muted-foreground">
                   Raw Paste Input
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setPasteText(DEMO_PASTE)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground hover:border-electric/30 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-base font-mono text-muted-foreground hover:text-foreground hover:border-electric/30 transition-colors"
               >
                 <FileText className="h-3.5 w-3.5" />
                 Load Example
               </button>
             </div>
-            <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+            <p className="text-lg text-muted-foreground mb-3 leading-relaxed">
               This is where you paste YOUR offer. Drop in the raw details from your network dashboard, email, or offer page below.
             </p>
             <textarea
               value={pasteText}
               onChange={(e) => setPasteText(e.target.value)}
-              className="w-full h-56 sm:h-64 rounded-xl border border-border/60 bg-surface text-foreground/80 font-mono text-sm p-5 resize-none focus:outline-none focus:ring-1 focus:ring-electric/30"
+              className="w-full h-56 sm:h-64 rounded-xl border border-border/60 bg-surface text-foreground/95 font-mono text-lg p-5 resize-none focus:outline-none focus:ring-1 focus:ring-electric/30"
               placeholder={"Offer Name \u2014 Product Description\nNetwork: NetworkName | Offer ID: XX-0001\nVertical: Health & Wellness\nPayout: $40 CPA (CC Submit)\nConversion Flow: Free Trial → CC Submit → Rebill\nAvailable Countries: US, CA, UK\nLanding Page: https://...\nBanned Traffic: Incentivized, Bot, Brand Search\nSub-ID Format: {sub1}_{sub2}_{sub3}\n\nKey product details:\n- Feature 1\n- Feature 2\n- Target audience: ...\n- Unique angle: ..."}
             />
           </motion.div>
 
           {!isUnlocked && (
           <motion.div variants={fadeUp} custom={1}>
-            <p className="font-mono text-xs text-muted-foreground">
+            <p className="font-mono text-base text-muted-foreground">
               {remainingGenerations > 0
                 ? `${remainingGenerations} free generation${remainingGenerations === 1 ? "" : "s"} remaining`
                 : "Free generation limit reached"}
@@ -299,7 +299,7 @@ export default function GeneratorPage() {
                 <>
                   <div className="flex items-center gap-2 mb-3">
                     <ClipboardPaste className="h-4 w-4 text-electric" />
-                    <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                    <p className="font-mono text-base uppercase tracking-wider text-muted-foreground">
                       Parsed Fields
                     </p>
                   </div>
@@ -315,11 +315,11 @@ export default function GeneratorPage() {
           <motion.div variants={fadeUp} custom={3}>
             <button
               onClick={() => setShowSubIDs(!showSubIDs)}
-              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
+              className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
             >
               <Tag className="h-4 w-4 text-electric" />
               Platform Sub-IDs
-              <span className="text-xs text-muted-foreground/60 font-mono">(optional)</span>
+              <span className="text-base text-muted-foreground/80 font-mono">(optional)</span>
               <span className="ml-auto">
                 {showSubIDs ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
               </span>
@@ -327,7 +327,7 @@ export default function GeneratorPage() {
 
             {showSubIDs && (
               <div className="mt-3 rounded-xl border border-border/60 bg-surface p-4 sm:p-5">
-                <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+                <p className="text-base text-muted-foreground mb-4 leading-relaxed">
                   Per-platform tracking tags appended to generated links. Edit
                   the tag format for each platform below.
                 </p>
@@ -350,14 +350,14 @@ export default function GeneratorPage() {
           <motion.div variants={fadeUp} custom={4}>
             {limitReached ? (
               <div className="rounded-xl border border-electric/20 bg-electric/5 p-6 text-center space-y-3">
-                <p className="text-sm text-foreground font-medium">
+                <p className="text-lg text-foreground font-medium">
                   You've used all {FREE_GENERATION_LIMIT} free generations.
                 </p>
                 <a
                   href={GUMROAD_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-lg rounded-lg transition-colors"
                 >
                   GET NECTAR ENGINE
                   <ExternalLink className="h-4 w-4" />
@@ -367,7 +367,7 @@ export default function GeneratorPage() {
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating}
-                className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-lg rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
               >
                 {isGenerating ? (
                   <>
@@ -390,7 +390,7 @@ export default function GeneratorPage() {
               animate={{ opacity: 1, y: 0 }}
               className="rounded-lg border border-red-500/30 bg-red-500/5 p-4"
             >
-              <p className="text-sm text-red-400 font-medium">{error}</p>
+              <p className="text-lg text-red-400 font-medium">{error}</p>
             </motion.div>
           )}
         </motion.div>
@@ -407,10 +407,10 @@ export default function GeneratorPage() {
             >
               <div className="flex items-center gap-3 mb-8">
                 <div className="h-3 w-3 rounded-full bg-electric" />
-                <span className="font-mono text-xs text-muted-foreground">
+                <span className="font-mono text-base text-muted-foreground">
                   {offerName}_toolkit_v1.0.json
                 </span>
-                <span className="font-mono text-[10px] uppercase text-electric/60 ml-auto">
+                <span className="font-mono text-xs uppercase text-electric/80 ml-auto">
                   AI Generated
                 </span>
               </div>
@@ -421,7 +421,7 @@ export default function GeneratorPage() {
                     <a
                       key={s.id}
                       href={`#gen-${s.id}`}
-                      className="shrink-0 px-3 py-1.5 rounded-md text-[11px] font-mono font-medium text-muted-foreground/70 hover:text-electric hover:bg-electric/[0.06] transition-colors"
+                      className="shrink-0 px-3 py-1.5 rounded-md text-sm font-mono font-medium text-muted-foreground/90 hover:text-electric hover:bg-electric/[0.06] transition-colors"
                     >
                       {s.label}
                     </a>
@@ -443,7 +443,7 @@ export default function GeneratorPage() {
                   transition={{ duration: 0.4, delay: 0.3 }}
                   className="space-y-3"
                 >
-                  <p className="text-xs text-muted-foreground font-mono">
+                  <p className="text-base text-muted-foreground font-mono">
                     {countToolkitBlocks(displayToolkit)} blocks in this toolkit · saved in this browser
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
@@ -462,7 +462,7 @@ export default function GeneratorPage() {
                           router.push("/scanner");
                         }
                       }}
-                      className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center gap-2"
+                      className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-lg rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center gap-2"
                     >
                       <ShieldCheck className="h-4 w-4" />
                       Check This Toolkit
@@ -473,7 +473,7 @@ export default function GeneratorPage() {
                       onClick={() => {
                         navigator.clipboard.writeText(buildFullToolkitText(displayToolkit));
                       }}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-border/50 bg-surface hover:bg-surface-raised px-6 h-12 text-sm font-mono text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-border/50 bg-surface hover:bg-surface-raised px-6 h-12 text-lg font-mono text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                     >
                       <Copy className="h-4 w-4" />
                       Copy Full Toolkit

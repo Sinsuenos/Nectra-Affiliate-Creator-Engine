@@ -13,7 +13,7 @@ const NAV_LINKS = [
 export function BottomNavRow() {
   return (
     <nav className="mx-auto max-w-5xl px-4 sm:px-6 pb-16 sm:pb-20">
-      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs font-medium tracking-wide">
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-base font-medium tracking-wide">
         {NAV_LINKS.map((link, i) => (
           <span key={link.href} className="flex items-center">
             {i > 0 && <span className="text-amber-400/25 mr-4 select-none">|</span>}

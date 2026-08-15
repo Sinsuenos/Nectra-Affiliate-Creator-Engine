@@ -24,7 +24,7 @@ export function BottomNextNav({ currentPage }: { currentPage: string }) {
       <Link
         href={next.id}
         prefetch={true}
-        className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white font-semibold px-6 py-2.5 rounded-full shadow-lg hover:shadow-amber-500/30 transition-all text-sm"
+        className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white font-semibold px-6 py-2.5 rounded-full shadow-lg hover:shadow-amber-500/30 transition-all text-lg"
       >
         {isLast ? "Back to Home" : `Next: ${next.label}`}
         <ChevronRight className="h-4 w-4" />

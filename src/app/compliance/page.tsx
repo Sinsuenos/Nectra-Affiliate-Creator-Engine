@@ -38,13 +38,13 @@ function ExpandableRow({ row, index }: { row: (typeof PLATFORM_MATRIX)[number]; 
         <td className="px-5 py-4 text-foreground font-medium whitespace-nowrap">
           <span className="flex items-center gap-2">
             {isLong && (
-              <span className="text-muted-foreground/70">
+              <span className="text-muted-foreground/90">
                 {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
               </span>
             )}
             {row.name}
             {isVerified && (
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold tracking-wider bg-electric/10 text-electric border border-electric/20">SOURCED</span>
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-mono font-semibold tracking-wider bg-electric/10 text-electric border border-electric/20">SOURCED</span>
             )}
           </span>
         </td>
@@ -54,17 +54,17 @@ function ExpandableRow({ row, index }: { row: (typeof PLATFORM_MATRIX)[number]; 
             <span className={`${colors.text} font-medium`}>{row.risk}</span>
           </span>
         </td>
-        <td className="px-5 py-4 text-foreground/85 text-xs leading-relaxed max-w-xs">
+        <td className="px-5 py-4 text-foreground/95 text-base leading-relaxed max-w-xs">
           <span className={isLong ? (expanded ? "" : "line-clamp-2") : ""}>
             {row.bannedTriggers.join(", ")}
           </span>
         </td>
-        <td className="px-5 py-4 text-foreground/85 text-xs leading-relaxed max-w-xs">
+        <td className="px-5 py-4 text-foreground/95 text-base leading-relaxed max-w-xs">
           <span className={isLong ? (expanded ? "" : "line-clamp-2") : ""}>
             {row.safeApproach}
           </span>
         </td>
-        <td className="px-5 py-4 text-foreground/85 text-xs leading-relaxed max-w-xs">
+        <td className="px-5 py-4 text-foreground/95 text-base leading-relaxed max-w-xs">
           <span className={isLong ? (expanded ? "" : "line-clamp-2") : ""}>
             {row.notes}
           </span>
@@ -91,13 +91,13 @@ export default function CompliancePage() {
       <NectarOrbs />
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24">
         <motion.header className="max-w-3xl" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <p className="font-mono text-xs tracking-widest uppercase text-electric mb-4">Protect Before You Post</p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Platform Compliance Matrix</h1>
-          <p className="text-base text-muted-foreground leading-relaxed mb-3">
+          <p className="font-mono text-base tracking-widest uppercase text-electric mb-4">Protect Before You Post</p>
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-4">Platform Compliance Matrix</h1>
+          <p className="text-xl text-muted-foreground leading-relaxed mb-3">
             A strategic reference for the risk signals Nectar looks for across nine publishing environments. Use it to understand the kinds of language and behavior that deserve a second look before publishing.
           </p>
-          <p className="text-sm text-electric hover:text-electric/80 transition-colors mb-3"><Link href="/scanner" className="inline-flex items-center gap-1">Have content ready? Open the Scanner <ExternalLink className="h-3 w-3" /></Link></p>
-          <p className="text-sm text-zinc-200 leading-relaxed rounded-lg border border-amber-400/25 bg-amber-400/5 px-4 py-3">
+          <p className="text-lg text-electric hover:text-electric/95 transition-colors mb-3"><Link href="/scanner" className="inline-flex items-center gap-1">Have content ready? Open the Scanner <ExternalLink className="h-3 w-3" /></Link></p>
+          <p className="text-lg text-zinc-100 leading-relaxed rounded-lg border border-amber-400/25 bg-amber-400/5 px-4 py-3">
             This is educational guidance, not a guarantee of compliance. Platform rules and enforcement change, and requirements vary by region, account history, content category, and format. Always verify the current rules directly with the platform before publishing.
           </p>
         </motion.header>
@@ -105,9 +105,9 @@ export default function CompliancePage() {
         <Separator className="my-8 bg-border/60" />
 
         <div className="overflow-x-auto rounded-xl border border-border/60 sm:sticky sm:top-[64px] sm:z-20">
-          <table className="w-full text-sm">
+          <table className="w-full text-lg">
             <thead className="border-b border-border/60 bg-surface-raised"><tr>
-              {['Platform','Risk Level','Risk Signals','Safer Approach','Posting Guidance'].map((heading) => <th key={heading} className="text-left px-5 py-3 text-xs uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">{heading}</th>)}
+              {['Platform','Risk Level','Risk Signals','Safer Approach','Posting Guidance'].map((heading) => <th key={heading} className="text-left px-5 py-3 text-base uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">{heading}</th>)}
             </tr></thead>
             <tbody>{PLATFORM_MATRIX.map((row, i) => {
               return <ExpandableRow key={row.id} row={row} index={i} />;
@@ -116,11 +116,11 @@ export default function CompliancePage() {
         </div>
 
         <motion.div className="mt-6 flex items-center gap-3" variants={fadeUp} custom={2} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}>
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold tracking-wider bg-electric/10 text-electric border border-electric/20">SOURCED</span>
-          <p className="font-mono text-xs text-zinc-400">Indicates policy data individually researched and cited in source code.</p>
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-mono font-semibold tracking-wider bg-electric/10 text-electric border border-electric/20">SOURCED</span>
+          <p className="font-mono text-base text-zinc-200">Indicates policy data individually researched and cited in source code.</p>
         </motion.div>
 
-        <motion.p className="mt-3 font-mono text-xs text-zinc-400" variants={fadeUp} custom={3} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}>
+        <motion.p className="mt-3 font-mono text-base text-zinc-200" variants={fadeUp} custom={3} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}>
           Reference data is maintained as strategic guidance. Verify current platform policies directly before publishing.
         </motion.p>
       </section>

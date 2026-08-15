@@ -36,11 +36,11 @@ function FAQItem({ item, index, isOpen, onToggle }: {
         onClick={onToggle}
         className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left cursor-pointer hover:bg-slate-700/30 transition-colors"
       >
-        <span className="text-sm sm:text-base font-semibold text-white leading-snug">{item.question}</span>
+        <span className="text-lg sm:text-xl font-semibold text-white leading-snug">{item.question}</span>
         <motion.span
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="shrink-0 text-zinc-400"
+          className="shrink-0 text-zinc-200"
         >
           <ChevronDown className="h-4 w-4" />
         </motion.span>
@@ -54,7 +54,7 @@ function FAQItem({ item, index, isOpen, onToggle }: {
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <p className="px-5 pb-5 text-sm text-zinc-200 leading-relaxed">{item.answer}</p>
+            <p className="px-5 pb-5 text-lg text-zinc-100 leading-relaxed">{item.answer}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -70,13 +70,13 @@ export default function FAQPage() {
       <NectarOrbs />
       <section className="mx-auto max-w-3xl px-4 sm:px-6 py-20 pb-28">
         <motion.p
-          className="font-mono text-xs tracking-widest uppercase text-electric mb-3"
+          className="font-mono text-base tracking-widest uppercase text-electric mb-3"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
         >
           Got questions?
         </motion.p>
         <motion.h1
-          className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-2"
+          className="text-5xl sm:text-6xl md:text-6xl font-bold tracking-tight mb-2"
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
         >
           FAQ{' '}
@@ -85,7 +85,7 @@ export default function FAQPage() {
           </span>
         </motion.h1>
         <motion.p
-          className="text-base text-muted-foreground mb-10"
+          className="text-xl text-muted-foreground mb-10"
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
         >
           Honest answers to the things people actually ask.

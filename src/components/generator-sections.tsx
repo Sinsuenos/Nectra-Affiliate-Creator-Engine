@@ -19,12 +19,12 @@ export function EditableChip({
 
   return (
     <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-background/60 px-4 py-2.5">
-      <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground w-28 shrink-0">
+      <span className="font-mono text-sm uppercase tracking-wider text-muted-foreground w-28 shrink-0">
         {field.label}
       </span>
       {editing ? (
         <input
-          className="flex-1 bg-transparent text-sm text-foreground font-mono outline-none border-b border-electric/40 pb-0.5"
+          className="flex-1 bg-transparent text-lg text-foreground font-mono outline-none border-b border-electric/40 pb-0.5"
           value={val}
           onChange={(e) => setVal(e.target.value)}
           onBlur={() => setEditing(false)}
@@ -33,7 +33,7 @@ export function EditableChip({
         />
       ) : (
         <span
-          className={`flex-1 text-sm font-mono ${val ? "text-foreground" : "text-muted-foreground/50"}`}
+          className={`flex-1 text-lg font-mono ${val ? "text-foreground" : "text-muted-foreground/75"}`}
         >
           {val || "—"}
         </span>
@@ -71,7 +71,7 @@ export const OUTPUT_SECTIONS = [
 export function PromoAnglesSection({ angles }: { angles: PromoAngle[] }) {
   return (
     <div id="gen-angles">
-      <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
+      <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground mb-4">
         Promo Angles
       </p>
       <div className="space-y-4">
@@ -81,19 +81,19 @@ export function PromoAnglesSection({ angles }: { angles: PromoAngle[] }) {
             className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
-              <span className="font-mono text-[11px] uppercase text-electric">
+              <span className="font-mono text-sm uppercase text-electric">
                 Angle {i + 1}
               </span>
               <span className="h-px flex-1 bg-border/30" />
-              <span className="font-mono text-xs text-foreground font-medium">
+              <span className="font-mono text-base text-foreground font-medium">
                 {angle.angle}
               </span>
               <CopyButton text={`${angle.hook}\n\n${angle.body}`} />
             </div>
-            <p className="text-sm text-foreground font-medium mb-2">
+            <p className="text-lg text-foreground font-medium mb-2">
               {angle.hook}
             </p>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-relaxed">
               {angle.body}
             </p>
           </div>
@@ -117,14 +117,14 @@ const PLATFORM_CHAR_LIMITS: Record<string, number> = {
 
 function CharBadge({ count, platform }: { count: number; platform: string }) {
   const limit = PLATFORM_CHAR_LIMITS[platform];
-  if (!limit) return <span className="font-mono text-[11px] text-muted-foreground/70">{count} chars</span>;
+  if (!limit) return <span className="font-mono text-sm text-muted-foreground/90">{count} chars</span>;
   const ratio = count / limit;
   const over = count > limit;
   const color = over ? "text-red-400 bg-red-500/10 border-red-500/20" : ratio > 0.85 ? "text-amber-400 bg-amber-500/10 border-amber-500/20" : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border font-mono text-[10px] font-semibold tracking-wide ${color}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border font-mono text-xs font-semibold tracking-wide ${color}`}>
       {over && <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />}
-      {count}<span className="text-muted-foreground/50">/{limit}</span>
+      {count}<span className="text-muted-foreground/75">/{limit}</span>
     </span>
   );
 }
@@ -140,7 +140,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-mono text-muted-foreground/60 hover:text-electric hover:bg-electric/[0.06] border border-transparent hover:border-electric/20 transition-all cursor-pointer"
+      className="shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-mono text-muted-foreground/80 hover:text-electric hover:bg-electric/[0.06] border border-transparent hover:border-electric/20 transition-all cursor-pointer"
       aria-label="Copy"
     >
       {copied ? <><Check className="h-3 w-3 text-emerald-400" />Copied</> : <><Copy className="h-3 w-3" />Copy</>}
@@ -151,7 +151,7 @@ function CopyButton({ text }: { text: string }) {
 export function SocialPostsSection({ posts }: { posts: SocialPost[] }) {
   return (
     <div id="gen-posts">
-      <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
+      <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground mb-4">
         Social Posts
       </p>
       <div className="space-y-4">
@@ -161,14 +161,14 @@ export function SocialPostsSection({ posts }: { posts: SocialPost[] }) {
             className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors"
           >
             <div className="flex items-center gap-3 mb-3">
-              <span className="font-mono text-xs text-electric font-semibold">
+              <span className="font-mono text-base text-electric font-semibold">
                 {post.platform}
               </span>
               <span className="h-px flex-1 bg-border/30" />
               <CharBadge count={post.character_count} platform={post.platform} />
               <CopyButton text={post.text} />
             </div>
-            <p className="text-sm text-foreground/90 leading-relaxed">
+            <p className="text-lg text-foreground leading-relaxed">
               {post.text}
             </p>
           </div>
@@ -181,7 +181,7 @@ export function SocialPostsSection({ posts }: { posts: SocialPost[] }) {
 export function HeadlinesSection({ headlines }: { headlines: Headline[] }) {
   return (
     <div id="gen-headlines">
-      <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
+      <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground mb-4">
         Headlines
       </p>
       <div className="space-y-4">
@@ -191,13 +191,13 @@ export function HeadlinesSection({ headlines }: { headlines: Headline[] }) {
             className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
-              <span className="font-mono text-[11px] uppercase text-electric">
+              <span className="font-mono text-sm uppercase text-electric">
                 Variant {h.variant}
               </span>
               <span className="h-px flex-1 bg-border/30" />
               <CopyButton text={h.text} />
             </div>
-            <p className="text-sm text-foreground font-medium">{h.text}</p>
+            <p className="text-lg text-foreground font-medium">{h.text}</p>
           </div>
         ))}
       </div>
@@ -209,13 +209,13 @@ export function BodyCopySection({ text }: { text: string }) {
   return (
     <div id="gen-body">
       <div className="flex items-center justify-between mb-4">
-        <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+        <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
           Body Copy
         </p>
         <CopyButton text={text} />
       </div>
       <div className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors">
-        <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
+        <p className="text-lg text-foreground leading-relaxed whitespace-pre-line">
           {text}
         </p>
       </div>
@@ -226,7 +226,7 @@ export function BodyCopySection({ text }: { text: string }) {
 export function CTASection({ ctas }: { ctas: CTA[] }) {
   return (
     <div id="gen-ctas">
-      <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-4">
+      <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground mb-4">
         CTA Variations
       </p>
       <div className="space-y-4">
@@ -236,16 +236,16 @@ export function CTASection({ ctas }: { ctas: CTA[] }) {
             className="rounded-lg bg-surface border border-border/40 p-5 hover:border-border/60 transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
-              <span className="font-mono text-[11px] uppercase text-electric">
+              <span className="font-mono text-sm uppercase text-electric">
                 {cta.id}
               </span>
               <span className="h-px flex-1 bg-border/30" />
-              <span className="font-mono text-[10px] text-muted-foreground/70 bg-surface-raised px-2 py-0.5 rounded border border-border/30">
+              <span className="font-mono text-xs text-muted-foreground/90 bg-surface-raised px-2 py-0.5 rounded border border-border/30">
                 {cta.tone}
               </span>
               <CopyButton text={cta.text} />
             </div>
-            <p className="text-sm text-foreground font-medium">{cta.text}</p>
+            <p className="text-lg text-foreground font-medium">{cta.text}</p>
           </div>
         ))}
       </div>
@@ -289,7 +289,7 @@ export function ComplianceSection({ notes }: { notes: ComplianceNote[] }) {
     <div id="gen-compliance">
       <div className="flex items-center gap-2 mb-4">
         <ShieldCheck className="h-4 w-4 text-amber-400" />
-        <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+        <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
           Compliance Notes
         </p>
       </div>
@@ -306,12 +306,12 @@ export function ComplianceSection({ notes }: { notes: ComplianceNote[] }) {
             >
               <div className="flex items-center gap-3 mb-2">
                 <span className={`inline-block h-2 w-2 rounded-full ${RISK_DOT[risk]}`} />
-                <span className="font-mono text-xs text-foreground font-medium">
+                <span className="font-mono text-base text-foreground font-medium">
                   {note.platform}
                 </span>
-                <span className={`ml-auto font-mono text-[10px] font-semibold tracking-wider ${RISK_TEXT[risk]}`}>{risk}</span>
+                <span className={`ml-auto font-mono text-xs font-semibold tracking-wider ${RISK_TEXT[risk]}`}>{risk}</span>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-lg text-muted-foreground leading-relaxed">
                 {note.note}
               </p>
             </div>

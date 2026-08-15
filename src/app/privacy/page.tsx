@@ -69,7 +69,7 @@ export default function PrivacyPage() {
     <>
       <section className="mx-auto max-w-3xl px-4 sm:px-6 py-16 sm:py-24">
         <motion.p
-          className="font-mono text-xs tracking-widest uppercase text-electric mb-4"
+          className="font-mono text-base tracking-widest uppercase text-electric mb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
@@ -78,7 +78,7 @@ export default function PrivacyPage() {
         </motion.p>
 
         <motion.h1
-          className="text-3xl sm:text-4xl font-bold tracking-tight mb-4"
+          className="text-5xl sm:text-6xl font-bold tracking-tight mb-4"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -87,7 +87,7 @@ export default function PrivacyPage() {
         </motion.h1>
 
         <motion.p
-          className="text-sm text-muted-foreground leading-relaxed mb-8"
+          className="text-lg text-muted-foreground leading-relaxed mb-8"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -107,10 +107,10 @@ export default function PrivacyPage() {
               whileInView="visible"
               viewport={{ once: true, margin: "-40px" }}
             >
-              <h2 className="text-lg font-bold tracking-tight mb-3">
+              <h2 className="text-2xl font-bold tracking-tight mb-3">
                 {section.heading}
               </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-lg text-muted-foreground leading-relaxed">
                 {section.body}
               </p>
             </motion.div>

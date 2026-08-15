@@ -102,19 +102,19 @@ function ResultCard({
       }
     >
       <div className="flex items-center gap-2.5 mb-3">
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${pill}`}>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-base font-semibold border ${pill}`}>
           <Icon className="h-3.5 w-3.5" />
           {label}
         </span>
-        <span className="font-mono text-sm font-medium text-foreground">{result.platform}</span>
+        <span className="font-mono text-lg font-medium text-foreground">{result.platform}</span>
       </div>
 
       {isPass ? (
         <div className="flex items-center gap-2">
-          <p className="text-sm text-muted-foreground">Clear to post.</p>
+          <p className="text-lg text-muted-foreground">Clear to post.</p>
           <button
             onClick={() => handleCopy(result.reason || 'Clear to post.')}
-            className="shrink-0 ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-mono text-muted-foreground/60 hover:text-electric hover:bg-electric/[0.06] border border-transparent hover:border-electric/20 transition-all cursor-pointer"
+            className="shrink-0 ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-mono text-muted-foreground/80 hover:text-electric hover:bg-electric/[0.06] border border-transparent hover:border-electric/20 transition-all cursor-pointer"
             aria-label="Copy"
           >
             {copied ? <><Check className="h-3 w-3 text-emerald-400" />Copied</> : <><Copy className="h-3 w-3" />Copy</>}
@@ -124,10 +124,10 @@ function ResultCard({
         <div className="space-y-3">
           {result.flagged_phrases.length > 0 && (
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Flagged Phrases</p>
+              <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground mb-1.5">Flagged Phrases</p>
               <div className="flex flex-wrap gap-1.5">
                 {result.flagged_phrases.map((phrase, i) => (
-                  <span key={i} className="inline-block rounded-md bg-red-500/10 border border-red-500/20 px-2.5 py-1 text-xs text-red-300 font-mono">
+                  <span key={i} className="inline-block rounded-md bg-red-500/10 border border-red-500/20 px-2.5 py-1 text-base text-red-300 font-mono">
                     &ldquo;{phrase}&rdquo;
                   </span>
                 ))}
@@ -135,17 +135,17 @@ function ResultCard({
             </div>
           )}
 
-          <p className="text-sm text-muted-foreground leading-relaxed">{result.reason}</p>
+          <p className="text-lg text-muted-foreground leading-relaxed">{result.reason}</p>
 
           {result.safer_rewrite && result.safer_rewrite.trim() && (
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-wider text-electric mb-1.5">Safer Rewrite</p>
+              <p className="font-mono text-sm uppercase tracking-wider text-electric mb-1.5">Safer Rewrite</p>
               <div className="rounded-lg bg-surface border border-border/40 p-4">
-                <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{result.safer_rewrite}</p>
+                <p className="text-lg text-foreground leading-relaxed whitespace-pre-line">{result.safer_rewrite}</p>
               </div>
               <button
                 onClick={() => handleCopy(result.safer_rewrite)}
-                className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-5 h-9 text-xs transition-colors cursor-pointer"
+                className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-5 h-9 text-base transition-colors cursor-pointer"
               >
                 {copied ? <><Check className="h-3.5 w-3.5" />Copied</> : <><Copy className="h-3.5 w-3.5" />Copy Safer Version</>}
               </button>
@@ -171,8 +171,8 @@ function PlatformChip({
       type="button"
       onClick={() => onToggle(platform)}
       className={selected
-        ? "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium border bg-electric/10 text-electric border-electric/30 transition-all cursor-pointer"
-        : "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium border bg-surface text-muted-foreground border-border/40 hover:text-foreground hover:border-border/60 transition-all cursor-pointer"}
+        ? "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-base font-mono font-medium border bg-electric/10 text-electric border-electric/30 transition-all cursor-pointer"
+        : "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-base font-mono font-medium border bg-surface text-muted-foreground border-border/40 hover:text-foreground hover:border-border/60 transition-all cursor-pointer"}
     >
       <span className={selected ? "h-1.5 w-1.5 rounded-full bg-electric" : "h-1.5 w-1.5 rounded-full bg-muted-foreground/30"} />
       {platform}
@@ -314,13 +314,13 @@ function ScannerInner() {
       <NectarOrbs />
 
       <section className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-8">
-        <motion.h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+        <motion.h1 className="text-5xl sm:text-6xl md:text-6xl font-bold tracking-tight" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
           Compliance Scanner
         </motion.h1>
-        <motion.p className="mt-3 text-electric/90 text-base sm:text-lg font-medium" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}>
+        <motion.p className="mt-3 text-electric text-xl sm:text-2xl font-medium" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}>
           Check it before you post.
         </motion.p>
-        <motion.p className="mt-2 text-muted-foreground max-w-xl text-sm sm:text-base leading-relaxed" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
+        <motion.p className="mt-2 text-muted-foreground max-w-xl text-lg sm:text-xl leading-relaxed" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
           Pick the platforms. Get Pass, Warning, or Fail, plus a safer rewrite.
         </motion.p>
       </section>
@@ -330,17 +330,17 @@ function ScannerInner() {
       <section className="mx-auto max-w-4xl px-4 sm:px-6 py-12 sm:py-16">
         <motion.div className="space-y-6" initial="hidden" animate="visible">
           <motion.div variants={fadeUp} custom={0}>
-            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-3">Content</p>
+            <p className="font-mono text-base uppercase tracking-wider text-muted-foreground mb-3">Content</p>
             <textarea
               value={content}
               onChange={(e) => { setContent(e.target.value); setResults(null); }}
-              className="w-full h-48 sm:h-56 rounded-xl border border-border/60 bg-surface text-foreground/80 font-mono text-sm p-5 resize-none focus:outline-none focus:ring-1 focus:ring-electric/30"
+              className="w-full h-48 sm:h-56 rounded-xl border border-border/60 bg-surface text-foreground/95 font-mono text-lg p-5 resize-none focus:outline-none focus:ring-1 focus:ring-electric/30"
               placeholder={'Paste your social post, ad copy, or any content here...\n\nExample:\n"Lose weight fast with this guaranteed supplement! Act now - free trial, no risk. Click here to sign up and start seeing results today!"'}
             />
           </motion.div>
 
           <motion.div variants={fadeUp} custom={1}>
-            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-3">Platforms</p>
+            <p className="font-mono text-base uppercase tracking-wider text-muted-foreground mb-3">Platforms</p>
             <div className="flex flex-wrap gap-2">
               {ALL_PLATFORMS.map((p) => <PlatformChip key={p} platform={p} selected={selectedPlatforms.has(p)} onToggle={togglePlatform} />)}
             </div>
@@ -351,7 +351,7 @@ function ScannerInner() {
               <button
                 onClick={handleScan}
                 disabled={isScanning}
-                className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-sm rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                className="w-full sm:w-auto bg-electric hover:bg-electric/90 text-background font-semibold tracking-wide px-8 h-12 text-lg rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
               >
                 {isScanning ? <><Loader2 className="h-4 w-4 animate-spin" />Checking...</> : <><ShieldCheck className="h-4 w-4" />Check Compliance</>}
               </button>
@@ -373,11 +373,11 @@ function ScannerInner() {
 
           {error && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-lg border border-red-500/30 bg-red-500/5 p-4">
-              <p className="text-sm text-red-400 font-medium">{error}</p>
+              <p className="text-lg text-red-400 font-medium">{error}</p>
             </motion.div>
           )}
 
-          <p className="text-xs text-muted-foreground/75 leading-relaxed">
+          <p className="text-base text-muted-foreground/90 leading-relaxed">
             AI-generated compliance guidance is informational only. Platform policies can change, and final responsibility for posted content remains with the user.
           </p>
         </motion.div>
@@ -390,17 +390,17 @@ function ScannerInner() {
             <motion.section className="mx-auto max-w-4xl px-4 sm:px-6 py-12 sm:py-16" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
                 <div>
-                  <p className="font-mono text-xs tracking-widest uppercase text-electric mb-3">Scan Results</p>
-                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  <p className="font-mono text-base tracking-widest uppercase text-electric mb-3">Scan Results</p>
+                  <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
                     {issueCount === 0 ? `${totalScanned} of ${totalScanned} platforms - all clear` : `${issueCount} of ${totalScanned} platforms need changes before you post`}
                   </h2>
-                  <p className="mt-2 text-xs text-muted-foreground/70 leading-relaxed">
+                  <p className="mt-2 text-base text-muted-foreground/90 leading-relaxed">
                     AI-generated compliance guidance is informational only. Platform policies can change, and final responsibility for posted content remains with the user.
                   </p>
                 </div>
                 <button
                   onClick={handleCopyAll}
-                  className="shrink-0 inline-flex items-center gap-2 rounded-lg border border-border/50 bg-surface hover:bg-surface-raised px-4 py-2.5 text-xs font-mono font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  className="shrink-0 inline-flex items-center gap-2 rounded-lg border border-border/50 bg-surface hover:bg-surface-raised px-4 py-2.5 text-base font-mono font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   {allCopied ? <><Check className="h-3.5 w-3.5 text-emerald-400" />Copied</> : <><FileText className="h-3.5 w-3.5" />Copy Report</>}
                 </button>
@@ -409,21 +409,21 @@ function ScannerInner() {
               <div className="flex items-center gap-2 sm:gap-3 mb-6 p-3 rounded-xl border border-border/40 bg-surface/50">
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  <span className="font-mono text-sm font-bold text-emerald-400">{passCount}</span>
-                  <span className="text-[10px] font-mono text-emerald-400/70 uppercase hidden sm:inline">Pass</span>
+                  <span className="font-mono text-lg font-bold text-emerald-400">{passCount}</span>
+                  <span className="text-xs font-mono text-emerald-400/70 uppercase hidden sm:inline">Pass</span>
                 </div>
                 {warnCount > 0 && (
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
                     <ShieldAlert className="h-3.5 w-3.5 text-amber-400" />
-                    <span className="font-mono text-sm font-bold text-amber-400">{warnCount}</span>
-                    <span className="text-[10px] font-mono text-amber-400/70 uppercase hidden sm:inline">Warn</span>
+                    <span className="font-mono text-lg font-bold text-amber-400">{warnCount}</span>
+                    <span className="text-xs font-mono text-amber-400/70 uppercase hidden sm:inline">Warn</span>
                   </div>
                 )}
                 {failCount > 0 && (
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20">
                     <ShieldX className="h-3.5 w-3.5 text-red-400" />
-                    <span className="font-mono text-sm font-bold text-red-400">{failCount}</span>
-                    <span className="text-[10px] font-mono text-red-400/70 uppercase hidden sm:inline">Fail</span>
+                    <span className="font-mono text-lg font-bold text-red-400">{failCount}</span>
+                    <span className="text-xs font-mono text-red-400/70 uppercase hidden sm:inline">Fail</span>
                   </div>
                 )}
                 <div className="flex-1" />
@@ -437,7 +437,7 @@ function ScannerInner() {
               </div>
 
               {hasAnyFail && (
-                <motion.p className="mt-6 text-sm text-red-400/90 font-medium text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+                <motion.p className="mt-6 text-lg text-red-400/90 font-medium text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
                   Fix these, then post. This is the difference between traffic and a ban.
                 </motion.p>
               )}

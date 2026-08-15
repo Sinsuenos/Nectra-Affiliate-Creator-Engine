@@ -5,7 +5,7 @@ export function SiteFooter() {
     <footer className="mt-auto border-t border-border/60 bg-surface">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="flex items-center gap-2.5 text-xs font-bold tracking-widest uppercase">
+          <span className="flex items-center gap-2.5 text-base font-bold tracking-widest uppercase">
             <img
               src="/favicon-32.png"
               alt=""
@@ -18,7 +18,7 @@ export function SiteFooter() {
           </span>
 
           <nav
-            className="flex items-center gap-6 text-xs text-muted-foreground"
+            className="flex items-center gap-6 text-base text-muted-foreground"
             aria-label="Footer navigation"
           >
             <Link
@@ -48,7 +48,7 @@ export function SiteFooter() {
           </nav>
         </div>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground/60 font-mono">
+        <p className="mt-6 text-center text-base text-muted-foreground/80 font-mono">
           &copy; {new Date().getFullYear()} Nectar Engine. All rights reserved.
         </p>
       </div>

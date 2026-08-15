@@ -51,18 +51,18 @@ function LiveModuleCard({ mod, index }: { mod: (typeof LIVE_MODULES)[number]; in
         <div className="flex items-start justify-between gap-4 mb-3">
           <div>
             <div className="flex items-center gap-2.5 mb-1.5">
-              <span className="font-mono text-[11px] text-electric/70">{mod.id}</span>
-              <span className="inline-flex items-center rounded-full border border-electric/30 bg-electric/10 px-2.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-electric">LIVE</span>
+              <span className="font-mono text-sm text-electric/90">{mod.id}</span>
+              <span className="inline-flex items-center rounded-full border border-electric/30 bg-electric/10 px-2.5 py-0.5 font-mono text-xs font-semibold tracking-wider text-electric">LIVE</span>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">{mod.name}</h3>
+            <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">{mod.name}</h3>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed mb-4">{mod.oneLiner}</p>
+        <p className="text-lg text-muted-foreground leading-relaxed mb-4">{mod.oneLiner}</p>
         <div className="mb-5">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground/80 mb-2">Capabilities</p>
+          <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground/95 mb-2">Capabilities</p>
           <ul className="space-y-1.5">
             {mod.capabilities.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm text-foreground/85">
+              <li key={item} className="flex items-start gap-2 text-lg text-foreground/95">
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-electric" />
                 {item}
               </li>
@@ -71,7 +71,7 @@ function LiveModuleCard({ mod, index }: { mod: (typeof LIVE_MODULES)[number]; in
         </div>
         <Link
           href={mod.link}
-          className="inline-flex items-center gap-2 rounded-full border border-electric/25 bg-electric/[0.06] px-4 py-2 font-mono text-[11px] font-semibold tracking-wider text-electric hover:bg-electric/15 transition-colors"
+          className="inline-flex items-center gap-2 rounded-full border border-electric/25 bg-electric/[0.06] px-4 py-2 font-mono text-sm font-semibold tracking-wider text-electric hover:bg-electric/15 transition-colors"
         >
           Open module
           <ArrowRight className="h-3.5 w-3.5" />
@@ -93,9 +93,9 @@ export default function ModulesPage() {
 
       <NectarOrbs />
       <section className="mx-auto max-w-5xl px-4 sm:px-6 pt-16 sm:pt-24 pb-10">
-        <motion.p className="font-mono text-base sm:text-lg tracking-widest uppercase text-electric mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Nectar Architecture</motion.p>
-        <motion.h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>What Nectar performs for all of us today</motion.h1>
-        <motion.p className="mt-4 text-muted-foreground max-w-2xl text-base sm:text-lg leading-relaxed" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.p className="font-mono text-xl sm:text-2xl tracking-widest uppercase text-electric mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Nectar Architecture</motion.p>
+        <motion.h1 className="text-5xl sm:text-6xl md:text-6xl font-bold tracking-tight" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>What Nectar performs for all of us today</motion.h1>
+        <motion.p className="mt-4 text-muted-foreground max-w-2xl text-xl sm:text-2xl leading-relaxed" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           Two modules are live and ready to use. A third is in progress. Everything else is on the drawing board, not advertised as coming soon, not behind a paywall, just future product direction.
         </motion.p>
       </section>
@@ -124,15 +124,15 @@ export default function ModulesPage() {
         >
           <div className="px-5 sm:px-6 py-5">
             <div className="flex items-center gap-2.5 mb-1.5">
-              <span className="font-mono text-[11px] text-amber-400/60">{PARTIAL_MODULE.id}</span>
-              <span className="inline-flex items-center rounded-full border border-amber-400/25 bg-amber-400/[0.08] px-2.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-amber-300">PARTIAL</span>
+              <span className="font-mono text-sm text-amber-400/60">{PARTIAL_MODULE.id}</span>
+              <span className="inline-flex items-center rounded-full border border-amber-400/25 bg-amber-400/[0.08] px-2.5 py-0.5 font-mono text-xs font-semibold tracking-wider text-amber-300">PARTIAL</span>
             </div>
-            <h3 className="text-base font-bold tracking-tight text-foreground mb-2">{PARTIAL_MODULE.name}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-3">{PARTIAL_MODULE.oneLiner}</p>
+            <h3 className="text-xl font-bold tracking-tight text-foreground mb-2">{PARTIAL_MODULE.name}</h3>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-3">{PARTIAL_MODULE.oneLiner}</p>
             <div>
               <ul className="space-y-1.5">
                 {PARTIAL_MODULE.capabilities.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-foreground/75">
+                  <li key={item} className="flex items-start gap-2 text-lg text-foreground/90">
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400/60" />
                     {item}
                   </li>
@@ -146,10 +146,10 @@ export default function ModulesPage() {
       {/* NEXT modules — single condensed line */}
       <section className="mx-auto max-w-5xl px-4 sm:px-6 pb-12">
         <motion.p
-          className="text-sm text-muted-foreground/70 leading-relaxed"
+          className="text-lg text-muted-foreground/90 leading-relaxed"
           initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
         >
-          <Layers className="inline h-3.5 w-3.5 mr-1.5 -mt-0.5 text-muted-foreground/60" aria-hidden="true" />
+          <Layers className="inline h-3.5 w-3.5 mr-1.5 -mt-0.5 text-muted-foreground/80" aria-hidden="true" />
           Additional modules in development: Niche Intelligence, Content Architecture, Funnel Blueprint, Email Sequence Engine, Landing Page Builder, and Analytics Framework.
         </motion.p>
       </section>
@@ -163,9 +163,9 @@ export default function ModulesPage() {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-fuchsia-500 to-purple-500 rounded-2xl" aria-hidden="true" />
           <div className="relative rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-8">
-            <p className="font-mono text-[11px] uppercase tracking-widest text-electric mb-3">The real product story</p>
-            <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-4">Offer → Angles → Output → Protection</h3>
-            <p className="text-sm text-zinc-200 leading-relaxed max-w-3xl">
+            <p className="font-mono text-sm uppercase tracking-widest text-electric mb-3">The real product story</p>
+            <h3 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Offer → Angles → Output → Protection</h3>
+            <p className="text-lg text-zinc-100 leading-relaxed max-w-3xl">
               Today, that core loop is real. Context intelligence and deeper campaign orchestration are the next expansion, which is why they are visible in the product story without being disguised as finished features.
             </p>
           </div>
