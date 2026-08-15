@@ -389,7 +389,7 @@ function ScannerInner() {
           )}
 
           <p className="text-base text-muted-foreground/90 leading-relaxed">
-            AI-generated compliance guidance is informational only. Platform policies can change, and final responsibility for posted content remains with the user.
+            Compliance guidance is informational only. Platform policies can change, and final responsibility for posted content remains with the user.
           </p>
         </motion.div>
       </section>
@@ -406,7 +406,7 @@ function ScannerInner() {
                     {issueCount === 0 ? `${totalScanned} of ${totalScanned} platforms - all clear` : `${issueCount} of ${totalScanned} platforms need changes before you post`}
                   </h2>
                   <p className="mt-2 text-base text-muted-foreground/90 leading-relaxed">
-                    AI-generated compliance guidance is informational only. Platform policies can change, and final responsibility for posted content remains with the user.
+                    Compliance guidance is informational only. Platform policies can change, and final responsibility for posted content remains with the user.
                   </p>
                 </div>
                 <button

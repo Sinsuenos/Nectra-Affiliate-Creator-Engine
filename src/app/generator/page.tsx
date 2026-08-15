@@ -411,7 +411,7 @@ export default function GeneratorPage() {
                   {offerName}_toolkit_v1.0.json
                 </span>
                 <span className="font-mono text-xs uppercase text-electric/80 ml-auto">
-                  AI Generated
+                  Nectar Output
                 </span>
               </div>
 
