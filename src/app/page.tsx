@@ -38,7 +38,7 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
         <div className="rounded-2xl border border-white/15 bg-[#171b26]/90 p-6 sm:p-8 shadow-2xl">
           <p className="font-mono text-sm uppercase tracking-widest text-electric">Watch it work</p>
-          <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-white">Offer in. Useful output out.</h2>
+          <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-white">One offer in. Angles, content, and compliance signals out.</h2>
           <div className="mt-7 grid gap-5 md:grid-cols-2">
             <div className="rounded-xl border border-white/10 bg-black/20 p-5 font-mono text-sm text-zinc-300">
               <p className="text-electric mb-3">RAW OFFER</p>
