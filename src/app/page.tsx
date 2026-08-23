@@ -1,101 +1,88 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { TransformationRail } from "@/components/transformation-rail";
 import { BottomNavRow } from "@/components/BottomNavRow";
+
+const PLATFORMS = [
+  ["X", "LOW"], ["TikTok", "MEDIUM"], ["Instagram", "MEDIUM"],
+  ["Facebook", "MEDIUM"], ["Reddit", "HIGH"], ["Pinterest", "LOW"],
+  ["Snapchat", "MEDIUM"], ["Discord", "MEDIUM"], ["Telegram", "MEDIUM"],
+];
 
 export default function Home() {
   return (
     <div>
-      {/* Full-page background image */}
-      <div
-        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-[0.67]"
-        style={{ backgroundImage: 'url(/nectar-bg-landing.png)' }}
-        aria-hidden="true"
-      />
-
-      {/* ── HERO ── */}
+      <div className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-[0.67]" style={{ backgroundImage: "url(/nectar-bg-landing.png)" }} aria-hidden="true" />
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.075]" style={{ backgroundImage: "linear-gradient(#22b8ff 1px, transparent 1px), linear-gradient(90deg, #22b8ff 1px, transparent 1px)", backgroundSize: "64px 64px" }} aria-hidden="true" />
-        <div className="pointer-events-none absolute left-[8%] top-10 h-96 w-96 rounded-full bg-fuchsia-500/[0.13] blur-3xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute right-[7%] top-24 h-[28rem] w-[28rem] rounded-full bg-electric/[0.16] blur-3xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute left-1/2 top-[54%] h-80 w-80 -translate-x-1/2 rounded-full bg-lime-400/[0.07] blur-3xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-[620px] max-w-7xl overflow-hidden" aria-hidden="true">
-          <img src="/nectar-atmosphere.svg" alt="" className="absolute right-[-18%] top-10 w-[72%] max-w-5xl opacity-[0.16] mix-blend-screen blur-[1px]" />
-        </div>
-
+        <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "linear-gradient(#22b8ff 1px, transparent 1px), linear-gradient(90deg, #22b8ff 1px, transparent 1px)", backgroundSize: "64px 64px" }} aria-hidden="true" />
+        <div className="pointer-events-none absolute right-[7%] top-24 h-[28rem] w-[28rem] rounded-full bg-electric/[0.14] blur-3xl" aria-hidden="true" />
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 text-center">
-          <motion.p className="font-mono text-lg sm:text-xl tracking-widest uppercase text-electric mb-5 font-semibold" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>Nectar Engine · Affiliate Content Transformation</motion.p>
-          <motion.h1 className="text-6xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.02] text-white drop-shadow-[0_4px_28px_rgba(0,0,0,0.35)]" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
-            One Offer.<br /><span className="bg-gradient-to-r from-electric via-fuchsia-300 to-lime-200 bg-clip-text text-transparent">Nine Platform-Ready Campaigns.</span>
+          <motion.p className="font-mono text-base sm:text-lg tracking-widest uppercase text-electric mb-5 font-semibold" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Nectar Engine · High-Risk Affiliate Engine</motion.p>
+          <motion.h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.02] text-white" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            One Offer.<br /><span className="bg-gradient-to-r from-electric via-fuchsia-300 to-lime-200 bg-clip-text text-transparent">Platform-aware campaigns. Risk-checked before you post.</span>
           </motion.h1>
-          <motion.p className="mx-auto mt-6 max-w-2xl text-xl sm:text-2xl text-zinc-100 leading-relaxed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>Paste an affiliate offer once. Nectar extracts what matters, turns the source into distinct campaign directions and platform-ready content, then checks the copy before you publish it.</motion.p>
-          <div className="mt-6 space-y-1">
-            <p className="text-4xl md:text-5xl font-light text-amber-400/90">
-              Less beige corporate oatmeal.
-            </p>
-            <p className="text-4xl md:text-5xl font-light text-amber-400/90">
-              Fewer five‑alarm compliance fires.
-            </p>
+          <motion.p className="mx-auto mt-6 max-w-3xl text-xl sm:text-2xl text-zinc-100 leading-relaxed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            Paste a raw affiliate offer. Nectar extracts what matters, surfaces restrictions stated in the source, generates distinct content for nine platforms, and checks the copy for platform-specific risk signals before you publish.
+          </motion.p>
+          <div className="mt-7 flex flex-col sm:flex-row justify-center gap-3">
+            <a href="https://sinaloainspired.gumroad.com/l/nectar-engine" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg bg-electric px-7 h-12 text-lg font-semibold text-background hover:bg-electric/90">Get Nectar Engine <ArrowRight className="h-4 w-4" /></a>
+            <Link href="/generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/25 bg-black/20 px-7 h-12 text-lg font-semibold text-white hover:border-electric/50">Try the free Generator</Link>
           </div>
+          <p className="mt-3 text-sm text-zinc-300">Free Generator: 3 generations, no signup. Paid Nectar Engine: full workflow + Compliance Scanner.</p>
+          <div className="mt-7 space-y-1"><p className="text-2xl md:text-3xl font-light text-amber-400/90">Less beige corporate oatmeal.</p><p className="text-2xl md:text-3xl font-light text-amber-400/90">Fewer five-alarm compliance fires.</p></div>
         </div>
       </section>
 
-      {/* ── PIPELINE DIAGRAM (gradient border from removed Watch the Transformation box) ── */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="relative rounded-2xl overflow-hidden">
-          <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-r from-electric/35 via-fuchsia-400/25 to-lime-300/25 opacity-90" aria-hidden="true" />
-          <div className="relative rounded-2xl border border-white/15 bg-[#171b26]/90 backdrop-blur-sm shadow-2xl shadow-black/40">
-            <TransformationRail />
-          </div>
-        </div>
-      </div>
-
-      {/* ── FAQ SNIPPET (untouched) ── */}
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
-        <motion.div
-          className="relative rounded-2xl overflow-hidden p-[2px]"
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.5 }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 rounded-2xl" aria-hidden="true" />
-          <div className="relative rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-8">
-            <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4 flex items-center gap-3">
-              <span className="text-4xl" aria-hidden="true">🔥</span>
-              From the FAQ: Five-Alarm Burnout
-            </h3>
-            <p className="text-lg font-semibold text-amber-300 mb-2">Is it true that Nectar Engine was built during what you call a five-alarm creative burnout fire?</p>
-            <p className="text-lg text-zinc-100 leading-relaxed mb-5">Absolutely. We started coding after our third straight late-night brainstorm where every &apos;safe&apos; post felt like beige wallpaper. Nectar Engine was born from exhaustion, sarcasm, and the desperate need for a tool that understood why &ldquo;compliant&rdquo; doesn&apos;t have to mean &ldquo;boring.&rdquo;</p>
-            <Link href="/faq" className="inline-flex items-center gap-1.5 text-lg font-semibold text-pink-400 hover:text-pink-300 transition-colors">
-              Read all Frequently Awkward Questions <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+        <div className="rounded-2xl border border-white/15 bg-[#171b26]/90 p-6 sm:p-8 shadow-2xl">
+          <p className="font-mono text-sm uppercase tracking-widest text-electric">Watch it work</p>
+          <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-white">Offer in. Useful output out.</h2>
+          <div className="mt-7 grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-white/10 bg-black/20 p-5 font-mono text-sm text-zinc-300">
+              <p className="text-electric mb-3">RAW OFFER</p>
+              <p>Vertical: High-risk affiliate</p><p>Network: [network]</p><p>Offer: [offer]</p><p>Payout: [source value]</p><p className="mt-3 text-amber-300">Restrictions:</p><p>• [source restriction]</p><p>• [source restriction]</p><p>• [source restriction]</p>
+            </div>
+            <div className="rounded-xl border border-electric/20 bg-electric/[0.04] p-5">
+              <p className="text-electric font-mono text-sm mb-3">NECTAR RETURNS</p>
+              <p className="text-white font-semibold">Multiple campaign directions</p><p className="mt-1 text-zinc-300">Distinct platform-specific copy, not nine copies of the same post.</p>
+              <div className="mt-4 flex items-center gap-2 text-sm text-emerald-300"><ShieldCheck className="h-4 w-4" /> Risk signals checked before publishing</div>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* ── MERGED FEATURE BLOCK (replaces two-column layout) ── */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6 pb-16 sm:pb-20">
-        <motion.div
-          className="relative rounded-2xl overflow-hidden p-[2px]"
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.5 }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 rounded-2xl" aria-hidden="true" />
-          <div className="relative rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-8">
-            <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-              Your offer is the source material.
-            </h3>
-            <p className="text-lg text-zinc-100 leading-relaxed mb-3">
-              Nectar Engine takes a raw affiliate offer and extracts its core value, angles, and compliance risks. Then it turns that into platform-specific content that actually works.
-            </p>
-            <p className="text-lg text-zinc-100 leading-relaxed">
-              Less prompting. More producing. No more staring at a blank page trying to figure out what to say.
-            </p>
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 pb-14">
+        <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 sm:p-8">
+          <p className="font-mono text-sm uppercase tracking-widest text-electric">Nine platforms, one source of truth</p>
+          <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-white">The same offer, different platform realities.</h2>
+          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {PLATFORMS.map(([name, risk]) => <div key={name} className="rounded-lg border border-white/10 bg-black/20 px-4 py-3 flex justify-between gap-3"><span className="font-mono text-sm text-zinc-200">{name}</span><span className="font-mono text-xs text-zinc-400">{risk}</span></div>)}
           </div>
-        </motion.div>
+          <Link href="/compliance" className="mt-5 inline-flex items-center gap-1.5 text-electric font-semibold">See the full Compliance Matrix <ArrowRight className="h-4 w-4" /></Link>
+        </div>
       </section>
 
-      {/* ── BOTTOM NAV ROW ── */}
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 pb-14">
+        <div className="rounded-2xl border border-amber-500/20 bg-slate-900/80 p-6 sm:p-8">
+          <p className="font-mono text-sm uppercase tracking-widest text-amber-300">Built for restricted verticals</p>
+          <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-white">The messy part is the point.</h2>
+          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-zinc-200">Nectar is built for affiliates working where generic copy tools can miss platform rules, offer restrictions, or the difference between a clever angle and a costly mistake. The scanner gives you risk signals, not a magic compliance certificate.</p>
+          <Link href="/faq" className="mt-5 inline-flex items-center gap-1.5 text-electric font-semibold">Read the FAQ <ArrowRight className="h-4 w-4" /></Link>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 pb-16">
+        <div className="rounded-2xl border border-white/10 bg-[#171b26]/90 p-6 sm:p-8">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div><p className="font-mono text-sm uppercase tracking-widest text-electric">Free Generator</p><p className="mt-2 text-xl text-white font-semibold">3 free generations</p><p className="mt-2 text-zinc-300">A working taste of the offer-to-output engine, no signup.</p></div>
+            <div><p className="font-mono text-sm uppercase tracking-widest text-electric">Nectar Engine · $47</p><p className="mt-2 text-xl text-white font-semibold">Generator + Compliance Scanner</p><p className="mt-2 text-zinc-300">The full workflow for turning source material into platform-aware campaigns and checking the copy before publishing.</p></div>
+          </div>
+          <a href="https://sinaloainspired.gumroad.com/l/nectar-engine" target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-electric px-7 h-12 text-lg font-semibold text-background">Get Nectar Engine <ArrowRight className="h-4 w-4" /></a>
+          <p className="mt-6 text-sm text-zinc-400">Nectar Engine provides strategic risk signals, not legal advice, guaranteed approval, reach, conversions, or immunity from platform moderation.</p>
+        </div>
+      </section>
       <BottomNavRow />
     </div>
   );
