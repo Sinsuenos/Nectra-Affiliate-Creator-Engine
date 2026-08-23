@@ -28,6 +28,12 @@ export function SiteFooter() {
               FAQ
             </Link>
             <Link
+              href="/contact"
+              className="hover:text-foreground transition-colors"
+            >
+              Contact
+            </Link>
+            <Link
               href="/terms"
               className="hover:text-foreground transition-colors"
             >

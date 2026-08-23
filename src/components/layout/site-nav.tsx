@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/generator", label: "Generator" },
   { href: "/scanner", label: "Scanner" },
   { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Contact" },
 ] as const;
 
 export function SiteNav() {

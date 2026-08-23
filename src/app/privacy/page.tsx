@@ -28,12 +28,12 @@ const sections = [
     body: `If an email address is provided, it is used only for: (a) delivering purchase confirmations and access to the Product; (b) responding to support requests. We do not use your email for marketing, newsletters, or any purpose beyond delivery and support unless you explicitly opt in.`,
   },
   {
-    heading: "Data We Do Not Collect",
-    body: `Nectar Engine does not collect: browsing history, device fingerprints, location data, payment details beyond what is processed by the payment processor, or any data entered into the Product's input fields (offer details, paste content, or generated outputs). All content you enter into the Product remains in your browser session and is not transmitted to or stored on our servers.`,
+    heading: "How API Inputs Are Handled",
+    body: `When you use the Generator or Compliance Scanner, the text you submit (affiliate-offer text for generation, promotional copy for scanning) is transmitted to Nectar Engine's server over HTTPS and processed for the requested operation. The Generator forwards your offer text to a third-party language-model provider (OpenRouter) to produce generated content. The Scanner forwards your content to a third-party language-model provider (Google Gemini) to identify platform-specific risk phrases. Neither your inputs nor the generated outputs are persisted in a database — they exist only for the duration of the request and are discarded after the response is returned. We do not retain, log, or reuse submitted content for any purpose beyond completing the request you initiated.`,
   },
   {
     heading: "Third-Party Services",
-    body: `The Product may use Vercel Analytics to collect anonymous, aggregated page view data (pages visited, general geographic region, device type). This data cannot identify you personally. No analytics data is sold to third parties. Payment processing, if applicable, is handled by the applicable payment processor under their own privacy policy.`,
+    body: `The Product uses Vercel Analytics to collect anonymous, aggregated page-view data (pages visited, general geographic region, device type). This data cannot identify you personally. No analytics data is sold to third parties. The Generator and Scanner route your input through third-party language-model providers (OpenRouter and Google Gemini respectively) under their own privacy and retention policies; those providers process your input server-side to return the generated result. Payment processing, if applicable, is handled by the applicable payment processor (Gumroad) under their own privacy policy.`,
   },
   {
     heading: "No Data Sold or Shared",
@@ -41,19 +41,19 @@ const sections = [
   },
   {
     heading: "Cookies and Local Storage",
-    body: `The Product may use browser local storage to save your preferences or session state during use. No tracking cookies from Nectar Engine are set. Third-party services (such as Vercel Analytics) may set their own cookies as described in their respective privacy policies.`,
+    body: `The Product may use browser local storage to save your preferences or session state during use (for example, counting your 3 free Generator uses). No tracking cookies from Nectar Engine are set. Third-party services (such as Vercel Analytics and Google Analytics) may set their own cookies as described in their respective privacy policies.`,
   },
   {
     heading: "Data Retention",
-    body: `Since Nectar Engine does not collect personal data through the Product interface, there is no personal data to retain. Email addresses provided for purchase or support are retained only as long as necessary for order fulfillment and support purposes.`,
+    body: `Nectar Engine does not persist API inputs (submitted offer text or scan content) in any database — they are processed in-memory for the request and discarded after the response is returned. Email addresses provided for purchase or support are retained only as long as necessary for order fulfillment and support purposes. Aggregate, anonymous page-view analytics are retained by Vercel Analytics per their default retention policy.`,
   },
   {
     heading: "Your Rights",
-    body: `Depending on your jurisdiction, you may have the right to access, correct, or delete any personal information we hold about you. To exercise these rights, contact us using the information provided below. We will respond within a reasonable timeframe.`,
+    body: `Depending on your jurisdiction, you may have the right to access or correct personal information we hold about you (such as an email provided for purchase or support). Because API inputs are not persisted, there is no stored API-input data to access or delete. To exercise your rights regarding personal information, contact us using the information provided below. We will respond within a reasonable timeframe.`,
   },
   {
     heading: "Session Data",
-    body: `Each user receives 3 free content generations. Your generated content lives only in your browser session. Copy or save anything you want to keep. Once you navigate away, refresh the page, or clear your browser data, your pasted offers and generated output are gone. We do not store your pasted offers or generated output on our servers.`,
+    body: `Each visitor receives 3 free Generator uses per browser session, tracked via browser local storage. Your generated content lives only in your browser session for the current tab. Copy or save anything you want to keep. Once you navigate away, refresh the page, or clear your browser data, your pasted offers and generated output are gone from your browser. The server-side copies of your inputs were already discarded when the request completed.`,
   },
   {
     heading: "Contact",

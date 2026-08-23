@@ -16,7 +16,7 @@ const FAQ_DATA = [
   {"question":"Do you store or steal my secret affiliate sauce?","answer":"No. Your offers, angles, and that one weird sub-niche you don't tell your family about stay on your machine. We don't log prompts, we don't resell data, and we certainly don't need to know why you're pushing kale supplements to crypto bros."},
   {"question":"How much does it cost and what's the catch?","answer":"One price, lifetime access, via Gumroad\u2014buy once, cry once. No subscriptions, no credits, no 'premium pro max ultra' tiers. If we ever add a paid add-on (like a Risqu\u00e9 Filter), we'll be annoyingly transparent about it."},
   {"question":"What is the Protect / Check This Toolkit button?","answer":"It's the sober friend who reads your post before you hit send. It runs your generated content through the full compliance scanner and returns specific warnings, a rewrite, and a copy button, so your clever innuendo doesn't accidentally violate three platform policies at once."},
-  {"question":"How do I reach support at 2 AM when everything is on fire?","answer":"Email the placeholder address (we'll replace it soon, promise). We can't guarantee an instant reply at 2 AM, but we've been there, and we'll respond with genuine empathy and maybe a GIF of a dumpster fire. You're not alone."}
+  {"question":"How do I reach support at 2 AM when everything is on fire?","answer":"Email sinaloainspireddreams@gmail.com — that's the real, monitored inbox. We can't guarantee an instant reply at 2 AM, but we've been there, and we'll respond with genuine empathy and maybe a GIF of a dumpster fire. You're not alone."}
 ];
 
 const DEFAULT_OPEN = 4;

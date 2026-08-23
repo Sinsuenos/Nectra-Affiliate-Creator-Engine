@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { handleCorsPreflight, withCors } from "@/lib/cors";
 
 export const maxDuration = 60;
 
@@ -182,15 +183,19 @@ async function callOpenRouter(offerText: string, offerUrl?: string): Promise<str
   return content;
 }
 
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsPreflight(request);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body: GenerateRequest = await request.json();
     const { offerText, offerUrl } = body;
     if (!offerText || typeof offerText !== "string" || offerText.trim().length < 20) {
-      return NextResponse.json({ error: "Offer text is required and must be at least 20 characters." }, { status: 400 });
+      return withCors(NextResponse.json({ error: "Offer text is required and must be at least 20 characters." }, { status: 400 }), request);
     }
     if (offerUrl && typeof offerUrl !== "string") {
-      return NextResponse.json({ error: "Offer URL must be a valid URL string." }, { status: 400 });
+      return withCors(NextResponse.json({ error: "Offer URL must be a valid URL string." }, { status: 400 }), request);
     }
 
     const raw = await callOpenRouter(offerText, offerUrl);
@@ -200,27 +205,27 @@ export async function POST(request: NextRequest) {
 
     let parsed: GeneratedToolkit;
     try { parsed = JSON.parse(cleaned) as GeneratedToolkit; }
-    catch { return NextResponse.json({ error: "The model returned invalid JSON. Please try again." }, { status: 502 }); }
+    catch { return withCors(NextResponse.json({ error: "The model returned invalid JSON. Please try again." }, { status: 502 }), request); }
 
     const requiredKeys: (keyof GeneratedToolkit)[] = ["promo_angles", "social_posts", "headlines", "body_copy", "cta_variations", "compliance_notes"];
-    for (const key of requiredKeys) if (!parsed[key]) return NextResponse.json({ error: `Generated output is missing required field: ${key}` }, { status: 502 });
-    if (!Array.isArray(parsed.social_posts)) return NextResponse.json({ error: "Generated output contains an invalid social_posts list." }, { status: 502 });
+    for (const key of requiredKeys) if (!parsed[key]) return withCors(NextResponse.json({ error: `Generated output is missing required field: ${key}` }, { status: 502 }), request);
+    if (!Array.isArray(parsed.social_posts)) return withCors(NextResponse.json({ error: "Generated output contains an invalid social_posts list." }, { status: 502 }), request);
 
     const requiredPlatforms = ["X", "TikTok", "Pinterest", "Reddit", "Instagram", "Facebook", "Snapchat", "Discord", "Telegram"];
     const postsByPlatform = new Map(parsed.social_posts.map((post) => [post.platform, post]));
     const missingPlatforms = requiredPlatforms.filter((platform) => !postsByPlatform.has(platform));
-    if (missingPlatforms.length) return NextResponse.json({ error: `Generated output is missing platforms: ${missingPlatforms.join(", ")}` }, { status: 502 });
+    if (missingPlatforms.length) return withCors(NextResponse.json({ error: `Generated output is missing platforms: ${missingPlatforms.join(", ")}` }, { status: 502 }), request);
     parsed.social_posts = requiredPlatforms.map((platform) => {
       const post = postsByPlatform.get(platform)!;
       return { ...post, character_count: typeof post.text === "string" ? post.text.length : 0 };
     });
-    return NextResponse.json({ data: parsed });
+    return withCors(NextResponse.json({ data: parsed }), request);
   } catch (err: unknown) {
     console.error("Generation Error:", err);
     const message = err instanceof Error ? err.message : "Unknown error";
-    if (message.includes("429") || message.includes("rate") || message.includes("quota") || message.includes("insufficient")) return NextResponse.json({ error: "Rate limit or billing issue. Please wait a moment and try again." }, { status: 429 });
-    if (message.includes("not configured") || message.includes("not set")) return NextResponse.json({ error: message }, { status: 503 });
-    if (message.includes("401") || message.includes("403") || message.includes("invalid")) return NextResponse.json({ error: "API key is invalid or unauthorized." }, { status: 503 });
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (message.includes("429") || message.includes("rate") || message.includes("quota") || message.includes("insufficient")) return withCors(NextResponse.json({ error: "Rate limit or billing issue. Please wait a moment and try again." }, { status: 429 }), request);
+    if (message.includes("not configured") || message.includes("not set")) return withCors(NextResponse.json({ error: message }, { status: 503 }), request);
+    if (message.includes("401") || message.includes("403") || message.includes("invalid")) return withCors(NextResponse.json({ error: "API key is invalid or unauthorized." }, { status: 503 }), request);
+    return withCors(NextResponse.json({ error: message }, { status: 500 }), request);
   }
 }

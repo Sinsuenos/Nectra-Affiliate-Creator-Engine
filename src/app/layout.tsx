@@ -12,8 +12,13 @@ const spaceGrotesk = Space_Grotesk({ variable: "--font-space-grotesk", subsets: 
 const jetbrainsMono = JetBrains_Mono({ variable: "--font-jetbrains-mono", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://nectar-engine.vercel.app"),
   title: "Nectar Engine — Affiliate Content Architecture System",
   description: "A 9-module engine that architects, generates, and packages compliant affiliate content systems. Built for affiliates working high-risk, tightly-restricted verticals.",
+  applicationName: "Nectar Engine",
+  authors: [{ name: "Nectar Engine", url: "https://nectar-engine.vercel.app" }],
+  creator: "Nectar Engine",
+  publisher: "Nectar Engine",
   icons: {
     icon: [
       { url: "/favicon-32.png?v=2", sizes: "32x32", type: "image/png" },
@@ -22,7 +27,27 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png?v=2",
   },
-  openGraph: { title: "Nectar Engine", description: "A 9-module engine that architects, generates, and packages compliant affiliate content systems.", type: "website" },
+  openGraph: {
+    title: "Nectar Engine",
+    description: "A 9-module engine that architects, generates, and packages compliant affiliate content systems.",
+    type: "website",
+    url: "https://nectar-engine.vercel.app",
+    siteName: "Nectar Engine",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Nectar Engine — Affiliate Content Architecture System",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Nectar Engine",
+    description: "Affiliate content architecture, generation, and compliance scanning.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

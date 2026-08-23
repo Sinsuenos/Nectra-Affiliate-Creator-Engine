@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { PLATFORM_MATRIX } from "@/lib/compliance/platform-matrix";
+import { handleCorsPreflight, withCors } from "@/lib/cors";
 
 export const maxDuration = 60;
 
@@ -158,8 +159,12 @@ function validateResults(
   return output;
 }
 
-function errorResponse(error: string, diagnostic: string, status: number) {
-  return NextResponse.json({ error, diagnostic }, { status });
+function errorResponse(error: string, diagnostic: string, status: number, request: NextRequest) {
+  return withCors(NextResponse.json({ error, diagnostic }, { status }), request);
+}
+
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsPreflight(request);
 }
 
 export async function POST(request: NextRequest) {
@@ -175,6 +180,7 @@ export async function POST(request: NextRequest) {
         "Content is required and must be at least 10 characters.",
         "invalid_input",
         400,
+        request,
       );
     }
     if (platforms.length === 0) {
@@ -182,6 +188,7 @@ export async function POST(request: NextRequest) {
         "At least one platform must be selected.",
         "no_platforms",
         400,
+        request,
       );
     }
 
@@ -191,6 +198,7 @@ export async function POST(request: NextRequest) {
         "Scanner is not configured on the server. No compliance clearance was issued.",
         "GEMINI_API_KEY_missing",
         503,
+        request,
       );
     }
 
@@ -224,7 +232,7 @@ export async function POST(request: NextRequest) {
 
         const results = validateResults(content, platforms, parsed);
         if (!results) throw new Error("invalid scanner result schema");
-        return NextResponse.json({ data: results });
+        return withCors(NextResponse.json({ data: results }), request);
       } catch (err) {
         lastError = err instanceof Error ? err.message : String(err);
         console.error(`Scanner attempt ${attempt + 1} failed (model=${model}):`, lastError);
@@ -244,6 +252,7 @@ export async function POST(request: NextRequest) {
         "Scan temporarily unavailable. Please try again in a moment.",
         "provider_rate_limit",
         503,
+        request,
       );
     }
     if (lower.includes("timeout") || lower.includes("abort")) {
@@ -251,6 +260,7 @@ export async function POST(request: NextRequest) {
         "The scanner timed out waiting for the model. Try again.",
         "timeout",
         504,
+        request,
       );
     }
     if (
@@ -265,6 +275,7 @@ export async function POST(request: NextRequest) {
         "Scanner is not configured on the server. No compliance clearance was issued.",
         `auth_error:${lastError.slice(0, 160)}`,
         503,
+        request,
       );
     }
 
@@ -272,6 +283,7 @@ export async function POST(request: NextRequest) {
       "The scanner could not complete the AI check. No compliance clearance was issued. Please try again.",
       `scanner_failed:${lastError.slice(0, 200)}`,
       503,
+      request,
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unexpected scanner error";
@@ -280,6 +292,7 @@ export async function POST(request: NextRequest) {
       "The scanner could not process this request. Please try again.",
       message.slice(0, 160),
       500,
+      request,
     );
   }
 }
