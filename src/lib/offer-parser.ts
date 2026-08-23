@@ -2,6 +2,8 @@
 /*  ROBUST OFFER FIELD EXTRACTION                                     */
 /* ------------------------------------------------------------------ */
 
+import { extractRestrictions } from "./restriction-parser";
+
 export interface ParsedField {
   key: string;
   label: string;
@@ -16,6 +18,37 @@ interface FieldDef {
 }
 
 const LABEL_PREFIX = String.raw`(?:[-*•]\s*)?`;
+
+// Known conversion-type tokens that may appear inside a payout string.
+// Used to derive a normalized Conversion Flow value when no explicit
+// "Conversion Flow:" label exists in the source.
+const CONVERSION_TYPE_MAP: Record<string, string> = {
+  PPS: "Pay Per Sale",
+  CPA: "Cost Per Action",
+  CPL: "Cost Per Lead",
+  CPI: "Cost Per Install",
+  CPS: "Cost Per Sale",
+  CPM: "Cost Per Mille",
+  RevShare: "Revenue Share",
+  REVSHARE: "Revenue Share",
+  "REVENUE SHARE": "Revenue Share",
+  PPC: "Pay Per Click",
+  PPV: "Pay Per View",
+};
+
+function normalizeConversionType(token: string): string | null {
+  const upper = token.toUpperCase().replace(/[^A-Z]/g, "");
+  if (upper === "PPS") return "PPS (Pay Per Sale)";
+  if (upper === "CPA") return "CPA (Cost Per Action)";
+  if (upper === "CPL") return "CPL (Cost Per Lead)";
+  if (upper === "CPI") return "CPI (Cost Per Install)";
+  if (upper === "CPS") return "CPS (Cost Per Sale)";
+  if (upper === "CPM") return "CPM (Cost Per Mille)";
+  if (upper === "PPC") return "PPC (Pay Per Click)";
+  if (upper === "PPV") return "PPV (Pay Per View)";
+  if (upper === "REVENUESHARE" || upper === "REVSHARE") return "RevShare (Revenue Share)";
+  return null;
+}
 
 const FIELD_DEFS: FieldDef[] = [
   {
@@ -50,9 +83,26 @@ const FIELD_DEFS: FieldDef[] = [
   },
   {
     key: "top_geo",
-    label: "Available Countries",
-    aliases: ["top geo", "geo", "geos", "countries", "target countries", "accepted countries", "allowed countries", "available countries"],
-    patterns: [new RegExp(`^${LABEL_PREFIX}(?:(?:top[\\s_-]?)?(?:geo|geos)|target[\\s_-]?countries|accepted[\\s_-]?countries|allowed[\\s_-]?countries|available[\\s_-]?countries)[\\s:#|=\\-]+([^\\n|]+)`, "im")],
+    // Label reflects what is actually being extracted from affiliate-network offer text.
+    // Source data lines like "Top Performing Countries: FR,SG,UK,US" describe top
+    // performers, not guaranteed availability — keeping the label honest prevents
+    // implying broader geo availability than the source actually states.
+    label: "Top Performing Countries",
+    aliases: [
+      "top performing countries",
+      "top-performing countries",
+      "top countries",
+      "performing countries",
+      "top geo",
+      "geo",
+      "geos",
+      "countries",
+      "target countries",
+      "accepted countries",
+      "allowed countries",
+      "available countries",
+    ],
+    patterns: [new RegExp(`^${LABEL_PREFIX}(?:top[\\s_-]?performing[\\s_-]?countries|top[\\s_-]?countries|performing[\\s_-]?countries|(?:top[\\s_-]?)?(?:geo|geos)|target[\\s_-]?countries|accepted[\\s_-]?countries|allowed[\\s_-]?countries|available[\\s_-]?countries)[\\s:#|=\\-]+([^\\n|]+)`, "im")],
   },
   {
     key: "landing_page",
@@ -63,10 +113,13 @@ const FIELD_DEFS: FieldDef[] = [
   {
     key: "banned_traffic",
     label: "Banned Traffic Types",
-    aliases: ["banned traffic", "banned traffic types", "prohibited traffic", "restricted traffic", "forbidden traffic", "traffic restrictions", "traffic allowed", "traffic sources"],
+    aliases: ["banned traffic", "banned traffic types", "prohibited traffic", "restricted traffic", "forbidden traffic", "traffic restrictions", "traffic allowed", "traffic sources", "restrictions", "restricted", "prohibited", "forbidden", "banned"],
     patterns: [
       new RegExp(`^${LABEL_PREFIX}(?:banned|prohibited|restricted|forbidden)[\\s_-]?traffic(?:[\\s_-]?types)?[\\s:#|=\\-]+([^\\n|]+)`, "im"),
       new RegExp(`^${LABEL_PREFIX}(?:traffic[\\s_-]?restrictions|traffic[\\s_-]?allowed|traffic[\\s_-]?sources)[\\s:#|=\\-]+([^\\n|]+)`, "im"),
+      // Bare "Restrictions No Incentive No Bot ..." (no colon, no "traffic" word).
+      // Captures everything after the heading on the same line.
+      new RegExp(`^${LABEL_PREFIX}(?:restrictions?|prohibited|forbidden|banned)[\\s:#|=\\-]+(.+)$`, "im"),
     ],
   },
   {
@@ -232,6 +285,198 @@ function extractProsePayout(source: string): string | null {
   return null;
 }
 
+// ---------------------------------------------------------------------------
+//  SUB-ID / TRACKING URL EXTRACTION
+// ---------------------------------------------------------------------------
+// Affiliate networks ship explicit tracking URLs with query parameters like
+//   ?aff_sub=NEWMODE&aff_sub2=DESKTOP&source=CANTINA&aff_sub5=SF_006OG000004lmDN
+// Often there are two URLs (one labeled LAPTOP / DESKTOP, one labeled MOBILE)
+// that differ only in aff_sub2. We preserve both rather than collapsing them.
+
+export interface TrackingUrl {
+  /** Canonical label (e.g. "DESKTOP", "MOBILE", or "DEFAULT" if unlabeled). */
+  context: string;
+  /** The full tracking URL as it appeared in the source text. */
+  url: string;
+  /** Parsed query parameters from the URL. */
+  params: Record<string, string>;
+}
+
+export interface SubIdData {
+  /** All tracking URLs discovered, in source order. */
+  trackingUrls: TrackingUrl[];
+  /**
+   * Per-parameter aggregation. For parameters that vary by context (e.g.
+   * aff_sub2=DESKTOP in one URL and aff_sub2=MOBILE in another), the value
+   * is an array of distinct values; otherwise it's a single-element array.
+   */
+  params: Record<string, string[]>;
+  /**
+   * Convenience: human-readable summary string used for the "Sub-ID Format"
+   * parsed field in the UI. Format: "aff_sub=NEWMODE; aff_sub2=DESKTOP/MOBILE; ..."
+   */
+  summary: string;
+}
+
+const TRACKING_URL_RE = /https?:\/\/[^\s"'<>'")\]]+\?(?:[^#\s]*\baff_sub\d?=[^#\s&|]+[^#\s|]*)/gi;
+const DEVICE_CONTEXT_RE = /^\s*(LAPTOP|DESKTOP|MOBILE|TABLET|WEB|APP)\s*:?\s*$/i;
+
+function parseQueryParams(url: string): Record<string, string> {
+  try {
+    const q = url.split("?")[1];
+    if (!q) return {};
+    const fragmentless = q.split("#")[0];
+    const out: Record<string, string> = {};
+    for (const pair of fragmentless.split("&")) {
+      const eq = pair.indexOf("=");
+      if (eq <= 0) continue;
+      const k = decodeURIComponent(pair.slice(0, eq));
+      // Strip trailing JS-string terminator chars (' or ") that may
+      // have been captured when a URL was embedded in a <script> tag.
+      const v = decodeURIComponent(pair.slice(eq + 1)).replace(/['"]+$/, "");
+      if (k && v) out[k] = v;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+function cleanUrlString(url: string): string {
+  // Strip trailing JS-string terminators (', ", `, ), ;, ,, ], }) that may
+  // be captured when a URL is embedded inside a <script> tag or JS object.
+  return url.replace(/['"`);,\]}]+$/, "");
+}
+
+export function extractSubIdData(text: string): SubIdData | null {
+  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+
+  // Find all tracking URLs along with the most recent "LAPTOP" / "MOBILE"
+  // context label that appeared on a line by itself immediately above.
+  // We collect both labeled and unlabeled URLs separately: labeled URLs
+  // are the user-visible "tracking URL" source-of-truth; unlabeled URLs
+  // (e.g. embedded inside <script> tags) are only used as a fallback.
+  const labeled: TrackingUrl[] = [];
+  const unlabeled: TrackingUrl[] = [];
+  let pendingContext: string | null = null;
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    const ctx = line.match(DEVICE_CONTEXT_RE);
+    if (ctx) {
+      pendingContext = ctx[1].toUpperCase();
+      continue;
+    }
+    if (!line) continue;
+
+    // Pull all tracking URLs from this line (most lines have 1).
+    const matches = line.matchAll(TRACKING_URL_RE);
+    for (const m of matches) {
+      const url = cleanUrlString(m[0]);
+      const params = parseQueryParams(url);
+      if (Object.keys(params).length === 0) continue;
+      // Only register URLs that actually contain affiliate tracking parameters
+      // (aff_sub, aff_sub2, source, aff_sub3, aff_sub4, aff_sub5, etc.).
+      const hasAffParam = Object.keys(params).some((k) => /^aff_sub\d?$|^source$|^aff_id$/i.test(k));
+      if (!hasAffParam) continue;
+      const entry: TrackingUrl = {
+        context: pendingContext ?? "DEFAULT",
+        url,
+        params,
+      };
+      if (pendingContext) labeled.push(entry);
+      else unlabeled.push(entry);
+    }
+    // Reset context after consuming a URL line so the next label is required
+    // before another URL is attributed to that context.
+    pendingContext = null;
+  }
+
+  // Prefer labeled URLs. Fall back to unlabeled only if no labeled URLs exist.
+  const trackingUrls = labeled.length > 0 ? labeled : unlabeled;
+  if (trackingUrls.length === 0) return null;
+
+  // Aggregate per-parameter: collect distinct values across all tracking URLs,
+  // preserving first-seen order.
+  const params: Record<string, string[]> = {};
+  for (const t of trackingUrls) {
+    for (const [k, v] of Object.entries(t.params)) {
+      if (!params[k]) params[k] = [];
+      if (!params[k].includes(v)) params[k].push(v);
+    }
+  }
+
+  // Build a human-readable summary. Use the canonical tracking-parameter
+  // ordering: aff_sub, aff_sub2, aff_sub3, aff_sub4, aff_sub5, source, aff_id,
+  // then any remaining keys in insertion order.
+  const canonicalOrder = ["aff_sub", "aff_sub2", "aff_sub3", "aff_sub4", "aff_sub5", "source", "aff_id"];
+  const seen = new Set<string>();
+  const orderedKeys: string[] = [];
+  for (const k of canonicalOrder) {
+    if (params[k]) {
+      orderedKeys.push(k);
+      seen.add(k);
+    }
+  }
+  for (const k of Object.keys(params)) {
+    if (!seen.has(k)) orderedKeys.push(k);
+  }
+
+  const parts = orderedKeys.map((k) => `${k}=${params[k].join("/")}`);
+  const summary = parts.join("; ");
+
+  return { trackingUrls, params, summary };
+}
+
+// ---------------------------------------------------------------------------
+//  RESTRICTION SPLITTING
+// ---------------------------------------------------------------------------
+// A captured "Restrictions" string may be either:
+//   "No Incentive No Bot No Misleading No Brand Impersonation ..."
+// or a semicolon/comma-separated list, or a multi-line list. Split it into
+// individual normalized restriction entries. Never invent entries — only
+// reformat what is actually present.
+
+function splitRestrictions(rawValue: string): string[] {
+  if (!rawValue) return [];
+  // Normalize separators: split on semicolons and commas first so that
+  // explicit lists ("No X; No Y; No Z") become line-based.
+  const normalized = rawValue.replace(/\s*;\s*/g, "\n").replace(/\s*,\s*/g, "\n");
+  const lines = normalized.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+
+  const out: string[] = [];
+  const seen = new Set<string>();
+
+  const push = (value: string) => {
+    const cleaned = value.trim();
+    if (!cleaned) return;
+    const key = cleaned.toLowerCase().replace(/\s+/g, " ");
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(cleaned);
+  };
+
+  // Match each "No X" item where X can be one or more words. Items are
+  // bounded by the next " No " token or end-of-line. This handles both
+  // run-on form ("No Incentive No Bot No Misleading...") and explicit
+  // multi-word items ("No Brand Impersonation", "No Brand Bidding").
+  const NO_ITEM_RE = /No\s+[A-Za-z][^,;|\n]*?(?=\s+No\s+[A-Za-z]|$)/g;
+
+  for (const line of lines) {
+    const matches = [...line.matchAll(NO_ITEM_RE)];
+    if (matches.length === 0) {
+      // Line doesn't follow the "No X" pattern — push as-is.
+      push(line);
+      continue;
+    }
+    for (const m of matches) {
+      push(m[0]);
+    }
+  }
+
+  return out;
+}
+
 function extractField(def: FieldDef, source: string, lines: string[]): string | null {
   for (const pattern of def.patterns) {
     const match = source.match(pattern);
@@ -253,21 +498,83 @@ export function extractFields(text: string): ParsedField[] {
   const source = text.replace(/\r\n?/g, "\n");
   const lines = normalizedLines(source);
 
-  return FIELD_DEFS.map((def) => {
-    let value = extractField(def, source, lines);
+  // First pass: extract every field using existing logic.
+  const preliminary = FIELD_DEFS.map((def) => ({
+    def,
+    value: extractField(def, source, lines),
+  }));
+
+  // Look up the payout value (needed for conversion-flow normalization).
+  const payoutValue = preliminary.find((p) => p.def.key === "payout_model")?.value ?? null;
+
+  return preliminary.map(({ def, value }) => {
+    let final = value;
+
     if (def.key === "offer_name") {
-      if (!value) value = extractOfferNameFromProse(lines) ?? extractOfferNameFromAnyLine(lines) ?? extractOfferNameFromFirstMeaningfulLine(lines);
+      if (!final) final = extractOfferNameFromProse(lines) ?? extractOfferNameFromAnyLine(lines) ?? extractOfferNameFromFirstMeaningfulLine(lines);
       // If extracted name is suspiciously long (>10 words), it's likely a wrong match
       // (e.g. "Offer Description" line captured by the broad "offer" alias).
       // Fall back to the first line of pasted text.
-      if (value && value.split(/\s+/).length > 10) {
-        value = extractOfferNameFromFirstLine(lines) ?? value.split(/\s+/).slice(0, 6).join(" ");
+      if (final && final.split(/\s+/).length > 10) {
+        final = extractOfferNameFromFirstLine(lines) ?? final.split(/\s+/).slice(0, 6).join(" ");
       }
     }
-    if (def.key === "vertical" && !value) value = extractProseVertical(source);
-    if (def.key === "payout_model" && !value) value = extractProsePayout(source);
-    if (def.key === "landing_page" && !value) value = extractStandaloneUrl(lines);
-    return { key: def.key, label: def.label, value: value || "Not detected" };
+    if (def.key === "vertical" && !final) final = extractProseVertical(source);
+    if (def.key === "payout_model" && !final) final = extractProsePayout(source);
+    if (def.key === "landing_page" && !final) final = extractStandaloneUrl(lines);
+
+    // Conversion Flow: if no explicit "Conversion Flow:" label was found, but
+    // the payout string contains a known conversion-type token (PPS, CPA,
+    // CPL, CPI, CPS, CPM, RevShare, PPC, PPV), normalize the token and use
+    // it as the conversion flow. This is normalization of explicitly present
+    // data, not fabrication.
+    if (def.key === "conversion_flow" && !final && payoutValue) {
+      const tokens = payoutValue.split(/[\s|,;]+/).filter(Boolean);
+      for (const tok of tokens) {
+        const normalized = normalizeConversionType(tok);
+        if (normalized) {
+          final = normalized;
+          break;
+        }
+      }
+    }
+
+    // Banned Traffic Types: if the explicit "banned traffic" patterns matched,
+    // the captured value may be a run-on string like "No Incentive No Bot..."
+    // Split it into a clean semicolon-separated list. If no explicit pattern
+    // matched, OR if only one item was captured (likely because
+    // extractFollowingLineValue only grabs the FIRST bullet of a multi-line
+    // list), fall back to the heading-aware restriction-parser library which
+    // collects ALL bullet items after a "Restrictions:" heading.
+    if (def.key === "banned_traffic") {
+      if (final) {
+        const parts = splitRestrictions(final);
+        if (parts.length > 1) final = parts.join("; ");
+      }
+      // Always try the heading-aware parser when we have 0 or 1 captured item.
+      // If it returns 2+ items (a real list), use it. If we had nothing and it
+      // returns 1 item, use that.
+      const currentItemCount = final ? final.split(";").map((s) => s.trim()).filter(Boolean).length : 0;
+      if (currentItemCount < 2) {
+        const detected = extractRestrictions(source);
+        if (detected.length >= 2) {
+          final = detected.map((r) => r.text).join("; ");
+        } else if (detected.length === 1 && !final) {
+          final = detected[0].text;
+        }
+      }
+    }
+
+    // Sub-ID Format: if no explicit "Sub-ID:" label was found, try to extract
+    // structured tracking-URL data. The UI field's value becomes the human-
+    // readable summary string; the structured form is also available via
+    // extractSubIdData() for downstream consumers.
+    if (def.key === "subid_format" && !final) {
+      const subId = extractSubIdData(source);
+      if (subId) final = subId.summary;
+    }
+
+    return { key: def.key, label: def.label, value: final || "Not detected" };
   });
 }
 

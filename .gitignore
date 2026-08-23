@@ -46,7 +46,6 @@ local-*
 *.log
 dev.log
 dev.out.log
-test
 prompt
 
 server.log
@@ -54,7 +53,6 @@ server.log
 # Sandbox-only files
 /Caddyfile
 /examples/
-/tests/
 /download/
 /db/
 /tool-results/
