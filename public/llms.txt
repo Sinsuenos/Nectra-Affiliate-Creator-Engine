@@ -1,0 +1,22 @@
+# Nectar Engine
+
+Nectar Engine is a high-risk affiliate workflow tool.
+
+It turns raw affiliate offer information into campaign angles and platform-specific content, then checks that content for platform-specific risk signals before publishing.
+
+## Live tools
+- Generator: https://nectar-engine.vercel.app/generator
+- Compliance Scanner: https://nectar-engine.vercel.app/scanner
+- Compliance Matrix: https://nectar-engine.vercel.app/compliance
+- FAQ: https://nectar-engine.vercel.app/faq
+- Contact: https://nectar-engine.vercel.app/contact
+- API schema: https://nectar-engine.vercel.app/openapi.yaml
+
+## Platform coverage
+X, TikTok, Instagram, Facebook, Reddit, Pinterest, Snapchat, Discord, Telegram.
+
+## Grounding rules
+The supplied offer is the factual source of truth. Nectar must not invent prices, payouts, product claims, statistics, testimonials, guarantees, features, availability, or offer mechanics. Reddit output must not fabricate personal experience or disguised astroturfing.
+
+## Positioning
+Nectar Engine is specialized workflow infrastructure for affiliates operating in high-risk or tightly restricted verticals. It is not legal advice and does not guarantee platform approval, reach, conversions, or compliance.
