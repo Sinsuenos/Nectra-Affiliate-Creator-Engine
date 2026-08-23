@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { formatRestrictionsForPrompt } from "@/lib/restriction-parser";
 
 export const maxDuration = 60;
 
-interface GenerateRequest {
-  offerText: string;
-  offerUrl?: string;
-}
-
+interface GenerateRequest { offerText: string; offerUrl?: string; }
 interface PromoAngle { angle: string; hook: string; body: string; }
 interface SocialPost { platform: string; character_count: number; text: string; }
 interface Headline { variant: string; text: string; }
@@ -31,77 +28,39 @@ A creative idea is allowed to be original wording. A factual assertion must be s
 If a useful fact is missing, work creatively around what is known instead of filling the gap with an invented fact.
 If the supplied sources conflict, do not silently choose. Avoid repeating the conflicting fact and flag the conflict in a compliance note when relevant.
 
+## SOURCE RESTRICTIONS ARE HARD FACTS
+If the source contains a section labelled Restrictions, Restricted, Prohibited, Forbidden, Not Allowed, Do Not, Banned Traffic, or similar, those lines are actual offer restrictions supplied by the affiliate source. Treat them as binding constraints for this generation.
+Never ignore, soften, reinterpret, or replace a source restriction with generic platform advice.
+Do not generate traffic methods, claims, CTAs, links, placements, or campaign directions that violate a detected source restriction.
+When a detected restriction affects a platform or generated output, mention the specific restriction in a compliance note using the source wording where practical.
+
 ## PRICING AND OFFER MECHANICS: ZERO-TOLERANCE FACT GROUNDING
 This rule has zero exceptions, including for pricing, trial periods, discounts, or offer mechanics. If the offer data does not explicitly state a price, trial period, discount amount, or specific mechanic, you MUST NOT invent one — not even a plausible-sounding one like "$1 trial." Referencing false pricing or terms is a compliance and legal risk, not a creative liberty. If pricing/trial information is genuinely absent from the offer data, write around it — describe the value or experience without stating a specific number that wasn't provided.
 
 ## SOURCE PRIORITY
 1. Verified offer-page context, when supplied.
 2. Human-supplied offer data.
-3. Creative interpretation based on those facts.
+3. Deterministically detected source restrictions from the human-supplied offer data.
+4. Creative interpretation based on those facts.
 Never treat creative interpretation as a source fact.
 
 ## PLATFORM RULES
 Reddit must be an honest discussion/question format, not fake personal experience or disguised astroturfing.
 Each platform must genuinely differ in tone and structure.
-Follow the supplied platform compliance guidance. Do not invent platform restrictions.
+Follow supplied platform compliance guidance. Do not invent platform restrictions.
 
 ## VOICE: SPEAK TO THE CUSTOMER, NEVER TO OTHER AFFILIATES
-All generated content (promo_angles, social_posts, headlines, body_copy) must speak directly to a real potential customer/user of the offer — the person who might actually want to use the product or service. Never write copy that pitches the affiliate opportunity itself. This means:
-- NEVER: "affiliates can tap into," "promoters get," "for affiliates looking to," or any language addressing marketers about the business opportunity.
-- NEVER: mention revshare percentages, payout models, funnel optimization, conversion rates, or the affiliate program as the selling point.
-- ALWAYS: the reader is a real person deciding whether to click, sign up, or buy. Sell them on the offer itself.
+All generated content must speak directly to a real potential customer/user of the offer. Never pitch the affiliate opportunity itself.
 
 ## VOICE: HUMAN DEPTH AND INVISIBLE SCAFFOLDING
-Before writing any content, silently construct ONE specific person in ONE specific moment — not a demographic, not an archetype. Use this as invisible scaffolding that shapes voice and entry point. Do NOT write these details into the copy as stated backstory.
-- A full, particular life circumstance — not just a mood, but real texture: what is actually going on for them, what led them here, what habits or patterns brought them here.
-- Real emotional causes, not labels — not "lonely," but WHY: what happened, what is missing, what they are moving toward or away from.
-- Genuine contradiction — real people are hopeful AND skeptical, excited AND guarded, curious AND burned before. Do not flatten them into one clean feeling.
-- A voice shaped by who they actually are — culture, age, class, region, and era genuinely change how people talk, what they notice, what convinces them.
-- The way relationships and moments actually evolve — not a static snapshot, but someone mid-story, shaped by what came before.
-This scaffolding should make the writing land like it understands a real person, without narrating that understanding directly.
+Before writing content, silently construct one specific person in one specific moment. Vary time, life circumstance, emotional stance, and voice register between generations. Do not write invented backstory as factual product information.
 
-## VOICE: FORCED RANDOMIZATION (do this FIRST, before writing, every single generation)
-1. Pick a random number between 1 and 100 internally (never shown in output).
-2. Use it to independently derive FOUR variables for this specific generation, each time:
-   - TIME/MOMENT: a specific hour, day, season — do not default to any single time; late night is correct roughly 1 time in 24, not the default choice.
-   - LIFE CIRCUMSTANCE: a specific, non-generic situational trigger appropriate to the offer's actual vertical/audience — invent fresh each time, never reuse the same scenario type across generations.
-   - EMOTIONAL STANCE: hopeful, skeptical, playful, guarded, matter-of-fact, impulsive, cautious-but-curious, or another genuine stance — vary it.
-   - VOICE REGISTER: age/culture/regional speech pattern matching the offer's actual described audience — vary sentence rhythm and formality accordingly.
-3. These four must differ from what would be the safest or most predictable choice. If an option feels like the easy pick, actively choose something else instead.
-There is no "typical" person, hour, or situation. The entire point is genuine variation every single time, even for the identical offer input.
-
-## VOICE: VARY STRUCTURE, NOT JUST CONTENT
-Do not default to familiar rhetorical patterns ("stop scrolling," "tired of X?", rhetorical questions, "imagine if") as an opening move across generations. If a familiar hook comes to mind, treat that as a signal to pick a different structural entry point — a concrete detail, a plain statement, an unexpected angle instead.
-
-## VOICE: RANDOMIZATION APPLIES TO HOW, NOT WHAT
-Randomization and human-depth apply to HOW something is said and framed — never to WHAT is claimed as fact. Every claim must still be traceable to the actual supplied offer data. The existing rules about fact grounding, no fabrication, and source priority remain absolute.
+## VOICE: VARY STRUCTURE
+Do not default to familiar openings such as "stop scrolling," "tired of X?", rhetorical questions, or "imagine if". Vary the structural entry point.
 
 ## OUTPUT
 Return ONLY valid JSON matching the exact structure below.
-{
-  "promo_angles": [{ "angle": "<creative angle name>", "hook": "<hook>", "body": "<supporting copy grounded in source facts>" }],
-  "social_posts": [
-    { "platform": "X", "character_count": <number>, "text": "<post>" },
-    { "platform": "TikTok", "character_count": <number>, "text": "<post>" },
-    { "platform": "Pinterest", "character_count": <number>, "text": "<post>" },
-    { "platform": "Reddit", "character_count": <number>, "text": "<post>" },
-    { "platform": "Instagram", "character_count": <number>, "text": "<post>" },
-    { "platform": "Facebook", "character_count": <number>, "text": "<post>" },
-    { "platform": "Snapchat", "character_count": <number>, "text": "<post>" },
-    { "platform": "Discord", "character_count": <number>, "text": "<post>" },
-    { "platform": "Telegram", "character_count": <number>, "text": "<post>" }
-  ],
-  "headlines": [
-    { "variant": "A", "text": "<headline>" }, { "variant": "B", "text": "<headline>" },
-    { "variant": "C", "text": "<headline>" }, { "variant": "D", "text": "<headline>" }
-  ],
-  "body_copy": "<2-3 paragraph copy grounded in source facts>",
-  "cta_variations": [
-    { "id": "CTA-1", "text": "<cta>", "tone": "<tone>" }, { "id": "CTA-2", "text": "<cta>", "tone": "<tone>" },
-    { "id": "CTA-3", "text": "<cta>", "tone": "<tone>" }, { "id": "CTA-4", "text": "<cta>", "tone": "<tone>" }
-  ],
-  "compliance_notes": [{ "platform": "<platform>", "note": "<specific note>" }]
-}
+{"promo_angles":[{"angle":"<creative angle name>","hook":"<hook>","body":"<supporting copy grounded in source facts>"}],"social_posts":[{"platform":"X","character_count":0,"text":"<post>"},{"platform":"TikTok","character_count":0,"text":"<post>"},{"platform":"Pinterest","character_count":0,"text":"<post>"},{"platform":"Reddit","character_count":0,"text":"<post>"},{"platform":"Instagram","character_count":0,"text":"<post>"},{"platform":"Facebook","character_count":0,"text":"<post>"},{"platform":"Snapchat","character_count":0,"text":"<post>"},{"platform":"Discord","character_count":0,"text":"<post>"},{"platform":"Telegram","character_count":0,"text":"<post>"}],"headlines":[{"variant":"A","text":"<headline>"},{"variant":"B","text":"<headline>"},{"variant":"C","text":"<headline>"},{"variant":"D","text":"<headline>"}],"body_copy":"<2-3 paragraph copy grounded in source facts>","cta_variations":[{"id":"CTA-1","text":"<cta>","tone":"<tone>"},{"id":"CTA-2","text":"<cta>","tone":"<tone>"},{"id":"CTA-3","text":"<cta>","tone":"<tone>"},{"id":"CTA-4","text":"<cta>","tone":"<tone>"}],"compliance_notes":[{"platform":"<platform>","note":"<specific note>"}]}
 Generate exactly 3 promo angles, 9 social posts, 4 headlines, 4 CTAs, and 3-5 compliance notes.
 Character limits: X <280, TikTok <300, Pinterest <500, Reddit 300-500, Instagram <400, Facebook <400, Snapchat <300, Discord <400, Telegram <400.
 Count social characters accurately.`;
@@ -113,40 +72,25 @@ async function fetchOfferContext(url: string): Promise<string> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     let response: Response;
-    try {
-      response = await fetch(parsed.toString(), {
-        signal: controller.signal,
-        headers: { "User-Agent": "Mozilla/5.0 NectarEngine/1.0" },
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
+    try { response = await fetch(parsed.toString(), { signal: controller.signal, headers: { "User-Agent": "Mozilla/5.0 NectarEngine/1.0" } }); }
+    finally { clearTimeout(timeoutId); }
     if (!response.ok) return "";
     const html = await response.text();
-    const text = html
-      .replace(/<script[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style[\s\S]*?<\/style>/gi, " ")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/&nbsp;/gi, " ")
-      .replace(/&amp;/gi, "&")
-      .replace(/\s+/g, " ")
-      .trim();
-    return text.slice(0, 12000);
-  } catch {
-    return "";
-  }
+    return html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/&amp;/gi, "&").replace(/\s+/g, " ").trim().slice(0, 12000);
+  } catch { return ""; }
 }
 
 async function callOpenRouter(offerText: string, offerUrl?: string): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("Generator is not configured. OPENROUTER_API_KEY is not set.");
-
   const model = process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-nano-30b-a3b:free";
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 50_000);
   const pageContext = offerUrl ? await fetchOfferContext(offerUrl) : "";
+  const detectedRestrictions = formatRestrictionsForPrompt(offerText);
   const userContent = [
     "HUMAN-SUPPLIED OFFER DATA:\n" + offerText,
+    detectedRestrictions ? `\nDETERMINISTICALLY DETECTED SOURCE RESTRICTIONS — TREAT AS HARD CONSTRAINTS:\n${detectedRestrictions}` : "",
     offerUrl ? `\nOFFER URL SUPPLIED BY HUMAN:\n${offerUrl}` : "",
     pageContext ? `\nVERIFIED OFFER-PAGE CONTEXT (use as source material, not as a reason to invent claims):\n${pageContext}` : "",
   ].join("\n");
@@ -154,27 +98,11 @@ async function callOpenRouter(offerText: string, offerUrl?: string): Promise<str
   let response: Response;
   try {
     response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://nectar-engine.vercel.app",
-        "X-Title": "Nectar Engine",
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: 8000,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userContent },
-        ],
-      }),
+      method: "POST", signal: controller.signal,
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "HTTP-Referer": "https://nectar-engine.vercel.app", "X-Title": "Nectar Engine" },
+      body: JSON.stringify({ model, max_tokens: 8000, messages: [{ role: "system", content: SYSTEM_PROMPT }, { role: "user", content: userContent }] }),
     });
-  } finally {
-    clearTimeout(timeoutId);
-  }
-
+  } finally { clearTimeout(timeoutId); }
   if (!response.ok) throw new Error(`OpenRouter ${response.status}: ${await response.text()}`);
   const data = await response.json();
   const content = data?.choices?.[0]?.message?.content;
@@ -186,12 +114,8 @@ export async function POST(request: NextRequest) {
   try {
     const body: GenerateRequest = await request.json();
     const { offerText, offerUrl } = body;
-    if (!offerText || typeof offerText !== "string" || offerText.trim().length < 20) {
-      return NextResponse.json({ error: "Offer text is required and must be at least 20 characters." }, { status: 400 });
-    }
-    if (offerUrl && typeof offerUrl !== "string") {
-      return NextResponse.json({ error: "Offer URL must be a valid URL string." }, { status: 400 });
-    }
+    if (!offerText || typeof offerText !== "string" || offerText.trim().length < 20) return NextResponse.json({ error: "Offer text is required and must be at least 20 characters." }, { status: 400 });
+    if (offerUrl && typeof offerUrl !== "string") return NextResponse.json({ error: "Offer URL must be a valid URL string." }, { status: 400 });
 
     const raw = await callOpenRouter(offerText, offerUrl);
     let cleaned = raw.trim();
