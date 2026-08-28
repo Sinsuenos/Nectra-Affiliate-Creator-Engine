@@ -21,6 +21,7 @@ import {
   BookOpen,
   ArrowRight,
   Copy,
+  Check,
 } from "lucide-react";
 import {
   extractFields,
@@ -59,7 +60,6 @@ const FREE_GENERATION_LIMIT = 3;
 const STORAGE_KEY = "nectar_generation_count";
 const UNLOCK_STORAGE_KEY = "nectar_access_unlocked";
 const ACCESS_TOKEN = "xf7-bk3m-qd82-pz14-wr59";
-const TOOLKIT_STORAGE_KEY = "nectar_last_toolkit";
 const SCAN_PAYLOAD_KEY = "nectar_scan_payload";
 
 export default function GeneratorPage() {
@@ -73,6 +73,38 @@ export default function GeneratorPage() {
   const [usedFallback, setUsedFallback] = useState(false);
   const [generationCount, setGenerationCount] = useState(0);
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [allCopied, setAllCopied] = useState(false);
+
+  // Robust clipboard write — awaits the Promise, surfaces success to the
+  // user via the `allCopied` flag (button switches to "Copied ✓" for 2s),
+  // and falls back to a hidden-textarea + document.execCommand('copy') if
+  // navigator.clipboard is unavailable (e.g. non-HTTPS context). (Bug 2 fix.)
+  async function copyToClipboard(text: string): Promise<boolean> {
+    if (!text) return false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {
+      /* fall through to fallback */
+    }
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      ta.style.top = "0";
+      ta.setAttribute("readonly", "");
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
 
   useEffect(() => {
     try {
@@ -93,15 +125,10 @@ export default function GeneratorPage() {
         }
       }
 
-      const saved = localStorage.getItem(TOOLKIT_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as { toolkit?: GeneratedToolkit; pasteText?: string };
-        if (parsed?.toolkit?.social_posts?.length) {
-          setToolkit(parsed.toolkit);
-          setHasGenerated(true);
-          if (typeof parsed.pasteText === "string" && parsed.pasteText) setPasteText(parsed.pasteText);
-        }
-      }
+      // NOTE: Do NOT restore previous session's toolkit or pasteText.
+      // The generator must always start empty/blank with placeholder text
+      // only. No previous session's data should ever appear in the input
+      // field on page load. (Bug 1 fix.)
     } catch {
       /* localStorage unavailable */
     }
@@ -150,10 +177,8 @@ export default function GeneratorPage() {
         setGenerationCount(next);
         try {
           localStorage.setItem(STORAGE_KEY, String(next));
-          localStorage.setItem(
-            TOOLKIT_STORAGE_KEY,
-            JSON.stringify({ toolkit: data.data, pasteText, savedAt: Date.now() }),
-          );
+          // NOTE: Do not persist the toolkit or pasteText to localStorage.
+          // The generator must start empty on every page load (Bug 1 fix).
         } catch {
           /* localStorage unavailable */
         }
@@ -470,13 +495,18 @@ export default function GeneratorPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(buildFullToolkitText(displayToolkit));
+                      onClick={async () => {
+                        if (!displayToolkit) return;
+                        const text = buildFullToolkitText(displayToolkit);
+                        const ok = await copyToClipboard(text);
+                        if (ok) {
+                          setAllCopied(true);
+                          setTimeout(() => setAllCopied(false), 2000);
+                        }
                       }}
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-border/50 bg-surface hover:bg-surface-raised px-6 h-12 text-lg font-mono text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                     >
-                      <Copy className="h-4 w-4" />
-                      Copy Full Toolkit
+                      {allCopied ? <><Check className="h-4 w-4 text-emerald-400" />Copied</> : <><Copy className="h-4 w-4" />Copy Full Toolkit</>}
                     </button>
                   </div>
                 </motion.div>

@@ -287,6 +287,39 @@ function ScannerInner() {
   const failCount = results?.filter((r) => r.status === "fail").length ?? 0;
 
   const [allCopied, setAllCopied] = useState(false);
+  const [contentCopied, setContentCopied] = useState(false);
+
+  // Robust clipboard helper — awaits the Promise, falls back to a hidden
+  // textarea + document.execCommand('copy') if navigator.clipboard is
+  // unavailable (e.g. non-HTTPS). (Bug 3 fix — matches the same pattern
+  // added to the generator for Bug 2.)
+  async function copyContentToClipboard(text: string): Promise<boolean> {
+    if (!text) return false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {
+      /* fall through to fallback */
+    }
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      ta.style.top = "0";
+      ta.setAttribute("readonly", "");
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+
   function handleCopyAll() {
     if (!results) return;
     const lines = results.map((r) => {
@@ -298,7 +331,11 @@ function ScannerInner() {
       if (r.safer_rewrite && r.safer_rewrite.trim()) detail += `\n  Safer: ${r.safer_rewrite}`;
       return detail;
     });
-    navigator.clipboard.writeText(lines.join("\n\n")).then(() => { setAllCopied(true); setTimeout(() => setAllCopied(false), 2000); });
+    navigator.clipboard.writeText(lines.join("\n\n")).then(() => { setAllCopied(true); setTimeout(() => setAllCopied(false), 2000); }).catch(async () => {
+      // Fallback for non-HTTPS contexts where navigator.clipboard rejects.
+      const ok = await copyContentToClipboard(lines.join("\n\n"));
+      if (ok) { setAllCopied(true); setTimeout(() => setAllCopied(false), 2000); }
+    });
   }
 
   return (
@@ -446,6 +483,45 @@ function ScannerInner() {
               <div className="space-y-4">
                 {results.map((result, i) => <ResultCard key={result.platform} result={result} index={i} />)}
               </div>
+
+              {/* Scanned Content panel — re-displays the content that was
+                  submitted for scanning, with a single Copy icon that
+                  matches the per-section copy pattern used in the
+                  generator output. (Bug 3 fix.) */}
+              {content.trim().length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: 0.15 }}
+                  className="mt-8"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <FileText className="h-4 w-4 text-electric" />
+                    <p className="font-mono text-base uppercase tracking-wider text-muted-foreground">
+                      Scanned Content
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-border/40 bg-surface p-5 sm:p-6 relative">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const ok = await copyContentToClipboard(content);
+                        if (ok) {
+                          setContentCopied(true);
+                          setTimeout(() => setContentCopied(false), 2000);
+                        }
+                      }}
+                      className="absolute top-3 right-3 shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-mono text-muted-foreground/70 hover:text-electric hover:bg-electric/[0.06] border border-transparent hover:border-electric/20 transition-all cursor-pointer"
+                      aria-label="Copy scanned content"
+                    >
+                      {contentCopied ? <><Check className="h-3 w-3 text-emerald-400" />Copied</> : <><Copy className="h-3 w-3" />Copy</>}
+                    </button>
+                    <p className="text-sm text-foreground/85 leading-relaxed whitespace-pre-wrap pr-16">
+                      {content}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
 
               {hasAnyFail && (
                 <motion.p className="mt-6 text-lg text-red-400/90 font-medium text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
