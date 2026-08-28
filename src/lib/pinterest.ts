@@ -2,7 +2,7 @@ import { createCipheriv, createDecipheriv, createHmac, randomBytes } from "node:
 import { cookies } from "next/headers";
 
 export const PINTEREST_APP_ID = process.env.PINTEREST_APP_ID || "1605925";
-export const PINTEREST_REDIRECT_URI = process.env.PINTEREST_REDIRECT_URI || "https://nectar-engine.vercel.app/api/pinterest/callback";
+export const PINTEREST_REDIRECT_URI = process.env.PINTEREST_REDIRECT_URI || "https://nectar-affiliate-creator-engine-cantina-virtual.vercel.app/api/pinterest/callback";
 export const PINTEREST_API_BASE = "https://api.pinterest.com/v5";
 export const PINTEREST_SCOPES = ["boards:read", "boards:write", "pins:read", "pins:write", "user_accounts:read"];
 
