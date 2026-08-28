@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "https://nectar-engine.vercel.app/dating-discovery", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: "https://nectar-engine.vercel.app/generator", lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: "https://nectar-engine.vercel.app/compliance", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: "https://nectar-engine.vercel.app/privacy", lastModified: now, changeFrequency: "monthly", priority: 0.4 },
     { url: "https://nectar-engine.vercel.app/faq", lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: "https://nectar-engine.vercel.app/contact", lastModified: now, changeFrequency: "monthly", priority: 0.4 },
   ];
