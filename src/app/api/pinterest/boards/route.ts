@@ -3,6 +3,13 @@ import { pinterestFetch } from "@/lib/pinterest";
 
 export const runtime = "nodejs";
 
+type PinterestBoard = { id: string; name: string; description?: string; privacy?: string };
+type PinterestBoardsResponse = { items?: PinterestBoard[]; bookmark?: string };
+
+function normalizeBoardName(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
+}
+
 export async function GET() {
   try {
     return NextResponse.json(await pinterestFetch("/boards?page_size=100"));
@@ -18,8 +25,16 @@ export async function POST(request: Request) {
     if (!body?.name || typeof body.name !== "string") {
       return NextResponse.json({ error: "Board name is required" }, { status: 400 });
     }
+
+    const name = body.name.trim().replace(/\s+/g, " ");
+    if (!name) return NextResponse.json({ error: "Board name is required" }, { status: 400 });
+
+    const existing = await pinterestFetch<PinterestBoardsResponse>("/boards?page_size=100");
+    const match = (existing.items || []).find((board) => normalizeBoardName(board.name) === normalizeBoardName(name));
+    if (match) return NextResponse.json({ ...match, reused: true }, { status: 200 });
+
     const payload = {
-      name: body.name.trim(),
+      name,
       description: typeof body.description === "string" ? body.description.trim() : undefined,
       privacy: body.privacy === "SECRET" ? "SECRET" : "PUBLIC",
     };
