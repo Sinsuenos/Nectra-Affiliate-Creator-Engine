@@ -89,23 +89,34 @@ export async function clearPinterestSession() {
   jar.delete(SESSION_COOKIE);
 }
 
+function refreshExpiry(data: Record<string, unknown>, fallback?: number) {
+  if (typeof data.refresh_token_expires_at === "number") return Number(data.refresh_token_expires_at) * 1000;
+  if (typeof data.refresh_token_expires_in === "number") return Date.now() + Number(data.refresh_token_expires_in) * 1000;
+  return fallback;
+}
+
 export async function exchangeCode(code: string): Promise<PinterestSession> {
   const clientSecret = process.env.PINTEREST_APP_SECRET;
   if (!clientSecret) throw new Error("PINTEREST_APP_SECRET is not configured");
-  const body = new URLSearchParams({ grant_type: "authorization_code", code, redirect_uri: PINTEREST_REDIRECT_URI });
+  const body = new URLSearchParams({
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: PINTEREST_REDIRECT_URI,
+    continuous_refresh: "true",
+  });
   const response = await fetch(`${PINTEREST_API_BASE}/oauth/token`, {
     method: "POST",
     headers: { Authorization: `Basic ${Buffer.from(`${PINTEREST_APP_ID}:${clientSecret}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" },
     body,
     cache: "no-store",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data?.message || `Pinterest token exchange failed (${response.status})`);
+  const data = await response.json() as Record<string, unknown>;
+  if (!response.ok) throw new Error(typeof data.message === "string" ? data.message : `Pinterest token exchange failed (${response.status})`);
   return {
-    accessToken: data.access_token,
-    refreshToken: data.refresh_token,
+    accessToken: String(data.access_token),
+    refreshToken: typeof data.refresh_token === "string" ? data.refresh_token : undefined,
     expiresAt: Date.now() + Number(data.expires_in || 2592000) * 1000,
-    refreshExpiresAt: data.refresh_token_expires_in ? Date.now() + Number(data.refresh_token_expires_in) * 1000 : undefined,
+    refreshExpiresAt: refreshExpiry(data),
     scope: String(data.scope || ""),
   };
 }
@@ -114,20 +125,24 @@ export async function refreshPinterestSession(session: PinterestSession) {
   if (!session.refreshToken) return session;
   const clientSecret = process.env.PINTEREST_APP_SECRET;
   if (!clientSecret) throw new Error("PINTEREST_APP_SECRET is not configured");
-  const body = new URLSearchParams({ grant_type: "refresh_token", refresh_token: session.refreshToken });
+  const body = new URLSearchParams({
+    grant_type: "refresh_token",
+    refresh_token: session.refreshToken,
+    continuous_refresh: "true",
+  });
   const response = await fetch(`${PINTEREST_API_BASE}/oauth/token`, {
     method: "POST",
     headers: { Authorization: `Basic ${Buffer.from(`${PINTEREST_APP_ID}:${clientSecret}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" },
     body,
     cache: "no-store",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data?.message || `Pinterest token refresh failed (${response.status})`);
+  const data = await response.json() as Record<string, unknown>;
+  if (!response.ok) throw new Error(typeof data.message === "string" ? data.message : `Pinterest token refresh failed (${response.status})`);
   const refreshed: PinterestSession = {
-    accessToken: data.access_token,
-    refreshToken: data.refresh_token || session.refreshToken,
+    accessToken: String(data.access_token),
+    refreshToken: typeof data.refresh_token === "string" ? data.refresh_token : session.refreshToken,
     expiresAt: Date.now() + Number(data.expires_in || 2592000) * 1000,
-    refreshExpiresAt: data.refresh_token_expires_in ? Date.now() + Number(data.refresh_token_expires_in) * 1000 : session.refreshExpiresAt,
+    refreshExpiresAt: refreshExpiry(data, session.refreshExpiresAt),
     scope: String(data.scope || session.scope),
   };
   await savePinterestSession(refreshed);
