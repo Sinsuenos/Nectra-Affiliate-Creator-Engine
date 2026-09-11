@@ -85,8 +85,7 @@ export async function savePinterestSession(session: PinterestSession) {
 }
 
 export async function clearPinterestSession() {
-  const jar = await cookies();
-  jar.delete(SESSION_COOKIE);
+  const jar = await cookies().delete(SESSION_COOKIE);
 }
 
 function refreshExpiry(data: Record<string, unknown>, fallback?: number) {
