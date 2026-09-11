@@ -15,10 +15,10 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL(`/pinterest?error=${encodeURIComponent(errorDescription || error)}`, url.origin));
   }
   if (!validState(state, expectedState)) {
-    return NextResponse.json({ error: "Pinterest OAuth state validation failed" }, { status: 400 });
+    return NextResponse.redirect(new URL(`/pinterest?error=${encodeURIComponent("OAuth state mismatch. Start Connect Pinterest again from this site.")}`, url.origin));
   }
   if (!code) {
-    return NextResponse.json({ error: "Pinterest did not return an authorization code" }, { status: 400 });
+    return NextResponse.redirect(new URL(`/pinterest?error=${encodeURIComponent("Pinterest did not return an authorization code")}`, url.origin));
   }
 
   try {
